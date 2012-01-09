@@ -56,7 +56,7 @@ namespace Loki.Maple.Characters
 
 			if (this.Parent.IsInitialized)
 			{
-				buff.Cancel();
+				buff.CancelBuffEffect();
 			}
 		}
 
@@ -151,7 +151,7 @@ namespace Loki.Maple.Characters
 			}
 		}
 
-		public void Cancel(Packet inPacket)
+		public void CancelBuffEffect(Packet inPacket)
 		{
 			int mapleId = inPacket.ReadInt();
 
@@ -180,6 +180,13 @@ namespace Loki.Maple.Characters
 					break;
 			}
 		}
+
+        public void CancelItemEffect(Packet inPacket)
+        {
+            int mapleId = inPacket.ReadInt();
+            Buff buff = new Buff(this, new Item(-mapleId), 0);
+            this.Remove(buff); // TODO: Shouldn't this happen even if it's one of the special skills?
+        }
 
 		public IEnumerator<Buff> GetEnumerator()
 		{

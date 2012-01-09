@@ -99,6 +99,29 @@ namespace Loki.Maple
         public short MasterLevel { get; private set; }
         public short Chance { get; private set; }
 
+        // Item cosumes data
+        public int CItemId { get; private set; }
+        public string CFlags { get; private set; }
+        public string CCureAilments { get; private set; }
+        public short CEffect { get; private set; }
+        public short CHP { get; private set; }
+        public short CMP { get; private set; }
+        public short CHPPercentage { get; private set; }
+        public short CMPPercentage { get; private set; }
+        public int CMoveTo { get; private set; }
+        public short CProb { get; private set; }
+        public int CBuffTime { get; private set; }
+        public short CWeaponAttack { get; private set; }
+        public short CMagicAttack { get; private set; }
+        public short CWeaponDefense { get; private set; }
+        public short CMagicDefense { get; private set; }
+        public short CAccuracy { get; private set; }
+        public short CAvoid { get; private set; }
+        public short CSpeed { get; private set; }
+        public short CJump { get; private set; }
+        public short CMorph { get; private set; }
+        public string CDropUp { get; private set; }
+
         public Character Character
         {
             get
@@ -404,6 +427,14 @@ namespace Loki.Maple
             }
         }
 
+        public bool IsItemConsume
+        {
+            get
+            {
+                return this.MapleID / 10000 >= 200 && this.MapleID / 10000 < 204;
+            }
+        }
+
         public byte AbsoluteSlot
         {
             get
@@ -519,6 +550,29 @@ namespace Loki.Maple
                 this.MasterLevel = this.CachedReference.MasterLevel;
                 this.Chance = this.CachedReference.Chance;
             }
+            else if (this.IsItemConsume)
+            {
+                this.CFlags = this.CachedReference.CFlags;
+                this.CCureAilments = this.CachedReference.CCureAilments;
+                this.CEffect = this.CachedReference.CEffect;
+                this.CHP = this.CachedReference.CHP;
+                this.CMP = this.CachedReference.CMP;
+                this.CHPPercentage = this.CachedReference.CHPPercentage;
+                this.CMPPercentage = this.CachedReference.CMPPercentage;
+                this.CMoveTo = this.CachedReference.CMoveTo;
+                this.CProb = this.CachedReference.CProb;
+                this.CBuffTime = this.CachedReference.CBuffTime;
+                this.CWeaponAttack = this.CachedReference.CWeaponAttack;
+                this.CMagicAttack = this.CachedReference.CMagicAttack;
+                this.CWeaponDefense = this.CachedReference.CWeaponDefense;
+                this.CMagicDefense = this.CachedReference.CMagicDefense;
+                this.CAccuracy = this.CachedReference.CAccuracy;
+                this.CAvoid = this.CachedReference.CAvoid;
+                this.CSpeed = this.CachedReference.CSpeed;
+                this.CJump = this.CachedReference.CJump;
+                this.CMorph = this.CachedReference.CMorph;
+                this.CDropUp = this.CachedReference.CDropUp;
+            }
         }
 
         public void LoadEquipmentData(dynamic equipDatum)
@@ -585,6 +639,30 @@ namespace Loki.Maple
             this.RequestSkillLevel = skillBookDatum.req_skill_level;
             this.MasterLevel = skillBookDatum.master_level;
             this.Chance = skillBookDatum.chance;
+        }
+
+        public void LoadItemConsumeData(dynamic ItemConsumeDatum)
+        {
+            this.CFlags = ItemConsumeDatum.flags;
+            this.CCureAilments = ItemConsumeDatum.cure_ailments;
+            this.CEffect = ItemConsumeDatum.effect;
+            this.CHP = ItemConsumeDatum.hp;
+            this.CMP = ItemConsumeDatum.mp;
+            this.CHPPercentage = ItemConsumeDatum.hp_percentage;
+            this.CMPPercentage = ItemConsumeDatum.mp_percentage;
+            this.CMoveTo = ItemConsumeDatum.move_to;
+            this.CProb = ItemConsumeDatum.prob;
+            this.CBuffTime = ItemConsumeDatum.buff_time;
+            this.CWeaponAttack = ItemConsumeDatum.weapon_attack;
+            this.CMagicAttack = ItemConsumeDatum.magic_attack;
+            this.CWeaponDefense = ItemConsumeDatum.weapon_defense;
+            this.CMagicDefense = ItemConsumeDatum.magic_defense;
+            this.CAccuracy = ItemConsumeDatum.accuracy;
+            this.CAvoid = ItemConsumeDatum.avoid;
+            this.CSpeed = ItemConsumeDatum.speed;
+            this.CJump = ItemConsumeDatum.jump;
+            this.CMorph = ItemConsumeDatum.morph;
+            this.CDropUp = ItemConsumeDatum.drop_up;
         }
 
         public Item(dynamic itemDatum)
@@ -682,6 +760,29 @@ namespace Loki.Maple
                     this.RequestSkillLevel = this.CachedReference.RequestSkillLevel;
                     this.MasterLevel = this.CachedReference.MasterLevel;
                     this.Chance = this.CachedReference.Chance;
+                }
+                else if (this.IsItemConsume)
+                {
+                    this.CFlags = this.CachedReference.CFlags;
+                    this.CCureAilments = this.CachedReference.CCureAilments;
+                    this.CEffect = this.CachedReference.CEffect;
+                    this.CHP = this.CachedReference.CHP;
+                    this.CMP = this.CachedReference.CMP;
+                    this.CHPPercentage = this.CachedReference.CHPPercentage;
+                    this.CMPPercentage = this.CachedReference.CMPPercentage;
+                    this.CMoveTo = this.CachedReference.CMoveTo;
+                    this.CProb = this.CachedReference.CProb;
+                    this.CBuffTime = this.CachedReference.CBuffTime;
+                    this.CWeaponAttack = this.CachedReference.CWeaponAttack;
+                    this.CMagicAttack = this.CachedReference.CMagicAttack;
+                    this.CWeaponDefense = this.CachedReference.CWeaponDefense;
+                    this.CMagicDefense = this.CachedReference.CMagicDefense;
+                    this.CAccuracy = this.CachedReference.CAccuracy;
+                    this.CAvoid = this.CachedReference.CAvoid;
+                    this.CSpeed = this.CachedReference.CSpeed;
+                    this.CJump = this.CachedReference.CJump;
+                    this.CMorph = this.CachedReference.CMorph;
+                    this.CDropUp = this.CachedReference.CDropUp;
                 }
             }
         }

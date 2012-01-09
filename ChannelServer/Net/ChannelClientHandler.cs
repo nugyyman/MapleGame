@@ -171,7 +171,7 @@ namespace Loki.Net
                     break;
 
                 case MapleClientOperationCode.CancelBuff:
-                    this.Character.Buffs.Cancel(inPacket);
+                    this.Character.Buffs.CancelBuffEffect(inPacket);
                     break;
 
                 case MapleClientOperationCode.SkillEffect:
@@ -196,6 +196,14 @@ namespace Loki.Net
 
                 case MapleClientOperationCode.UseSkillBook:
                     this.Character.UseSkillBook(inPacket);
+                    break;
+
+                case MapleClientOperationCode.UseItem:
+                    this.Character.UseItem(inPacket);
+                    break;
+
+                case MapleClientOperationCode.CancelItemEffect:
+                    this.Character.Buffs.CancelItemEffect(inPacket);
                     break;
             }
         }

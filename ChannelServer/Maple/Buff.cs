@@ -94,6 +94,22 @@ namespace Loki.Maple
 			Delay.Execute((this.End - DateTime.Now).TotalMilliseconds, () => this.Parent.Remove(this));
 		}
 
+        public Buff(CharacterBuffs parent, Item item, int value)
+        {
+            this.Parent = parent;
+            this.MapleID = item.MapleID;
+            this.SkillLevel = 0;
+            this.Type = 1;
+            this.Value = value;
+            this.End = DateTime.Now.AddSeconds(item.CBuffTime);
+            this.PrimaryStatups = new Dictionary<PrimaryBuffStat, short>();
+            this.SecondaryStatups = new Dictionary<SecondaryBuffStat, short>();
+
+            this.CalculateStatups(item);
+
+            Delay.Execute((this.End - DateTime.Now).TotalMilliseconds, () => { if (this.Parent.Contains(this)) this.Parent.Remove(this); });
+        }
+
 		public void Save()
 		{
 
@@ -111,126 +127,151 @@ namespace Loki.Maple
 
 		public void Apply()
 		{
-			switch (this.MapleID)
-			{
-				case (int)SkillNames.Corsair.SpeedInfusion:
-				case (int)SkillNames.Buccaneer.SpeedInfusion:
-				case (int)SkillNames.ThunderBreaker.SpeedInfusion:
-					using (Packet outPacket = new Packet(MapleServerOperationCode.GiveBuff))
-					{
-						outPacket.WriteLong(this.PrimaryBuffMask);
-						outPacket.WriteLong(0);
-						outPacket.WriteShort(0);
-						outPacket.WriteInt(this.PrimaryStatups.ElementAt(0).Value);
-						outPacket.WriteInt(this.MapleID);
-						outPacket.WriteLong(0);
-						outPacket.WriteShort(0);
-						outPacket.WriteShort((short)(this.End - DateTime.Now).TotalSeconds);
-						outPacket.WriteShort(0);
+            if (this.SkillLevel == 0)
+            {
+                using (Packet outPacket = new Packet(MapleServerOperationCode.GiveBuff))
+                {
+                    outPacket.WriteLong(0);
+                    outPacket.WriteLong(this.SecondaryBuffMask);
+
+                    foreach (KeyValuePair<SecondaryBuffStat, short> secondaryStatup in this.SecondaryStatups)
+                    {
+                        outPacket.WriteShort(secondaryStatup.Value);
+                        outPacket.WriteInt(-this.MapleID);
+                        outPacket.WriteInt((int)(this.End - DateTime.Now).TotalMilliseconds);
+                    }
+
+                    outPacket.WriteShort();
+                    outPacket.WriteShort();
+                    outPacket.WriteByte();
+
+                    this.Character.Client.Send(outPacket);
+                }
+                return;
+            }
+            else
+            {
+                switch (this.MapleID)
+                {
+                    case (int)SkillNames.Corsair.SpeedInfusion:
+                    case (int)SkillNames.Buccaneer.SpeedInfusion:
+                    case (int)SkillNames.ThunderBreaker.SpeedInfusion:
+                        using (Packet outPacket = new Packet(MapleServerOperationCode.GiveBuff))
+                        {
+                            outPacket.WriteLong(this.PrimaryBuffMask);
+                            outPacket.WriteLong(0);
+                            outPacket.WriteShort(0);
+                            outPacket.WriteInt(this.PrimaryStatups.ElementAt(0).Value);
+                            outPacket.WriteInt(this.MapleID);
+                            outPacket.WriteLong(0);
+                            outPacket.WriteShort(0);
+                            outPacket.WriteShort((short)(this.End - DateTime.Now).TotalSeconds);
+                            outPacket.WriteShort(0);
 
 
-						this.Parent.Parent.Client.Send(outPacket);
-					}
-					using (Packet outPacket = new Packet(MapleServerOperationCode.GiveForeignBuff))
-					{
-						outPacket.WriteInt(this.Parent.Parent.ID);
-						outPacket.WriteLong(this.PrimaryBuffMask);
-						outPacket.WriteLong(0);
-						outPacket.WriteShort(0);
-						outPacket.WriteInt(this.PrimaryStatups.ElementAt(0).Value);
-						outPacket.WriteInt(this.MapleID);
-						outPacket.WriteLong(0);
-						outPacket.WriteShort(0);
-						outPacket.WriteShort((short)(this.End - DateTime.Now).TotalSeconds);
-						outPacket.WriteShort(0);
+                            this.Parent.Parent.Client.Send(outPacket);
+                        }
+                        using (Packet outPacket = new Packet(MapleServerOperationCode.GiveForeignBuff))
+                        {
+                            outPacket.WriteInt(this.Parent.Parent.ID);
+                            outPacket.WriteLong(this.PrimaryBuffMask);
+                            outPacket.WriteLong(0);
+                            outPacket.WriteShort(0);
+                            outPacket.WriteInt(this.PrimaryStatups.ElementAt(0).Value);
+                            outPacket.WriteInt(this.MapleID);
+                            outPacket.WriteLong(0);
+                            outPacket.WriteShort(0);
+                            outPacket.WriteShort((short)(this.End - DateTime.Now).TotalSeconds);
+                            outPacket.WriteShort(0);
 
-						this.Parent.Parent.Map.Broadcast(outPacket);
-					}
-					break;
+                            this.Parent.Parent.Map.Broadcast(outPacket);
+                        }
+                        break;
 
-				case (int)SkillNames.Marauder.EnergyCharge:
-				case (int)SkillNames.ThunderBreaker.EnergyCharge:
-					using (Packet outPacket = new Packet(MapleServerOperationCode.GiveBuff))
-					{
-						outPacket.WriteLong(this.PrimaryBuffMask);
-						outPacket.WriteLong();
-						outPacket.WriteShort();
-						outPacket.WriteInt(this.Value);
-						outPacket.WriteLong(0);
-						outPacket.WriteByte();
-						outPacket.WriteShort(5);
-						outPacket.WriteShort(1);
+                    case (int)SkillNames.Marauder.EnergyCharge:
+                    case (int)SkillNames.ThunderBreaker.EnergyCharge:
+                        using (Packet outPacket = new Packet(MapleServerOperationCode.GiveBuff))
+                        {
+                            outPacket.WriteLong(this.PrimaryBuffMask);
+                            outPacket.WriteLong();
+                            outPacket.WriteShort();
+                            outPacket.WriteInt(this.Value);
+                            outPacket.WriteLong(0);
+                            outPacket.WriteByte();
+                            outPacket.WriteShort(5);
+                            outPacket.WriteShort(1);
 
-						this.Parent.Parent.Client.Send(outPacket);
-					}
-					using (Packet outPacket = new Packet(MapleServerOperationCode.GiveForeignBuff))
-					{
-						outPacket.WriteInt(this.Parent.Parent.ID);
-						outPacket.WriteLong(this.PrimaryBuffMask);
-						outPacket.WriteLong();
-						outPacket.WriteShort();
-						outPacket.WriteInt(this.Value);
-						outPacket.WriteLong(0);
-						outPacket.WriteByte();
-						outPacket.WriteShort(5);
-						outPacket.WriteShort(1);
+                            this.Parent.Parent.Client.Send(outPacket);
+                        }
+                        using (Packet outPacket = new Packet(MapleServerOperationCode.GiveForeignBuff))
+                        {
+                            outPacket.WriteInt(this.Parent.Parent.ID);
+                            outPacket.WriteLong(this.PrimaryBuffMask);
+                            outPacket.WriteLong();
+                            outPacket.WriteShort();
+                            outPacket.WriteInt(this.Value);
+                            outPacket.WriteLong(0);
+                            outPacket.WriteByte();
+                            outPacket.WriteShort(5);
+                            outPacket.WriteShort(1);
 
-						this.Parent.Parent.Map.Broadcast(outPacket);
-					}
-					break;
+                            this.Parent.Parent.Map.Broadcast(outPacket);
+                        }
+                        break;
 
-				default:
+                    default:
 
-					using (Packet outPacket = new Packet(MapleServerOperationCode.GiveBuff))
-					{
-						outPacket.WriteLong(this.PrimaryBuffMask);
-						outPacket.WriteLong(this.SecondaryBuffMask);
+                        using (Packet outPacket = new Packet(MapleServerOperationCode.GiveBuff))
+                        {
+                            outPacket.WriteLong(this.PrimaryBuffMask);
+                            outPacket.WriteLong(this.SecondaryBuffMask);
 
-						foreach (KeyValuePair<PrimaryBuffStat, short> primaryStatup in this.PrimaryStatups)
-						{
-							outPacket.WriteShort(primaryStatup.Value);
-							outPacket.WriteInt(this.MapleID);
-							outPacket.WriteInt((int)(this.End - DateTime.Now).TotalMilliseconds);
-						}
+                            foreach (KeyValuePair<PrimaryBuffStat, short> primaryStatup in this.PrimaryStatups)
+                            {
+                                outPacket.WriteShort(primaryStatup.Value);
+                                outPacket.WriteInt(this.MapleID);
+                                outPacket.WriteInt((int)(this.End - DateTime.Now).TotalMilliseconds);
+                            }
 
-						foreach (KeyValuePair<SecondaryBuffStat, short> secondaryStatup in this.SecondaryStatups)
-						{
-							outPacket.WriteShort(secondaryStatup.Value);
-							outPacket.WriteInt(this.MapleID);
-							outPacket.WriteInt((int)(this.End - DateTime.Now).TotalMilliseconds);
-						}
+                            foreach (KeyValuePair<SecondaryBuffStat, short> secondaryStatup in this.SecondaryStatups)
+                            {
+                                outPacket.WriteShort(secondaryStatup.Value);
+                                outPacket.WriteInt(this.MapleID);
+                                outPacket.WriteInt((int)(this.End - DateTime.Now).TotalMilliseconds);
+                            }
 
-						outPacket.WriteShort();
-						outPacket.WriteShort();
-						outPacket.WriteByte();
+                            outPacket.WriteShort();
+                            outPacket.WriteShort();
+                            outPacket.WriteByte();
 
-						this.Character.Client.Send(outPacket);
-					}
+                            this.Character.Client.Send(outPacket);
+                        }
 
-					using (Packet outPacket = new Packet(MapleServerOperationCode.GiveForeignBuff))
-					{
-						outPacket.WriteInt(this.Character.ID);
-						outPacket.WriteLong(this.PrimaryBuffMask);
-						outPacket.WriteLong(this.SecondaryBuffMask);
+                        using (Packet outPacket = new Packet(MapleServerOperationCode.GiveForeignBuff))
+                        {
+                            outPacket.WriteInt(this.Character.ID);
+                            outPacket.WriteLong(this.PrimaryBuffMask);
+                            outPacket.WriteLong(this.SecondaryBuffMask);
 
-						foreach (KeyValuePair<PrimaryBuffStat, short> primaryStatup in this.PrimaryStatups)
-						{
-							outPacket.WriteShort(primaryStatup.Value);
-						}
+                            foreach (KeyValuePair<PrimaryBuffStat, short> primaryStatup in this.PrimaryStatups)
+                            {
+                                outPacket.WriteShort(primaryStatup.Value);
+                            }
 
-						foreach (KeyValuePair<SecondaryBuffStat, short> secondaryStatup in this.SecondaryStatups)
-						{
-							outPacket.WriteShort(secondaryStatup.Value);
-						}
+                            foreach (KeyValuePair<SecondaryBuffStat, short> secondaryStatup in this.SecondaryStatups)
+                            {
+                                outPacket.WriteShort(secondaryStatup.Value);
+                            }
 
-						outPacket.WriteShort();
-						outPacket.WriteByte();
+                            outPacket.WriteShort();
+                            outPacket.WriteByte();
 
-						this.Character.Map.Broadcast(outPacket);
-					}
+                            this.Character.Map.Broadcast(outPacket);
+                        }
 
-					break;
-			}
+                        break;
+                }
+            }
 		}
 
         public Packet GetForeignBuffPacket()
@@ -298,7 +339,7 @@ namespace Loki.Maple
             }
         }
 
-		public void Cancel()
+		public void CancelBuffEffect()
 		{
 			using (Packet outPacket = new Packet(MapleServerOperationCode.CancelBuff))
 			{
@@ -318,6 +359,18 @@ namespace Loki.Maple
 				this.Character.Map.Broadcast(outPacket);
 			}
 		}
+
+        public void CancelItemEffect()
+        {
+            using (Packet outPacket = new Packet(MapleServerOperationCode.CancelBuff))
+            {
+                outPacket.WriteLong(0);
+                outPacket.WriteLong(this.SecondaryBuffMask);
+                outPacket.WriteByte(3);
+
+                this.Character.Client.Send(outPacket);
+            }
+        }
 
 		public void CalculateStatups(Skill skill)
 		{
@@ -571,5 +624,48 @@ namespace Loki.Maple
 
 			}
 		}
+
+        public void CalculateStatups(Item item)
+        {
+            if (item.CWeaponAttack > 0)
+            {
+                this.SecondaryStatups.Add(SecondaryBuffStat.WeaponAttack, item.CWeaponAttack);
+            }
+
+            if (item.CWeaponDefense > 0)
+            {
+                this.SecondaryStatups.Add(SecondaryBuffStat.WeaponDefense, item.CWeaponDefense);
+            }
+
+            if (item.CMagicAttack > 0)
+            {
+                this.SecondaryStatups.Add(SecondaryBuffStat.MagicAttack, item.CMagicAttack);
+            }
+
+            if (item.CMagicDefense > 0)
+            {
+                this.SecondaryStatups.Add(SecondaryBuffStat.MagicDefense, item.CMagicAttack);
+            }
+
+            if (item.CAccuracy > 0)
+            {
+                this.SecondaryStatups.Add(SecondaryBuffStat.Accuracy, item.CAccuracy);
+            }
+
+            if (item.CAvoid > 0)
+            {
+                this.SecondaryStatups.Add(SecondaryBuffStat.Avoid, item.CAvoid);
+            }
+
+            if (item.CSpeed > 0)
+            {
+                this.SecondaryStatups.Add(SecondaryBuffStat.Speed, item.CSpeed);
+            }
+
+            if (item.CJump > 0)
+            {
+                this.SecondaryStatups.Add(SecondaryBuffStat.Jump, item.CJump);
+            }
+        }
 	}
 }

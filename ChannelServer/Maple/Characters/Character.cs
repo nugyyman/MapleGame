@@ -2579,5 +2579,31 @@ namespace Loki.Maple.Characters
                 this.Client.Send(outPacket);
             }
         }
+
+        public void UseItem(Packet inPacket)
+        {
+            inPacket.ReadInt();
+            sbyte slot = (sbyte)inPacket.ReadShort();
+            int itemId = inPacket.ReadInt();
+            Item consume = this.Items[ItemType.Usable, slot];
+            if (consume.CFlags == "" && consume.CBuffTime == 0 && consume.CEffect == 0 && consume.CMoveTo == 0 && consume.CDropUp.Equals("none"))
+            {
+                this.CurrentHP = (short)(this.CurrentHP + consume.CHP);
+                this.CurrentMP = (short)(this.CurrentMP + consume.CMP);
+                this.CurrentHP = (this.CurrentHP + ((this.maxHP * consume.CHPPercentage) / 100)) >= 30000 ? this.MaxHP : (short)(this.CurrentHP + ((this.maxHP * consume.CHPPercentage) / 100));
+                this.CurrentMP = (this.CurrentMP + ((this.maxMP * consume.CMPPercentage) / 100)) >= 30000 ? this.MaxMP : (short)(this.CurrentMP + ((this.maxMP * consume.CMPPercentage) / 100));
+                this.UpdateStatistics(StatisticType.CurrentHP);
+                this.UpdateStatistics(StatisticType.CurrentMP);
+                this.Items.Remove(itemId, 1);
+            }
+            else if (consume.CFlags == "" && consume.CBuffTime != 0 && consume.CEffect == 0 && consume.CMoveTo == 0 && consume.CDropUp.Equals("none"))
+            {
+                Buff buff = new Buff(this.Buffs, consume, 0);
+                buff.End = DateTime.Now.AddMinutes(consume.CBuffTime / 60);
+                //Stop timer
+                this.Buffs.Add(buff);
+                this.Items.Remove(itemId, 1);
+            }
+        }
     }
 }
