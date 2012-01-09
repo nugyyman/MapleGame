@@ -2282,5 +2282,245 @@ namespace Loki.Maple.Characters
 
             }
         }
+
+        public void UseHammer(Packet inPacket)
+        {
+            using (Packet outPacket = new Packet(MapleServerOperationCode.ViciousHammer))
+            {
+                outPacket.WriteByte(0x38);
+                outPacket.WriteInt(0);
+                this.Client.Send(outPacket);
+            }
+        }
+
+        public void UseUpgradeScroll(Packet inPacket)
+        {
+            inPacket.ReadInt();
+            sbyte slot = (sbyte)inPacket.ReadShort();
+            sbyte dst = (sbyte)inPacket.ReadShort();
+            byte ws = (byte)inPacket.ReadShort();
+            bool whiteScroll = false;
+            bool legendarySpirit = false;
+            if ((ws & 2) == 2)
+            {
+                whiteScroll = true;
+            }
+            Item toScroll = null;
+            Skill legendarySpiritSkill = new Skill(0001003);
+            if (this.Skills.Contains(legendarySpiritSkill))
+            {
+                if (this.Skills[0001003].CurrentLevel > 0 && dst >= 0)
+                {
+                    legendarySpirit = true;
+                    toScroll = this.Items[ItemType.Equipment, dst];
+                }
+            }
+            else
+                toScroll = this.Items[(EquipmentSlot)dst];
+            byte oldLevel = toScroll.UpgradesApplied;
+            if (toScroll.UpgradesAvailable < 1)
+            {
+                this.Items.NotifyFull();
+                return;
+            }
+            Item scroll = this.Items[ItemType.Usable, slot];
+            if (whiteScroll)
+            {
+                if (!this.Items.Contains(2340000))
+                {
+                    whiteScroll = false;
+                }
+            }
+            if (scroll.Flag == "")
+            {
+                if (!((scroll.MapleID / 100) % 100 == (toScroll.MapleID / 10000) % 100))
+                {
+                    return;
+                }
+            }
+            if (scroll.Quantity < 1)
+            {
+                return;
+            }
+            ScrollResult scrollSuccess = ScrollResult.Success;
+            Random r = new Random();
+            int rand;
+            rand = r.Next(1, 101);
+            if (rand <= scroll.Success)
+            {
+                switch (scroll.Flag)
+                {
+                    case "":
+                        toScroll.UpgradesApplied++;
+                        toScroll.UpgradesAvailable--;
+                        toScroll.Strength += scroll.IStrength;
+                        toScroll.Dexterity += scroll.IDexterity;
+                        toScroll.Intelligence += scroll.IIntelligence;
+                        toScroll.Luck += scroll.ILuck;
+                        toScroll.HP += scroll.IHP;
+                        toScroll.MP += scroll.IMP;
+                        toScroll.WeaponAttack += scroll.IWeaponAttack;
+                        toScroll.MagicAttack += scroll.IMagicAttack;
+                        toScroll.WeaponDefense += scroll.IWeaponDefense;
+                        toScroll.MagicDefense += scroll.IMagicDefense;
+                        toScroll.Accuracy += scroll.IAccuracy;
+                        toScroll.Avoidability += scroll.IAvoidability;
+                        toScroll.Jump += scroll.IJump;
+                        toScroll.Speed += scroll.ISpeed;
+                        break;
+                    case "rand_stat":
+                        int inc = 1;
+                        if (r.Next(1, 3) == 1)
+                            inc = -1;
+                        if (toScroll.Strength > 0)
+                            toScroll.Strength = (short)Math.Max(0, toScroll.Strength + r.Next(1, 6) * inc);
+                        if (toScroll.Dexterity > 0)
+                            toScroll.Dexterity = (short)Math.Max(0, toScroll.Dexterity + r.Next(1, 6) * inc);
+                        if (toScroll.Intelligence > 0)
+                            toScroll.Intelligence = (short)Math.Max(0, toScroll.Intelligence + r.Next(1, 6) * inc);
+                        if (toScroll.Luck > 0)
+                            toScroll.Luck = (short)Math.Max(0, toScroll.Luck + r.Next(1, 6) * inc);
+                        if (toScroll.HP > 0)
+                            toScroll.HP = (short)Math.Max(0, toScroll.HP + r.Next(1, 6) * inc);
+                        if (toScroll.MP > 0)
+                            toScroll.MP = (short)Math.Max(0, toScroll.MP + r.Next(1, 6) * inc);
+                        if (toScroll.WeaponAttack > 0)
+                            toScroll.WeaponAttack = (short)Math.Max(0, toScroll.WeaponAttack + r.Next(1, 6) * inc);
+                        if (toScroll.MagicAttack > 0)
+                            toScroll.MagicAttack = (short)Math.Max(0, toScroll.MagicAttack + r.Next(1, 6) * inc);
+                        if (toScroll.WeaponDefense > 0)
+                            toScroll.WeaponDefense = (short)Math.Max(0, toScroll.WeaponDefense + r.Next(1, 6) * inc);
+                        if (toScroll.MagicDefense > 0)
+                            toScroll.MagicDefense = (short)Math.Max(0, toScroll.MagicDefense + r.Next(1, 6) * inc);
+                        if (toScroll.Accuracy > 0)
+                            toScroll.Accuracy = (short)Math.Max(0, toScroll.Accuracy + r.Next(1, 6) * inc);
+                        if (toScroll.Avoidability > 0)
+                            toScroll.Avoidability = (short)Math.Max(0, toScroll.Avoidability + r.Next(1, 6) * inc);
+                        if (toScroll.Jump > 0)
+                            toScroll.Jump = (short)Math.Max(0, toScroll.Jump + r.Next(1, 6) * inc);
+                        if (toScroll.Speed > 0)
+                            toScroll.Speed = (short)Math.Max(0, toScroll.Speed + r.Next(1, 6) * inc);
+                        toScroll.UpgradesApplied++;
+                        toScroll.UpgradesAvailable--;
+                        break;
+                    case "recover_slot":
+                        if (toScroll.UpgradesApplied + toScroll.UpgradesAvailable < toScroll.MaxUpgradesAvailable)
+                            toScroll.UpgradesAvailable++;
+                        break;
+                    case "warm_support":
+                        if (toScroll.PreventsColdness == true)
+                            return;
+                        toScroll.PreventsColdness = true;
+                        break;
+                    case "prevent_slip":
+                        if (toScroll.PreventsSlipping == true)
+                            return;
+                        toScroll.PreventsSlipping = true;
+                        break;
+                }
+            }
+            else
+            {
+                rand = r.Next(1, 101);
+                if (rand <= scroll.BreakItem && scroll.BreakItem > 0)
+                {
+                    scrollSuccess = ScrollResult.Curse;
+                }
+                else
+                {
+                    if (toScroll.PreventsColdness && scroll.Flag.Equals("warm_support") || toScroll.PreventsSlipping && scroll.Flag.Equals("prevent_slip"))
+                        return;
+                    else if (!whiteScroll && !scroll.Flag.Equals("warm_support") && !scroll.Flag.Equals("prevent_slip") && !scroll.Flag.Equals("recover_slot"))
+                        toScroll.UpgradesAvailable--;
+                    scrollSuccess = ScrollResult.Fail;
+                }
+            }
+            bool scrollsLeft = true;
+            short scrollSlot = scroll.Slot;
+            if (scroll.Quantity > 1)
+            {
+                this.Items.Remove(scroll.MapleID, 1);
+            }
+            else
+            {
+                scrollsLeft = false;
+                this.Items.Remove(scroll, false);
+            }
+            if (whiteScroll)
+            {
+                Item white = this.Items[ItemType.Usable, 2340000];
+                if (white.Quantity > 1)
+                    this.Items.Remove(2340000, 1);
+                else
+                    this.Items.Remove(white, true);
+            }
+            if (scrollSuccess == ScrollResult.Curse)
+            {
+                using (Packet outPacket = new Packet(MapleServerOperationCode.ModifyInventoryItem))
+                {
+                    outPacket.WriteByte(1);
+                    outPacket.WriteByte(2);
+                    outPacket.WriteByte(scrollsLeft ? (byte)1 : (byte)3);
+                    outPacket.WriteByte((byte)ItemType.Usable);
+                    outPacket.WriteShort((short)scroll.Slot);
+                    if (scrollsLeft)
+                    {
+                        outPacket.WriteShort(scroll.Quantity);
+                    }
+                    outPacket.WriteByte(3);
+                    outPacket.WriteByte((byte)ItemType.Equipment);
+                    outPacket.WriteShort(toScroll.Slot);
+                    outPacket.WriteByte(1);
+                    this.Client.Send(outPacket);
+                }
+                this.Items.Remove(toScroll, false);
+            }
+            else
+            {
+                using (Packet outPacket = new Packet(MapleServerOperationCode.ModifyInventoryItem))
+                {
+                    outPacket.WriteByte(1);
+                    outPacket.WriteByte(3);
+                    outPacket.WriteByte(scrollsLeft ? (byte)1 : (byte)3);
+                    outPacket.WriteByte((byte)ItemType.Usable);
+                    outPacket.WriteShort(scrollSlot);
+                    if (scrollsLeft)
+                    {
+                        outPacket.WriteShort(scroll.Quantity);
+                    }
+                    outPacket.WriteByte(3);
+                    outPacket.WriteByte((byte)ItemType.Equipment);
+                    outPacket.WriteShort(toScroll.Slot);
+                    outPacket.WriteByte(0);
+                    outPacket.WriteByte((byte)ItemType.Equipment);
+                    outPacket.WriteShort(toScroll.Slot);
+                    outPacket.WriteBytes(toScroll.ToByteArray(true, true));
+                    outPacket.WriteByte(1);
+                    this.Client.Send(outPacket);
+                }
+            }
+            using (Packet outPacket = new Packet(MapleServerOperationCode.ShowScrollEffect))
+            {
+                outPacket.WriteInt(this.ID);
+                switch (scrollSuccess)
+                {
+                    case ScrollResult.Success:
+                        outPacket.WriteShort(1);
+                        outPacket.WriteShort(legendarySpirit ? (short)1 : (short)0);
+                        break;
+                    case ScrollResult.Fail:
+                        outPacket.WriteShort(0);
+                        outPacket.WriteShort(legendarySpirit ? (short)1 : (short)0);
+                        break;
+                    case ScrollResult.Curse:
+                        outPacket.WriteByte(0);
+                        outPacket.WriteByte(1);
+                        outPacket.WriteShort(legendarySpirit ? (short)1 : (short)0);
+                        break;
+                }
+                this.Map.Broadcast(outPacket);
+            }
+            this.UpdateLook();
+        }
     }
 }

@@ -42,6 +42,7 @@
         SpawnCharacter = 0x91,
         RemoveCharacter = 0x92,
         ChatText = 0x93,
+        ShowScrollEffect = 0x98,
         MoveCharacter = 0xA7,
         FacialExpression = 0xAF,
         UpdateCharacterLook = 0xB3,

@@ -26,6 +26,14 @@ namespace Loki.Maple.Data
 				}
 			}
 
+            using (Log.Load("Scrolls"))
+            {
+                foreach (dynamic scrollDatum in new Datums("item_scroll_data").Populate())
+                {
+                    this[scrollDatum.itemid].LoadScrollData(scrollDatum);
+                }
+            }
+
 			this.WizetItemIDs = new List<int>(4);
 
 			this.WizetItemIDs.Add(1002140);
