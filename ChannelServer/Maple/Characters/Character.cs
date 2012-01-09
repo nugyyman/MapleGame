@@ -1463,50 +1463,115 @@ namespace Loki.Maple.Characters
 		{
 			lock (this)
 			{
-				if (this.AvailableAP < 1)
-				{
-					return;
-				}
-				else
-				{
-					inPacket.ReadInt();
+                if (this.AvailableAP < 1)
+                {
+                    return;
+                }
+                else
+                {
+                    inPacket.ReadInt();
 
-					switch (inPacket.ReadInt())
-					{
-						case 64:
-							this.Strength++;
-							break;
+                    switch (inPacket.ReadInt())
+                    {
+                        case 64:
+                            if (this.Strength == 32767)
+                                return;
+                            this.Strength++;
+                            break;
 
-						case 128:
-							this.Dexterity++;
-							break;
+                        case 128:
+                            if (this.Dexterity == 32767)
+                                return;
+                            this.Dexterity++;
+                            break;
 
-						case 256:
-							this.Intelligence++;
-							break;
+                        case 256:
+                            if (this.Intelligence == 32767)
+                                return;
+                            this.Intelligence++;
+                            break;
 
-						case 512:
-							this.Luck++;
-							break;
+                        case 512:
+                            if (this.Luck == 32767)
+                                return;
+                            this.Luck++;
+                            break;
 
-						case 2048:
-							this.MaxHP += 10; // TODO: Correct HP addition.
-							break;
+                        case 2048:
+                            if (this.MaxHP == 30000)
+                                return;
+                            this.MaxHP += 10; // TODO: Correct HP addition.
+                            break;
 
-						case 8192:
-							this.MaxMP += 10; // TODO: Correct MP addition.
-							break;
+                        case 8192:
+                            if (this.MaxMP == 30000)
+                                return;
+                            this.MaxMP += 10; // TODO: Correct MP addition.
+                            break;
 
-						default:
-							throw new NotImplementedException("Adding unknown statistic.");
-					}
+                        default:
+                            throw new NotImplementedException("Adding unknown statistic.");
+                    }
 
-					this.AvailableAP--;
+                    this.AvailableAP--;
 
-					this.Release();
-				}
+                    this.Release();
+                }
 			}
 		}
+
+        public void DistributeAP(int stat)
+        {
+            lock (this)
+            {
+                switch (stat)
+                {
+                    case 64:
+                        if (this.Strength == 32767)
+                            return;
+                        this.Strength++;
+                        break;
+
+                    case 128:
+                        if (this.Dexterity == 32767)
+                            return;
+                        this.Dexterity++;
+                        this.Dexterity++;
+                        break;
+
+                    case 256:
+                        if (this.Intelligence == 32767)
+                            return;
+                        this.Intelligence++;
+                        break;
+
+                    case 512:
+                        if (this.Luck == 32767)
+                            return;
+                        this.Luck++;
+                        break;
+
+                    case 2048:
+                        if (this.MaxHP == 30000)
+                            return;
+                        this.MaxHP += 10; // TODO: Correct HP addition.
+                        break;
+
+                    case 8192:
+                        if (this.MaxMP == 30000)
+                            return;
+                        this.MaxMP += 10; // TODO: Correct MP addition.
+                        break;
+
+                    default:
+                        throw new NotImplementedException("Adding unknown statistic.");
+                }
+
+                this.AvailableAP--;
+
+                this.Release();
+            }
+        }
 
 		public void DistributeSP(Packet inPacket)
 		{

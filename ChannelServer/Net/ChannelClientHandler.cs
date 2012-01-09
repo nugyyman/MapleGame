@@ -2,6 +2,7 @@
 using Loki.IO;
 using Loki.Maple;
 using Loki.Maple.Characters;
+using Loki.Maple.CashShop;
 
 namespace Loki.Net
 {
@@ -179,6 +180,10 @@ namespace Loki.Net
 
                 case MapleClientOperationCode.ChangeKeymap:
                     this.Character.KeyMap.Update(inPacket);
+                    break;
+
+                case MapleClientOperationCode.UseCashItem:
+                    UseCashItem.Handle(this.Character, inPacket);
                     break;
 			}
 		}
