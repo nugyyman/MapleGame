@@ -2522,5 +2522,62 @@ namespace Loki.Maple.Characters
             }
             this.UpdateLook();
         }
+
+        public void UseSkillBook(Packet inPacket)
+        {
+            inPacket.ReadInt();
+            sbyte slot = (sbyte)inPacket.ReadShort();
+            int itemId = inPacket.ReadInt();
+            Item skillBook = this.Items[ItemType.Usable, slot];
+            if (!skillBook.IsSkillBook)
+            {
+
+                return;
+            }
+            if (!this.Items.Contains(itemId))
+                return;
+            bool canUse = false;
+            bool success = false;
+            int skillId = 0;
+            foreach (int skillid in skillBook.SkillId)
+                if (skillid / 10000 == (short)this.Job)
+                    skillId = skillid;
+            if (skillId == 0)
+                return;
+            Skill skill = new Skill(skillId);
+            if (skillBook.MapleID / 10000 == 228 && this.Skills.Contains(skill.MapleID))
+                return;
+            else if (skillBook.MapleID / 10000 == 229 && (!this.Skills.Contains(skill.MapleID) || this.Skills[skill.MapleID].MaxLevel >= skillBook.MasterLevel))
+                return;
+            if (!this.Skills.Contains(skill) || this.Skills[skill.MapleID].CurrentLevel >= skillBook.RequestSkillLevel || skillBook.RequestSkillLevel == 0)
+            {
+                canUse = true;
+                Random r = new Random();
+                if (r.Next(1, 101) <= skillBook.Chance)
+                {
+                    if (this.Skills.Contains(skill.MapleID))
+                        this.Skills[skill.MapleID].MaxLevel = (byte)skillBook.MasterLevel;
+                    else
+                        this.Skills.Add(new Skill(skillId, 0, (byte)skillBook.MasterLevel));
+                    success = true;
+                    this.Skills[skill.MapleID].Update();
+                }
+                else
+                    success = false;
+                this.Items.Remove(skillBook.MapleID, 1);
+            }
+            else
+                canUse = false;
+            using (Packet outPacket = new Packet(MapleServerOperationCode.UseSkillBook))
+            {
+                outPacket.WriteInt(this.ID);
+                outPacket.WriteByte(1);
+                outPacket.WriteInt(skill.MapleID);
+                outPacket.WriteInt(skillBook.MasterLevel);
+                outPacket.WriteByte((byte)(canUse ? 1 : 0));
+                outPacket.WriteByte((byte)(success ? 1 : 0));
+                this.Client.Send(outPacket);
+            }
+        }
     }
 }

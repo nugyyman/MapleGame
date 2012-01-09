@@ -34,6 +34,14 @@ namespace Loki.Maple.Data
                 }
             }
 
+            using (Log.Load("Skill Books"))
+            {
+                foreach (dynamic skillBookDatum in new Datums("item_skills").Populate())
+                {
+                    this[skillBookDatum.itemid].LoadSkillBookData(skillBookDatum);
+                }
+            }
+
 			this.WizetItemIDs = new List<int>(4);
 
 			this.WizetItemIDs.Add(1002140);

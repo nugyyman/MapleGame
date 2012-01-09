@@ -6,6 +6,7 @@ using Loki.Maple.Data;
 using Loki.Maple.Maps;
 using Loki.Net;
 using Loki.Threading;
+using System.Collections.Generic;
 
 namespace Loki.Maple
 {
@@ -91,6 +92,12 @@ namespace Loki.Maple
         public short IAvoidability { get; private set; }
         public short IJump { get; private set; }
         public short ISpeed { get; private set; }
+
+        // SkillBooks and MasteryBooks data
+        public List<int> SkillId = new List<int>();
+        public short RequestSkillLevel { get; private set; }
+        public short MasterLevel { get; private set; }
+        public short Chance { get; private set; }
 
         public Character Character
         {
@@ -389,6 +396,14 @@ namespace Loki.Maple
             }
         }
 
+        public bool IsSkillBook
+        {
+            get
+            {
+                return this.MapleID / 10000 == 228 || this.MapleID / 10000 == 229;
+            }
+        }
+
         public byte AbsoluteSlot
         {
             get
@@ -497,6 +512,13 @@ namespace Loki.Maple
                 this.IJump = this.CachedReference.IJump;
                 this.ISpeed = this.CachedReference.ISpeed;
             }
+            else if (this.IsSkillBook)
+            {
+                this.SkillId = this.CachedReference.SkillId;
+                this.RequestSkillLevel = this.CachedReference.RequestSkillLevel;
+                this.MasterLevel = this.CachedReference.MasterLevel;
+                this.Chance = this.CachedReference.Chance;
+            }
         }
 
         public void LoadEquipmentData(dynamic equipDatum)
@@ -555,6 +577,14 @@ namespace Loki.Maple
             this.IAvoidability = scrollDatum.iavo;
             this.IJump = scrollDatum.ijump;
             this.ISpeed = scrollDatum.ispeed;
+        }
+
+        public void LoadSkillBookData(dynamic skillBookDatum)
+        {
+            this.SkillId.Add(skillBookDatum.skillid);
+            this.RequestSkillLevel = skillBookDatum.req_skill_level;
+            this.MasterLevel = skillBookDatum.master_level;
+            this.Chance = skillBookDatum.chance;
         }
 
         public Item(dynamic itemDatum)
@@ -625,6 +655,33 @@ namespace Loki.Maple
                     this.Jump = itemDatum.Jump;
                     this.Speed = itemDatum.Speed;
                     this.ViciousHammerApplied = itemDatum.ViciousHammerApplied;
+                }
+                else if (this.IsScroll)
+                {
+                    this.Success = this.CachedReference.Success;
+                    this.BreakItem = this.CachedReference.BreakItem;
+                    this.Flag = this.CachedReference.Flag;
+                    this.IStrength = this.CachedReference.IStrength;
+                    this.IDexterity = this.CachedReference.IDexterity;
+                    this.IIntelligence = this.CachedReference.IIntelligence;
+                    this.ILuck = this.CachedReference.ILuck;
+                    this.IHP = this.CachedReference.IHP;
+                    this.IMP = this.CachedReference.IMP;
+                    this.IWeaponAttack = this.CachedReference.IWeaponAttack;
+                    this.IMagicAttack = this.CachedReference.IMagicAttack;
+                    this.IWeaponDefense = this.CachedReference.IWeaponDefense;
+                    this.IMagicDefense = this.CachedReference.IMagicDefense;
+                    this.IAccuracy = this.CachedReference.IAccuracy;
+                    this.IAvoidability = this.CachedReference.IAvoidability;
+                    this.IJump = this.CachedReference.IJump;
+                    this.ISpeed = this.CachedReference.ISpeed;
+                }
+                else if (this.IsSkillBook)
+                {
+                    this.SkillId = this.CachedReference.SkillId;
+                    this.RequestSkillLevel = this.CachedReference.RequestSkillLevel;
+                    this.MasterLevel = this.CachedReference.MasterLevel;
+                    this.Chance = this.CachedReference.Chance;
                 }
             }
         }

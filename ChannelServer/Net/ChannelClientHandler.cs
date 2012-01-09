@@ -193,6 +193,10 @@ namespace Loki.Net
                 case MapleClientOperationCode.UseUpgradeScroll:
                     this.Character.UseUpgradeScroll(inPacket);
                     break;
+
+                case MapleClientOperationCode.UseSkillBook:
+                    this.Character.UseSkillBook(inPacket);
+                    break;
             }
         }
 

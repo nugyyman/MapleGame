@@ -36,6 +36,7 @@
         UpdateMount = 0x2D,
         ShowQuestCompletion = 0x2E,
         SendTitleBox = 0x2F,
+        UseSkillBook = 0x30,
         CharacterInformation = 0x3A,
         AvatarMegaphone = 0x6F,
         WarpToMap = 0x72,
