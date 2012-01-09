@@ -1,0 +1,172 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>9.0.21022</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{36F56755-9B85-451F-8547-9AE0C6AFFA39}</ProjectGuid>
+    <OutputType>Exe</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Loki</RootNamespace>
+    <AssemblyName>ChannelServer</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <StartupObject>Loki.Net.ChannelServer</StartupObject>
+    <FileUpgradeFlags>
+    </FileUpgradeFlags>
+    <OldToolsVersion>3.5</OldToolsVersion>
+    <UpgradeBackupLocation />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
+    <PlatformTarget>x86</PlatformTarget>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>none</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>..\Release\Channel\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
+    <DebugSymbols>false</DebugSymbols>
+    <UseVSHostingProcess>false</UseVSHostingProcess>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>Loki.ico</ApplicationIcon>
+  </PropertyGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+  <ItemGroup>
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="MySql.Data">
+      <HintPath>..\MySql.Data.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Loki.ico" />
+    <Compile Include="Interoperability\InteroperabilityClient.cs" />
+    <Compile Include="ChannelServerSetup.cs" />
+    <Compile Include="Maple\Buff.cs" />
+    <Compile Include="Maple\Characters\CharacterBuffs.cs" />
+    <Compile Include="Maple\Characters\CharacterKeyMap.cs" />
+    <Compile Include="Maple\Characters\CharacterQuests.cs" />
+    <Compile Include="Maple\Characters\ControlledMobs.cs" />
+    <Compile Include="Maple\Characters\ControlledNpcs.cs" />
+    <Compile Include="Maple\Commands\Implementation\BringCommand.cs" />
+    <Compile Include="Maple\Commands\Implementation\ClearItemsCommand.cs" />
+    <Compile Include="Maple\Commands\Implementation\ClearDropsCommand.cs" />
+    <Compile Include="Maple\Commands\Implementation\ClearCommand.cs" />
+    <Compile Include="Maple\Commands\Implementation\SkillCommand.cs" />
+    <Compile Include="Maple\Commands\Implementation\HorntailCommand.cs" />
+    <Compile Include="Maple\Commands\Implementation\WarnCommand.cs" />
+    <Compile Include="Maple\Commands\Implementation\OnlineCommand.cs" />
+    <Compile Include="Maple\Commands\Implementation\SpawnCommand.cs" />
+    <Compile Include="Maple\Commands\Implementation\NpcCommand.cs" />
+    <Compile Include="Maple\Commands\Implementation\KillMobsCommand.cs" />
+    <Compile Include="Maple\Commands\Implementation\LogLevelCommand.cs" />
+    <Compile Include="Maple\Commands\Implementation\StyleCommand.cs" />
+    <Compile Include="Maple\Commands\Implementation\MasterCommand.cs" />
+    <Compile Include="Maple\Commands\Implementation\MesoCommand.cs" />
+    <Compile Include="Maple\Commands\Implementation\SearchCommand.cs" />
+    <Compile Include="Maple\Shortcut.cs" />
+    <Compile Include="Maple\Interaction\Fredrick.cs" />
+    <Compile Include="Maple\Interaction\HiredMerchant.cs" />
+    <Compile Include="Maple\Interaction\Omok.cs" />
+    <Compile Include="Maple\Interaction\PlayerShop.cs" />
+    <Compile Include="Maple\Interaction\Trade.cs" />
+    <Compile Include="Maple\Life\Npc.cs" />
+    <Compile Include="Maple\Rectangle.cs" />
+    <Compile Include="Maple\Data\CachedMobs.cs" />
+    <Compile Include="Maple\Data\CachedSkills.cs" />
+    <Compile Include="Maple\Data\Strings.cs" />
+    <Compile Include="Maple\Data\QuestData.cs" />
+    <Compile Include="Maple\Data\WorldHelpers.cs" />
+    <Compile Include="Maple\EnumerationHelper.cs" />
+    <Compile Include="Maple\HackException.cs" />
+    <Compile Include="Maple\Life\MobSkill.cs" />
+    <Compile Include="Maple\Life\Implementation\QuestNpc.cs" />
+    <None Include="Maple\Life\Implementation\NpcTemplate.cs" />
+    <Compile Include="Maple\Life\Loot.cs" />
+    <Compile Include="Maple\Life\MobSkills.cs" />
+    <Compile Include="Maple\Maps\MapPlayerShops.cs" />
+    <Compile Include="Maple\Maps\MapHiredMerchants.cs" />
+    <Compile Include="Maple\Maps\ISpawnable.cs" />
+    <Compile Include="Maple\Maps\MapOmoks.cs" />
+    <Compile Include="Maple\Maps\MapObjects.cs" />
+    <Compile Include="Maple\Maps\MapSpawnPoints.cs" />
+    <Compile Include="Maple\Maps\MapPortals.cs" />
+    <Compile Include="Maple\Maps\MapNpcs.cs" />
+    <Compile Include="Maple\Maps\MapMobs.cs" />
+    <Compile Include="Maple\Maps\MapDrops.cs" />
+    <Compile Include="Maple\Maps\MapCharacters.cs" />
+    <Compile Include="Maple\Maps\SpawnPoint.cs" />
+    <Compile Include="Maple\Quest.cs" />
+    <Compile Include="Maple\Shops\ShopItem.cs" />
+    <Compile Include="Maple\Shops\Shop.cs" />
+    <Compile Include="Maple\Maps\Drop.cs" />
+    <Compile Include="Maple\Meso.cs" />
+    <Compile Include="Maple\StyleUnavailableException.cs" />
+    <Compile Include="Maple\Data\AvailableStyles.cs" />
+    <Compile Include="Maple\Data\CachedItems.cs" />
+    <Compile Include="Maple\Characters\Character.cs" />
+    <Compile Include="Maple\Commands\Implementation\ItemCommand.cs" />
+    <Compile Include="Maple\Commands\Commands.cs" />
+    <Compile Include="Maple\Commands\Command.cs" />
+    <Compile Include="Maple\Commands\CommandFactory.cs" />
+    <Compile Include="Maple\Commands\Implementation\HelpCommand.cs" />
+    <Compile Include="Maple\Life\Implementation\Npc9900001.cs" />
+    <Compile Include="Maple\Life\Implementation\Npc9900000.cs" />
+    <Compile Include="Maple\Life\Implementation\Npc1032002.cs" />
+    <Compile Include="Maple\Life\Implementation\Npc9010002.cs" />
+    <Compile Include="Maple\Life\NpcEvents.cs" />
+    <Compile Include="Maple\Life\Mob.cs" />
+    <Compile Include="Maple\Life\LifeObject.cs" />
+    <Compile Include="Maple\InventoryFullException.cs" />
+    <Compile Include="Maple\Item.cs" />
+    <Compile Include="Maple\Characters\CharacterItems.cs" />
+    <Compile Include="Maple\Maps\Map.cs" />
+    <Compile Include="Maple\Data\WorldMaps.cs" />
+    <Compile Include="Maple\Maps\MapObject.cs" />
+    <Compile Include="Maple\Maps\Portal.cs" />
+    <Compile Include="Maple\Movement.cs" />
+    <Compile Include="Maple\Point.cs" />
+    <Compile Include="Maple\Skill.cs" />
+    <Compile Include="Maple\Characters\CharacterSkills.cs" />
+    <Compile Include="Maple\Data\World.cs" />
+    <Compile Include="Net\ChannelClientHandler.cs" />
+    <Compile Include="Net\ChannelServer.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Maple\Commands\Implementation\JobCommand.cs" />
+    <Compile Include="Maple\Commands\Implementation\LevelCommand.cs" />
+    <Compile Include="Maple\Commands\Implementation\GoToCommand.cs" />
+    <Compile Include="Maple\Commands\Implementation\TipCommand.cs" />
+    <Compile Include="Maple\Commands\Implementation\SaveCommand.cs" />
+    <Compile Include="Maple\Commands\Implementation\HeaderCommand.cs" />
+    <Compile Include="Maple\Commands\Implementation\NoticeCommand.cs" />
+    <Compile Include="Maple\Commands\Implementation\MapCommand.cs" />
+    <Compile Include="Maple\Commands\Implementation\SayCommand.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Common\Common.csproj">
+      <Project>{6C373C03-CDFA-4410-8879-F85A4243D7A6}</Project>
+      <Name>Common</Name>
+    </ProjectReference>
+  </ItemGroup>
+</Project>

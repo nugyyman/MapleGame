@@ -1,0 +1,32 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual C# Express 2010
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LoginServer", "LoginServer\LoginServer.csproj", "{D3C64B98-2551-4FA7-9374-0238282945DC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Common", "Common\Common.csproj", "{6C373C03-CDFA-4410-8879-F85A4243D7A6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChannelServer", "ChannelServer\ChannelServer.csproj", "{36F56755-9B85-451F-8547-9AE0C6AFFA39}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{D3C64B98-2551-4FA7-9374-0238282945DC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D3C64B98-2551-4FA7-9374-0238282945DC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D3C64B98-2551-4FA7-9374-0238282945DC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D3C64B98-2551-4FA7-9374-0238282945DC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6C373C03-CDFA-4410-8879-F85A4243D7A6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6C373C03-CDFA-4410-8879-F85A4243D7A6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6C373C03-CDFA-4410-8879-F85A4243D7A6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6C373C03-CDFA-4410-8879-F85A4243D7A6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{36F56755-9B85-451F-8547-9AE0C6AFFA39}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{36F56755-9B85-451F-8547-9AE0C6AFFA39}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{36F56755-9B85-451F-8547-9AE0C6AFFA39}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{36F56755-9B85-451F-8547-9AE0C6AFFA39}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

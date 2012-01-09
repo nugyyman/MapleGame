@@ -1,0 +1,12 @@
+character_skin_data > unsigned
+mob_data > carnaval_points & colors > unsigned
+item_equip_data > heal_hp & attack_speed > unsigned
+item_equip_data > scroll_slots > tinyint(3) unsigned
+shop_recharge_data > tier_id > tinyint(3) unsigned
+map_data > regen_rate > unsigned
+map_life > id > int(11)
+map_portals > id > tinyint(3) unsigned
+shop_data > recharge_tier > tinyint(3) unsigned
+questid (everywhere) > smallint(6) unsigned
+map_footholds > id > smallid(6)
+mob skills (all) > id and level > tinyint(3) unsigned
