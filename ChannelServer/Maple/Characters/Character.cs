@@ -1191,7 +1191,7 @@ namespace Loki.Maple.Characters
         {
             text = text.Replace("{", "{{").Replace("}", "}}");
 
-            if (text.StartsWith("!"))
+            if (text.StartsWith(Application.CommandIndicator) || text.StartsWith(Application.PlayerCommandIndicator))
             {
                 CommandFactory.Execute(this, text);
             }
@@ -2521,6 +2521,7 @@ namespace Loki.Maple.Characters
                 this.Map.Broadcast(outPacket);
             }
             this.UpdateLook();
+            this.Notify("ADEDEDEDEDE");
         }
 
         public void UseSkillBook(Packet inPacket)

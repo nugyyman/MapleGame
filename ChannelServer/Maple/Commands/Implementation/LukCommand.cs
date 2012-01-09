@@ -31,6 +31,11 @@ namespace Loki.Maple.Commands.Implementation
                     caller.Notify("Your stats can't reach more than 32767.");
                     return;
                 }
+                if (caller.Luck + stat < 4 && stat < 0)
+                {
+                    caller.Notify("Your stats can't be lower than 4.");
+                    return;
+                }
                 caller.AvailableAP -= stat;
                 caller.Luck += stat;
             }

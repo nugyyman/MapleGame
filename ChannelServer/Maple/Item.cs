@@ -1112,7 +1112,7 @@ namespace Loki.Maple
                 {
                     buffer.WriteByte();
                 }
-                else
+                else if (!zeroPosition && !leaveOut)
                 {
                     buffer.WriteByte(this.ComputedSlot);
                 }
