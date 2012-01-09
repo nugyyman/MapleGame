@@ -77,7 +77,124 @@ namespace Loki.Maple.CashShop
                         }
                         player.Items.Remove(itemId, 1);
                         break;
-                    case 557:
+                    case 507: // Megaphones
+                        bool whisper;
+                        switch (itemId / 1000 % 10)
+                        {
+                            case 1: // Megaphone
+                                if (player.Level > 9)
+                                {
+                                    string message = player.Name + " : " + inPacket.ReadString();
+                                    using (Packet outPacket = new Packet(MapleServerOperationCode.ServerMessage))
+                                    {
+                                        outPacket.WriteByte((byte)2);
+                                        outPacket.WriteString(message); ;
+                                        player.Map.Broadcast(outPacket);
+                                    }
+                                }
+                                else
+                                    player.Notify("You may not use this until you're level 10.");
+                                player.Items.Remove(itemId, 1);
+                                break;
+                            case 2: // Super megaphone
+                                string message2 = player.Name + " : " + inPacket.ReadString();
+                                byte whisper2 = inPacket.ReadByte();
+                                using (Packet outPacket = new Packet(MapleServerOperationCode.ServerMessage))
+                                {
+                                    outPacket.WriteByte((byte)3);
+                                    outPacket.WriteString(message2);
+                                    outPacket.WriteByte((byte)(ChannelServer.InternalChannelID));
+                                    outPacket.WriteByte((byte)(whisper2 != 0 ? 1 : 0));
+                                    World.Broadcast(outPacket);
+                                }
+                                player.Items.Remove(itemId, 1);
+                                break;
+                            case 6: // Item megaphone
+                                string message3 = player.Name + " : " + inPacket.ReadString();
+                                whisper = inPacket.ReadByte() == 1;
+                                Item item = null;
+                                if (inPacket.ReadByte() == 1)
+                                {
+                                    int type = inPacket.ReadInt();
+                                    int slottt = inPacket.ReadInt();
+                                    item = player.Items[(ItemType)((byte)type), (sbyte)slottt];
+                                    using (Packet outPacket = new Packet(MapleServerOperationCode.ServerMessage))
+                                    {
+                                        outPacket.WriteByte(8);
+                                        outPacket.WriteString(message3);
+                                        outPacket.WriteByte(ChannelServer.InternalChannelID);
+                                        outPacket.WriteByte((byte)(whisper ? 1 : 0));
+                                        if (item == null)
+                                        {
+                                            outPacket.WriteByte(0);
+                                        }
+                                        else
+                                        {
+                                            outPacket.WriteBytes(item.ToByteArray(false));
+                                        }
+                                        World.Broadcast(outPacket);
+                                        player.Items.Remove(itemId, 1);
+                                    }
+                                }
+                                break;
+                            case 7: //Triple megaphone
+                                int lines = (int)inPacket.ReadByte();
+                                string[] message4 = new string[lines];
+                                for (int i = 0; i < lines; i++)
+                                {
+                                    message4[i] = player.Name + " : " + inPacket.ReadString();
+                                }
+                                whisper = inPacket.ReadByte() == 1;
+                                using (Packet outPacket = new Packet(MapleServerOperationCode.ServerMessage))
+                                {
+                                    outPacket.WriteByte(0x0A);
+                                    if (message4[0] != null)
+                                    {
+                                        outPacket.WriteString(message4[0]);
+                                    }
+                                    outPacket.WriteByte((byte)message4.Length);
+                                    for (int i = 1; i < message4.Length; i++)
+                                    {
+                                        if (message4[i] != null)
+                                        {
+                                            outPacket.WriteString(message4[i]);
+                                        }
+                                    }
+                                    for (int i = 0; i < 10; i++)
+                                    {
+                                        outPacket.WriteByte(ChannelServer.InternalChannelID);
+                                    }
+                                    outPacket.WriteByte((byte)(whisper ? 1 : 0));
+                                    outPacket.WriteByte(1);
+                                    World.Broadcast(outPacket);
+                                }
+                                player.Items.Remove(itemId, 1);
+                                break;
+                        }
+                        break;
+                    case 539: // Avatar Megaphone
+                        List<string> lines2 = new List<string>();
+                        for (int i = 0; i < 4; i++)
+                        {
+                            lines2.Add(inPacket.ReadString());
+                        }
+                        whisper = inPacket.ReadByte() == 1;
+                        using (Packet outPacket = new Packet(MapleServerOperationCode.AvatarMegaphone))
+                        {
+                            outPacket.WriteInt(itemId);
+                            outPacket.WriteString(player.Name);
+                            foreach (string line2 in lines2)
+                            {
+                                outPacket.WriteString(line2);
+                            }
+                            outPacket.WriteInt(ChannelServer.InternalChannelID);
+                            outPacket.WriteByte((byte)(whisper ? 1 : 0));
+                            outPacket.WriteBytes(player.AppearanceToByteArray());
+                            World.Broadcast(outPacket);
+                        }
+                        player.Items.Remove(itemId, 1);
+                        break;
+                    case 557: // Vicious Hammer
                         inPacket.ReadInt();
                         int slot = inPacket.ReadInt();
                         inPacket.ReadInt();

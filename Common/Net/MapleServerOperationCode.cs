@@ -37,6 +37,7 @@
         ShowQuestCompletion = 0x2E,
         SendTitleBox = 0x2F,
         CharacterInformation = 0x3A,
+        AvatarMegaphone = 0x6F,
         WarpToMap = 0x72,
         SpawnCharacter = 0x91,
         RemoveCharacter = 0x92,
