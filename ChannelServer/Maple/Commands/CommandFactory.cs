@@ -25,7 +25,13 @@ namespace Loki.Maple.Commands
 		{
 			string[] splitted = text.Split(' ');
 			splitted[0] = splitted[0].ToLower();
-			string commandName = text.StartsWith(Application.CommandIndicator) ? splitted[0].TrimStart(Application.CommandIndicator.ToCharArray()) : splitted[0];
+            string commandName = "";
+            if (text.StartsWith(Application.CommandIndicator))
+                commandName = splitted[0].TrimStart(Application.CommandIndicator.ToCharArray());
+            else if (text.StartsWith(Application.PlayerCommandIndicator))
+                commandName = splitted[0].TrimStart(Application.PlayerCommandIndicator.ToCharArray());
+            else
+                commandName = splitted[0];
 
 			string[] args = new string[splitted.Length - 1];
 
@@ -38,22 +44,29 @@ namespace Loki.Maple.Commands
 			{
 				Command command = CommandFactory.Commands[commandName];
 
-				if ((command.IsRestricted && caller.IsMaster) || !command.IsRestricted)
-				{
-					try
-					{
-						command.Execute(caller, args);
-					}
-					catch (Exception e)
-					{
-						caller.Notify("[Command] Unknown error: " + e.Message);
-						Log.Error("{0} error by {1}: ", e, command.GetType().Name, caller.Name);
-					}
-				}
-				else
-				{
-					caller.Notify("[Command] Restricted command.");
-				}
+                if ((command.IsRestricted && text.StartsWith(Application.CommandIndicator)) || (!command.IsRestricted && text.StartsWith(Application.PlayerCommandIndicator)))
+                {
+                    if ((command.IsRestricted && caller.IsMaster) || !command.IsRestricted)
+                    {
+                        try
+                        {
+                            command.Execute(caller, args);
+                        }
+                        catch (Exception e)
+                        {
+                            caller.Notify("[Command] Unknown error: " + e.Message);
+                            Log.Error("{0} error by {1}: ", e, command.GetType().Name, caller.Name);
+                        }
+                    }
+                    else
+                    {
+                        caller.Notify("[Command] Restricted command.");
+                    }
+                }
+                else
+                {
+                    caller.Notify("[Command] Invalid command.");
+                }
 			}
 			else
 			{

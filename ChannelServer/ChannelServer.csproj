@@ -73,8 +73,12 @@
     <Compile Include="Maple\Commands\Implementation\ClearItemsCommand.cs" />
     <Compile Include="Maple\Commands\Implementation\ClearDropsCommand.cs" />
     <Compile Include="Maple\Commands\Implementation\ClearCommand.cs" />
+    <Compile Include="Maple\Commands\Implementation\DexCommand.cs" />
+    <Compile Include="Maple\Commands\Implementation\IntCommand.cs" />
+    <Compile Include="Maple\Commands\Implementation\LukCommand.cs" />
     <Compile Include="Maple\Commands\Implementation\SkillCommand.cs" />
     <Compile Include="Maple\Commands\Implementation\HorntailCommand.cs" />
+    <Compile Include="Maple\Commands\Implementation\StrCommand.cs" />
     <Compile Include="Maple\Commands\Implementation\WarnCommand.cs" />
     <Compile Include="Maple\Commands\Implementation\OnlineCommand.cs" />
     <Compile Include="Maple\Commands\Implementation\SpawnCommand.cs" />

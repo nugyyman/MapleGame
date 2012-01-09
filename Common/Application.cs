@@ -11,6 +11,7 @@ namespace Loki
 		public const int DefaultBufferSize = 4096;
 		public const int MapleVersion = 75;
 		public const string CommandIndicator = "!";
+        public const string PlayerCommandIndicator = "@";
 
 		public static string LaunchPath
 		{
