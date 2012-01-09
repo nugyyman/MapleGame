@@ -8,52 +8,52 @@ using MySql.Data.MySqlClient;
 
 namespace Loki
 {
-	public static class ChannelServerSetup
-	{
-		private const string McdbFileName = "mcdb-4.3-75.sql";
+    public static class ChannelServerSetup
+    {
+        private const string McdbFileName = "mcdb-4.3-75.sql";
 
-		public static void Run()
-		{
-			Log.Entitle("Channel Server Setup");
+        public static void Run()
+        {
+            Log.Entitle("Channel Server Setup");
 
-			Log.Inform("If you do not know a value, leave the field blank to apply default.");
+            Log.Inform("If you do not know a value, leave the field blank to apply default.");
 
-			Log.Entitle("Database Setup");
+            Log.Entitle("Database Setup");
 
-			string databaseHost = string.Empty;
-			string databaseSchema = string.Empty;
-			string databaseUsername = string.Empty;
-			string databasePassword = string.Empty;
+            string databaseHost = string.Empty;
+            string databaseSchema = string.Empty;
+            string databaseUsername = string.Empty;
+            string databasePassword = string.Empty;
 
-		databaseConfiguration:
+        databaseConfiguration:
 
-			Log.Inform("Please enter your database credentials: ");
+            Log.Inform("Please enter your database credentials: ");
 
-			Log.SkipLine();
+            Log.SkipLine();
 
-			try
-			{
-				databaseHost = Log.Input("Host: ", "localhost");
-				databaseSchema = Log.Input("Schema: ", "channel");
-				databaseUsername = Log.Input("Username: ", "root");
-				databasePassword = Log.Input("Password: ", "");
+            try
+            {
+                databaseHost = Log.Input("Host: ", "localhost");
+                databaseSchema = Log.Input("Schema: ", "channel");
+                databaseUsername = Log.Input("Username: ", "root");
+                databasePassword = Log.Input("Password: ", "");
 
-				using (Database.TemporaryConnection(databaseHost, databaseSchema, databaseUsername, databasePassword))
-				{
-					Database.Test();
-				}
-			}
-			catch (MySqlException e)
-			{
-				Log.SkipLine();
+                using (Database.TemporaryConnection(databaseHost, databaseSchema, databaseUsername, databasePassword))
+                {
+                    Database.Test();
+                }
+            }
+            catch (MySqlException e)
+            {
+                Log.SkipLine();
 
-				Log.Error(e);
+                Log.Error(e);
 
-				Log.SkipLine();
+                Log.SkipLine();
 
-				if (e.Message.Contains("Unknown database") && Log.YesNo("Create and populate the " + databaseSchema + " database? ", true))
-				{
-					Database.ExecuteScript(databaseHost, databaseUsername, databasePassword, @"
+                if (e.Message.Contains("Unknown database") && Log.YesNo("Create and populate the " + databaseSchema + " database? ", true))
+                {
+                    Database.ExecuteScript(databaseHost, databaseUsername, databasePassword, @"
 							CREATE DATABASE {0};
 							USE {0};
 
@@ -124,6 +124,7 @@ namespace Loki
 							  `PreventsColdness` tinyint(1) unsigned NOT NULL,
 							  `IsStored` tinyint(1) unsigned NOT NULL,
 							  `Quantity` smallint(6) NOT NULL,
+                              `ViciousHammerApplied` tinyint(3) unsigned NOT NULL,
 							  PRIMARY KEY (`ID`),
 							  KEY `character_id` (`CharacterID`) USING BTREE
 							) ENGINE=InnoDB DEFAULT CHARSET=latin1;
@@ -180,120 +181,120 @@ namespace Loki
 							) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 						", databaseSchema);
 
-					Log.Inform("Database '{0}' created.", databaseSchema);
-				}
-				else
-				{
-					goto databaseConfiguration;
-				}
-			}
-			catch
-			{
-				Log.SkipLine();
+                    Log.Inform("Database '{0}' created.", databaseSchema);
+                }
+                else
+                {
+                    goto databaseConfiguration;
+                }
+            }
+            catch
+            {
+                Log.SkipLine();
 
-				goto databaseConfiguration;
-			}
+                goto databaseConfiguration;
+            }
 
-			Log.SkipLine();
+            Log.SkipLine();
 
-		mcdbConfiguration:
-			Log.Inform("The setup will now check for a MapleStory database.");
+        mcdbConfiguration:
+            Log.Inform("The setup will now check for a MapleStory database.");
 
-			try
-			{
-				using (Database.TemporaryConnection(databaseHost, "mcdb", databaseUsername, databasePassword))
-				{
-					Database.Test();
-				}
-			}
-			catch (MySqlException e)
-			{
-				Log.Error(e);
+            try
+            {
+                using (Database.TemporaryConnection(databaseHost, "mcdb", databaseUsername, databasePassword))
+                {
+                    Database.Test();
+                }
+            }
+            catch (MySqlException e)
+            {
+                Log.Error(e);
 
-				Log.SkipLine();
+                Log.SkipLine();
 
-				if (e.Message.Contains("Unknown database") && Log.YesNo("Create and populate the MCDB database? ", true))
-				{
-					try
-					{
-						Log.Inform("Please wait...");
+                if (e.Message.Contains("Unknown database") && Log.YesNo("Create and populate the MCDB database? ", true))
+                {
+                    try
+                    {
+                        Log.Inform("Please wait...");
 
-						Database.ExecuteFile(databaseHost, databaseUsername, databasePassword, Application.ExecutablePath + ChannelServerSetup.McdbFileName);
+                        Database.ExecuteFile(databaseHost, databaseUsername, databasePassword, Application.ExecutablePath + ChannelServerSetup.McdbFileName);
 
-						Log.Inform("Database 'mcdb' created.", databaseSchema);
-					}
-					catch (Exception mcdbE)
-					{
-						Log.Error("Error while creating 'mcdb': ", mcdbE);
-						goto mcdbConfiguration;
-					}
-				}
-				else
-				{
-					Log.SkipLine();
+                        Log.Inform("Database 'mcdb' created.", databaseSchema);
+                    }
+                    catch (Exception mcdbE)
+                    {
+                        Log.Error("Error while creating 'mcdb': ", mcdbE);
+                        goto mcdbConfiguration;
+                    }
+                }
+                else
+                {
+                    Log.SkipLine();
 
-					goto mcdbConfiguration;
-				}
-			}
+                    goto mcdbConfiguration;
+                }
+            }
 
-			Log.SkipLine();
+            Log.SkipLine();
 
-			Log.Success("Database configured!");
+            Log.Success("Database configured!");
 
-			Log.Entitle("Server Configuration");
+            Log.Entitle("Server Configuration");
 
-			string WorldName = string.Empty;
+            string WorldName = string.Empty;
 
-			do
-			{
-				WorldName = Log.Input("World name (examples: Bera, Khaini): ", "Scania");
-			}
-			while (!WorldNameResolver.IsValid(WorldName));
+            do
+            {
+                WorldName = Log.Input("World name (examples: Bera, Khaini): ", "Scania");
+            }
+            while (!WorldNameResolver.IsValid(WorldName));
 
-			IPAddress loginIP = Log.Input("Enter the IP of the login server: ", IPAddress.Loopback);
-			string securityCode = Log.Input("Assign the security code between servers: ", "");
-			IPAddress externalIP = Log.Input("Enter the public channel server IP: ", IPAddress.Loopback);
-			int maxUsers = Log.Input("Maximum amount of users for this channel: ", 80);
+            IPAddress loginIP = Log.Input("Enter the IP of the login server: ", IPAddress.Loopback);
+            string securityCode = Log.Input("Assign the security code between servers: ", "");
+            IPAddress externalIP = Log.Input("Enter the public channel server IP: ", IPAddress.Loopback);
+            int maxUsers = Log.Input("Maximum amount of users for this channel: ", 80);
 
-			Log.SkipLine();
+            Log.SkipLine();
 
-			Log.Success("Server configured!");
+            Log.Success("Server configured!");
 
-			Log.Entitle("User Profile");
+            Log.Entitle("User Profile");
 
-			Log.Inform("Please choose what information to display.\n  A. Hide packets (recommended)\n  B. Show names\n  C. Show content");
-			Log.SkipLine();
+            Log.Inform("Please choose what information to display.\n  A. Hide packets (recommended)\n  B. Show names\n  C. Show content");
+            Log.SkipLine();
 
-			LogLevel logLevel;
+            LogLevel logLevel;
 
-		multipleChoice:
-			switch (Log.Input("Please enter yours choice: ", "Hide").ToLower())
-			{
-				case "a":
-				case "hide":
-					logLevel = LogLevel.None;
-					break;
+        multipleChoice:
+            switch (Log.Input("Please enter yours choice: ", "Hide").ToLower())
+            {
+                case "a":
+                case "hide":
+                    logLevel = LogLevel.None;
+                    break;
 
-				case "b":
-				case "names":
-					logLevel = LogLevel.Name;
-					break;
+                case "b":
+                case "names":
+                    logLevel = LogLevel.Name;
+                    break;
 
-				case "c":
-				case "content":
-					logLevel = LogLevel.Full;
-					break;
+                case "c":
+                case "content":
+                    logLevel = LogLevel.Full;
+                    break;
 
-				default:
-					goto multipleChoice;
-			}
+                default:
+                    goto multipleChoice;
+            }
 
-			Log.Entitle("Please wait...");
+            Log.Entitle("Please wait...");
 
-			Log.Inform("Applying settings to 'Configuration.ini'...");
+            Log.Inform("Applying settings to 'Configuration.ini'...");
 
-			string lines = string.Format(
-				@"[Log]
+            string lines = string.Format(
+                @"[Log]
 				Packets={0}
 				StackTrace=False
 				LoadTime=False
@@ -315,16 +316,16 @@ namespace Loki
 				Schema={7}
 				Username={8}
 				Password={9}",
-				logLevel, WorldName, externalIP, maxUsers, loginIP,
-				securityCode, databaseHost, databaseSchema,
-				databaseUsername, databasePassword).Replace("	", "");
+                logLevel, WorldName, externalIP, maxUsers, loginIP,
+                securityCode, databaseHost, databaseSchema,
+                databaseUsername, databasePassword).Replace("	", "");
 
-			using (StreamWriter file = new StreamWriter(Application.ExecutablePath + "Configuration.ini"))
-			{
-				file.WriteLine(lines);
-			}
+            using (StreamWriter file = new StreamWriter(Application.ExecutablePath + "Configuration.ini"))
+            {
+                file.WriteLine(lines);
+            }
 
-			Log.Success("Configuration done!");
-		}
-	}
+            Log.Success("Configuration done!");
+        }
+    }
 }

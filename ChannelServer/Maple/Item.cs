@@ -41,7 +41,7 @@ namespace Loki.Maple
 		public bool IsScisored { get; private set; }
 		public int SalePrice { get; private set; }
 
-		public byte UpgradesAvailable { get; private set; }
+		public byte UpgradesAvailable { get; set; }
 		public byte UpgradesApplied { get; private set; }
 		public short Strength { get; private set; }
 		public short Dexterity { get; private set; }
@@ -58,7 +58,7 @@ namespace Loki.Maple
 		public short Agility { get; private set; }
 		public short Speed { get; private set; }
 		public short Jump { get; private set; }
-		public short ViciousHammerApplied { get; private set; }
+		public short ViciousHammerApplied { get; set; }
 
 		public byte AttackSpeed { get; private set; }
 		public short RecoveryRate { get; private set; }
@@ -446,6 +446,7 @@ namespace Loki.Maple
 				this.Agility = this.CachedReference.Agility;
 				this.Speed = this.CachedReference.Speed;
 				this.Jump = this.CachedReference.Jump;
+                this.ViciousHammerApplied = this.CachedReference.ViciousHammerApplied;
 			}
 		}
 
@@ -482,6 +483,7 @@ namespace Loki.Maple
 			this.Avoidability = equipDatum.avoid;
 			this.Jump = equipDatum.jump;
 			this.Speed = equipDatum.speed;
+            this.ViciousHammerApplied = 0;
 		}
 
 		public Item(dynamic itemDatum)
@@ -550,6 +552,7 @@ namespace Loki.Maple
 					this.Avoidability = itemDatum.Avoidability;
 					this.Jump = itemDatum.Jump;
 					this.Speed = itemDatum.Speed;
+                    this.ViciousHammerApplied = itemDatum.ViciousHammerApplied;
 				}
 			}
 		}
@@ -584,6 +587,7 @@ namespace Loki.Maple
 			datum.Avoidability = this.Avoidability;
 			datum.Jump = this.Jump;
 			datum.Speed = this.Speed;
+            datum.ViciousHammerApplied = this.ViciousHammerApplied;
 
 			if (this.Assigned)
 			{
