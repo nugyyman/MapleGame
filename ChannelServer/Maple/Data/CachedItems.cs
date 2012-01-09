@@ -42,6 +42,14 @@ namespace Loki.Maple.Data
                 }
             }
 
+            using (Log.Load("Item Consumes"))
+            {
+                foreach (dynamic itemConsumeDatum in new Datums("item_consume_data").Populate())
+                {
+                    this[itemConsumeDatum.itemid].LoadItemConsumeData(itemConsumeDatum);
+                }
+            }
+
 			this.WizetItemIDs = new List<int>(4);
 
 			this.WizetItemIDs.Add(1002140);
