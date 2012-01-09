@@ -36,7 +36,6 @@ namespace Loki.Maple.Commands.Implementation
                     caller.Notify("Your stats can't be lower than 4.");
                     return;
                 }
-                Log.Warn(caller.Dexterity);
                 caller.AvailableAP -= stat;
                 caller.Dexterity += stat;
             }

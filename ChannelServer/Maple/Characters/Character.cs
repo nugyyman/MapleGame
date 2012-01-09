@@ -2521,7 +2521,6 @@ namespace Loki.Maple.Characters
                 this.Map.Broadcast(outPacket);
             }
             this.UpdateLook();
-            this.Notify("ADEDEDEDEDE");
         }
 
         public void UseSkillBook(Packet inPacket)
