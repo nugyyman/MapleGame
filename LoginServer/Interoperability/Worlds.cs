@@ -2,11 +2,11 @@
 
 namespace Loki.Interoperability
 {
-	public class Worlds : KeyedCollection<byte, World>
-	{
-		protected override byte GetKeyForItem(World item)
-		{
-			return item.ID;
-		}
-	}
+    public class Worlds : KeyedCollection<byte, World>
+    {
+        protected override byte GetKeyForItem(World item)
+        {
+            return item.ID;
+        }
+    }
 }

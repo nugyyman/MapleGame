@@ -8,150 +8,150 @@ using Loki.Threading;
 
 namespace Loki.Maple.Maps
 {
-	public class MapMobs : MapObjects<Mob>
-	{
-		public MapMobs(Map parent) : base(parent) { }
+    public class MapMobs : MapObjects<Mob>
+    {
+        public MapMobs(Map parent) : base(parent) { }
 
-		protected override void InsertItem(int index, Mob item)
-		{
-			lock (this)
-			{
-				base.InsertItem(index, item);
+        protected override void InsertItem(int index, Mob item)
+        {
+            lock (this)
+            {
+                base.InsertItem(index, item);
 
-				if (World.IsInitialized)
-				{
-					using (Packet create = item.GetCreatePacket())
-					{
-						item.Map.Broadcast(create);
-					}
+                if (World.IsInitialized)
+                {
+                    using (Packet create = item.GetCreatePacket())
+                    {
+                        item.Map.Broadcast(create);
+                    }
 
-					item.AssignController();
-				}
-			}
-		}
+                    item.AssignController();
+                }
+            }
+        }
 
-		protected override void RemoveItem(int index) // NOTE: Equivalent of mob death.
-		{
-			lock (this)
-			{
-				Mob item = this.GetAtIndex(index);
+        protected override void RemoveItem(int index) // NOTE: Equivalent of mob death.
+        {
+            lock (this)
+            {
+                Mob item = this.GetAtIndex(index);
 
-				int mostDamage = 0;
-				Character owner = null;
+                int mostDamage = 0;
+                Character owner = null;
 
-				foreach (KeyValuePair<Character, uint> attacker in item.Attackers)
-				{
-					if (attacker.Key.IsAlive && attacker.Key.Client.IsAlive && attacker.Key.Map == this.Map)
-					{
-						if (attacker.Value > mostDamage)
-						{
-							owner = attacker.Key;
-						}
+                foreach (KeyValuePair<Character, uint> attacker in item.Attackers)
+                {
+                    if (attacker.Key.IsAlive && attacker.Key.Client.IsAlive && attacker.Key.Map == this.Map)
+                    {
+                        if (attacker.Value > mostDamage)
+                        {
+                            owner = attacker.Key;
+                        }
 
-						attacker.Key.Experience += (int)Math.Min(item.Experience, (attacker.Value * item.Experience) / item.MaxHP) * ChannelServer.ExperienceRate;
-					}
-				}
+                        attacker.Key.Experience += (int)Math.Min(item.Experience, (attacker.Value * item.Experience) / item.MaxHP) * ChannelServer.ExperienceRate;
+                    }
+                }
 
-				item.Attackers.Clear();
+                item.Attackers.Clear();
 
-				if (item.CanDrop)
-				{
-					List<Drop> drops = new List<Drop>();
+                if (item.CanDrop)
+                {
+                    List<Drop> drops = new List<Drop>();
 
-					foreach (Loot loopLoot in item.Loots)
-					{
-						if ((Application.Random.Next(1000000) / ChannelServer.DropRate) <= loopLoot.Chance)
-						{
-							if (loopLoot.IsMeso)
-							{
-								drops.Add(new Meso((short)(Application.Random.Next(loopLoot.MinimumQuantity, loopLoot.MaximumQuantity) * ChannelServer.MesoRate))
-								{
-									Dropper = item,
-									Owner = owner
-								});
-							}
-							else
-							{
-								drops.Add(new Item(loopLoot.MapleID, (short)Application.Random.Next(loopLoot.MinimumQuantity, loopLoot.MaximumQuantity))
-								{
-									Dropper = item,
-									Owner = owner
-								});
-							}
-						}
-					}
+                    foreach (Loot loopLoot in item.Loots)
+                    {
+                        if ((Application.Random.Next(1000000) / ChannelServer.DropRate) <= loopLoot.Chance)
+                        {
+                            if (loopLoot.IsMeso)
+                            {
+                                drops.Add(new Meso((short)(Application.Random.Next(loopLoot.MinimumQuantity, loopLoot.MaximumQuantity) * ChannelServer.MesoRate))
+                                {
+                                    Dropper = item,
+                                    Owner = owner
+                                });
+                            }
+                            else
+                            {
+                                drops.Add(new Item(loopLoot.MapleID, (short)Application.Random.Next(loopLoot.MinimumQuantity, loopLoot.MaximumQuantity))
+                                {
+                                    Dropper = item,
+                                    Owner = owner
+                                });
+                            }
+                        }
+                    }
 
-					double i = drops.Count / 2.0 * -1;
+                    double i = drops.Count / 2.0 * -1;
 
-					foreach (Drop loopDrop in drops)
-					{
-						//Log.Warn((short)(25.0 * i));
+                    foreach (Drop loopDrop in drops)
+                    {
+                        //Log.Warn((short)(25.0 * i));
 
-						//loopDrop.Position.X += (short)(25.0 * i);
-						i++;
+                        //loopDrop.Position.X += (short)(25.0 * i);
+                        i++;
 
-						this.Map.Drops.Add(loopDrop);
-					}
-				}
+                        this.Map.Drops.Add(loopDrop);
+                    }
+                }
 
-				if (owner != null)
-				{
-					foreach (KeyValuePair<ushort, Dictionary<int, short>> loopStartedQuest in owner.Quests.Started)
-					{
-						if (loopStartedQuest.Value.ContainsKey(item.MapleID))
-						{
-							loopStartedQuest.Value[item.MapleID]++;
+                if (owner != null)
+                {
+                    foreach (KeyValuePair<ushort, Dictionary<int, short>> loopStartedQuest in owner.Quests.Started)
+                    {
+                        if (loopStartedQuest.Value.ContainsKey(item.MapleID))
+                        {
+                            loopStartedQuest.Value[item.MapleID]++;
 
-							using (Packet outPacket = new Packet(MapleServerOperationCode.ShowStatusInfo))
-							{
-								outPacket.WriteByte(1);
-								outPacket.WriteUShort(loopStartedQuest.Key);
-								outPacket.WriteByte(1);
+                            using (Packet outPacket = new Packet(MapleServerOperationCode.ShowStatusInfo))
+                            {
+                                outPacket.WriteByte(1);
+                                outPacket.WriteUShort(loopStartedQuest.Key);
+                                outPacket.WriteByte(1);
 
-								string kills = string.Empty;
+                                string kills = string.Empty;
 
-								foreach (int kill in loopStartedQuest.Value.Values)
-								{
-									kills += kill.ToString().PadLeft(3, '0');
-								}
+                                foreach (int kill in loopStartedQuest.Value.Values)
+                                {
+                                    kills += kill.ToString().PadLeft(3, '0');
+                                }
 
-								outPacket.WriteString(kills);
-								outPacket.WriteInt();
-								outPacket.WriteInt();
+                                outPacket.WriteString(kills);
+                                outPacket.WriteInt();
+                                outPacket.WriteInt();
 
-								owner.Client.Send(outPacket);
-							}
+                                owner.Client.Send(outPacket);
+                            }
 
-							if (owner.Quests.CanComplete(loopStartedQuest.Key, true))
-							{
-								owner.Quests.NotifyComplete(loopStartedQuest.Key);
-							}
-						}
-					}
-				}
+                            if (owner.Quests.CanComplete(loopStartedQuest.Key, true))
+                            {
+                                owner.Quests.NotifyComplete(loopStartedQuest.Key);
+                            }
+                        }
+                    }
+                }
 
-				if (World.IsInitialized)
-				{
-					item.Controller.ControlledMobs.Remove(item);
+                if (World.IsInitialized)
+                {
+                    item.Controller.ControlledMobs.Remove(item);
 
-					using (Packet destroy = item.GetDestroyPacket())
-					{
-						item.Map.Broadcast(destroy);
-					}
-				}
+                    using (Packet destroy = item.GetDestroyPacket())
+                    {
+                        item.Map.Broadcast(destroy);
+                    }
+                }
 
-				base.RemoveItem(index);
+                base.RemoveItem(index);
 
-				if (item.SpawnPoint != null && item.CanRespawn)
-				{
-					Delay.Execute(3 * 1000, () => item.SpawnPoint.Spawn());
-				}
+                if (item.SpawnPoint != null && item.CanRespawn)
+                {
+                    Delay.Execute(3 * 1000, () => item.SpawnPoint.Spawn());
+                }
 
-				foreach (int summonId in item.DeathSummons)
-				{
-					this.Map.Mobs.Add(new Mob(summonId) { Position = item.Position });
-				}
-			}
-		}
-	}
+                foreach (int summonId in item.DeathSummons)
+                {
+                    this.Map.Mobs.Add(new Mob(summonId) { Position = item.Position });
+                }
+            }
+        }
+    }
 }

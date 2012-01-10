@@ -3,34 +3,34 @@ using System.Collections.ObjectModel;
 
 namespace Loki.Collections
 {
-	public abstract class DynamicKeyedCollection<TKey, TItem> : Collection<TItem>
-	{
-		public TItem this[TKey key]
-		{
-			get
-			{
-				foreach (TItem item in this)
-				{
-					if (EqualityComparer<TKey>.Default.Equals(key, this.GetKeyForItem(item)))
-					{
-						return item;
-					}
-				}
+    public abstract class DynamicKeyedCollection<TKey, TItem> : Collection<TItem>
+    {
+        public TItem this[TKey key]
+        {
+            get
+            {
+                foreach (TItem item in this)
+                {
+                    if (EqualityComparer<TKey>.Default.Equals(key, this.GetKeyForItem(item)))
+                    {
+                        return item;
+                    }
+                }
 
-				return default(TItem);
-			}
-		}
+                return default(TItem);
+            }
+        }
 
-		public bool Contains(TKey key)
-		{
-			return base.Contains(this[key]);
-		}
+        public bool Contains(TKey key)
+        {
+            return base.Contains(this[key]);
+        }
 
-		public void Remove(TKey key)
-		{
-			base.Remove(this[key]);
-		}
+        public void Remove(TKey key)
+        {
+            base.Remove(this[key]);
+        }
 
-		protected abstract TKey GetKeyForItem(TItem item);
-	}
+        protected abstract TKey GetKeyForItem(TItem item);
+    }
 }

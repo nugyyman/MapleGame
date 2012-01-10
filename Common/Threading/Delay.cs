@@ -4,62 +4,62 @@ using Timer = System.Timers.Timer;
 
 namespace Loki.Threading
 {
-	public class Delay
-	{
-		public static void Execute(double delay, ThreadStart action)
-		{
-			Delay.Execute((int)delay, action);
-		}
+    public class Delay
+    {
+        public static void Execute(double delay, ThreadStart action)
+        {
+            Delay.Execute((int)delay, action);
+        }
 
-		public static void Execute(int delay, ThreadStart action)
-		{
-			Timer t = new Timer(delay);
+        public static void Execute(int delay, ThreadStart action)
+        {
+            Timer t = new Timer(delay);
 
-			t.Elapsed += new ElapsedEventHandler(delegate(object sender, ElapsedEventArgs e)
-				{
-					t.Stop();
-					action();
-					t.Dispose();
-					t = null;
-				});
+            t.Elapsed += new ElapsedEventHandler(delegate(object sender, ElapsedEventArgs e)
+                {
+                    t.Stop();
+                    action();
+                    t.Dispose();
+                    t = null;
+                });
 
-			t.Start();
-		}
+            t.Start();
+        }
 
-		private ThreadStart action;
-		private Timer t;
+        private ThreadStart action;
+        private Timer t;
 
-		public Delay(int delay, ThreadStart action)
-		{
-			t = new Timer(delay);
+        public Delay(int delay, ThreadStart action)
+        {
+            t = new Timer(delay);
 
-			t.Elapsed += new ElapsedEventHandler(delegate(object sender, ElapsedEventArgs e)
-			{
-				if (t != null)
-				{
-					t.Stop();
-					action();
-					t.Dispose();
-				}
+            t.Elapsed += new ElapsedEventHandler(delegate(object sender, ElapsedEventArgs e)
+            {
+                if (t != null)
+                {
+                    t.Stop();
+                    action();
+                    t.Dispose();
+                }
 
-				t = null;
-			});
-		}
+                t = null;
+            });
+        }
 
-		public void Execute()
-		{
-			t.Start();
-		}
+        public void Execute()
+        {
+            t.Start();
+        }
 
-		public void Cancel()
-		{
-			if (t != null)
-			{
-				t.Stop();
-				t.Dispose();
-			}
+        public void Cancel()
+        {
+            if (t != null)
+            {
+                t.Stop();
+                t.Dispose();
+            }
 
-			t = null;
-		}
-	}
+            t = null;
+        }
+    }
 }

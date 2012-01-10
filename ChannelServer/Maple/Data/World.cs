@@ -9,151 +9,151 @@ using Loki.Maple.Life;
 
 namespace Loki.Maple.Data
 {
-	public static class World
-	{
-		public static bool IsInitialized { get; private set; }
+    public static class World
+    {
+        public static bool IsInitialized { get; private set; }
 
-		public static WorldMaps Maps { get; private set; }
-		public static CachedItems CachedItems { get; private set; }
-		public static CachedSkills CachedSkills { get; private set; }
-		public static CachedMobs CachedMobs { get; private set; }
-		public static AvailableStyles AvailableStyles { get; private set; }
-		public static WorldCharactersHelper Characters { get; private set; }
-		public static WorldNpcsHelper Npcs { get; private set; }
-		public static AvailableStyles CachedStyles { get; private set; }
-		public static QuestData Quests { get; private set; }
-				
-		public static void Initialize()
-		{
-			using (Database.TemporarySchema("mcdb"))
-			{
-				World.IsInitialized = false;
+        public static WorldMaps Maps { get; private set; }
+        public static CachedItems CachedItems { get; private set; }
+        public static CachedSkills CachedSkills { get; private set; }
+        public static CachedMobs CachedMobs { get; private set; }
+        public static AvailableStyles AvailableStyles { get; private set; }
+        public static WorldCharactersHelper Characters { get; private set; }
+        public static WorldNpcsHelper Npcs { get; private set; }
+        public static AvailableStyles CachedStyles { get; private set; }
+        public static QuestData Quests { get; private set; }
 
-				if (World.AvailableStyles != null)
-				{
-					World.AvailableStyles.Skins.Clear();
-					World.AvailableStyles.MaleHairs.Clear();
-					World.AvailableStyles.FemaleHairs.Clear();
-					World.AvailableStyles.MaleFaces.Clear();
-					World.AvailableStyles.FemaleFaces.Clear();
-				}
+        public static void Initialize()
+        {
+            using (Database.TemporarySchema("mcdb"))
+            {
+                World.IsInitialized = false;
 
-				if (World.CachedItems != null)
-				{
-					World.CachedItems.Clear();
-				}
+                if (World.AvailableStyles != null)
+                {
+                    World.AvailableStyles.Skins.Clear();
+                    World.AvailableStyles.MaleHairs.Clear();
+                    World.AvailableStyles.FemaleHairs.Clear();
+                    World.AvailableStyles.MaleFaces.Clear();
+                    World.AvailableStyles.FemaleFaces.Clear();
+                }
 
-				if (World.CachedSkills != null)
-				{
-					World.CachedSkills.Clear();
-				}
+                if (World.CachedItems != null)
+                {
+                    World.CachedItems.Clear();
+                }
 
-				if (World.CachedMobs != null)
-				{
-					World.CachedMobs.Clear();
-				}
+                if (World.CachedSkills != null)
+                {
+                    World.CachedSkills.Clear();
+                }
 
-				if (World.Maps != null)
-				{
-					World.Maps.Clear();
-				}
+                if (World.CachedMobs != null)
+                {
+                    World.CachedMobs.Clear();
+                }
 
-				if (World.Quests != null)
-				{
-					World.Quests.Clear();
-				}
+                if (World.Maps != null)
+                {
+                    World.Maps.Clear();
+                }
 
-				if (MobSkill.Summons != null)
-				{
-					MobSkill.Summons.Clear();
-				}
+                if (World.Quests != null)
+                {
+                    World.Quests.Clear();
+                }
 
-				if (Strings.Items != null)
-				{
-					Strings.Items.Clear();
-					Strings.Maps.Clear();
-					Strings.Mobs.Clear();
-					Strings.Npcs.Clear();
-					Strings.Quests.Clear();
-				}
+                if (MobSkill.Summons != null)
+                {
+                    MobSkill.Summons.Clear();
+                }
 
-				Database.Test();
+                if (Strings.Items != null)
+                {
+                    Strings.Items.Clear();
+                    Strings.Maps.Clear();
+                    Strings.Mobs.Clear();
+                    Strings.Npcs.Clear();
+                    Strings.Quests.Clear();
+                }
 
-				DateTime dti = DateTime.Now;
+                Database.Test();
 
-				Log.Inform("Loading data...");
-				Thread.Sleep(100);
+                DateTime dti = DateTime.Now;
 
-				World.AvailableStyles = new AvailableStyles();
-				World.CachedMobs = new CachedMobs();
-				World.CachedItems = new CachedItems();
-				World.CachedSkills = new CachedSkills();
-				World.Maps = new WorldMaps();
-				World.Quests = new QuestData();
+                Log.Inform("Loading data...");
+                Thread.Sleep(100);
 
-				Strings.Load();
-				CommandFactory.Initialize();
+                World.AvailableStyles = new AvailableStyles();
+                World.CachedMobs = new CachedMobs();
+                World.CachedItems = new CachedItems();
+                World.CachedSkills = new CachedSkills();
+                World.Maps = new WorldMaps();
+                World.Quests = new QuestData();
 
-				List<SpawnPoint> toSpawn = new List<SpawnPoint>();
+                Strings.Load();
+                CommandFactory.Initialize();
 
-				foreach (Map loopMap in World.Maps)
-				{
-					foreach (SpawnPoint loopSpawnPoint in loopMap.SpawnPoints)
-					{
-						toSpawn.Add(loopSpawnPoint);
-					}
-				}
+                List<SpawnPoint> toSpawn = new List<SpawnPoint>();
 
-				foreach (SpawnPoint loopSpawnPoint in toSpawn)
-				{
-					loopSpawnPoint.Spawn();
-				}
+                foreach (Map loopMap in World.Maps)
+                {
+                    foreach (SpawnPoint loopSpawnPoint in loopMap.SpawnPoints)
+                    {
+                        toSpawn.Add(loopSpawnPoint);
+                    }
+                }
 
-				toSpawn = null;
+                foreach (SpawnPoint loopSpawnPoint in toSpawn)
+                {
+                    loopSpawnPoint.Spawn();
+                }
 
-				Log.Success("Maple data loaded in {0} seconds.", (DateTime.Now - dti).Seconds);
+                toSpawn = null;
 
-				World.Characters = new WorldCharactersHelper();
-				World.Npcs = new WorldNpcsHelper();
+                Log.Success("Maple data loaded in {0} seconds.", (DateTime.Now - dti).Seconds);
 
-				World.IsInitialized = true;
-			}
-		}
+                World.Characters = new WorldCharactersHelper();
+                World.Npcs = new WorldNpcsHelper();
 
-		public static void Broadcast(Packet inPacket)
-		{
-			foreach (Map loopMap in World.Maps)
-			{
-				loopMap.Broadcast(inPacket);
-			}
-		}
+                World.IsInitialized = true;
+            }
+        }
 
-		public static string Header
-		{
-			set
-			{
-				World.Notify(value, NoticeType.Header);
-			}
-		}
+        public static void Broadcast(Packet inPacket)
+        {
+            foreach (Map loopMap in World.Maps)
+            {
+                loopMap.Broadcast(inPacket);
+            }
+        }
 
-		public static void Notify(string message, NoticeType type = NoticeType.Notice)
-		{
-			using (Packet outPacket = new Packet(MapleServerOperationCode.ServerMessage))
-			{
-				outPacket.WriteByte((byte)type);
-				outPacket.WriteString(message);
-				World.Broadcast(outPacket);
-			}
-		}
+        public static string Header
+        {
+            set
+            {
+                World.Notify(value, NoticeType.Header);
+            }
+        }
 
-		public static void Tip(string message, string header = "MapleTip")
-		{
-			using (Packet outPacket = new Packet(MapleServerOperationCode.YellowTip))
-			{
-				outPacket.WriteByte(0xFF);
-				outPacket.WriteString("[{0}] {1}", header, message);
-				World.Broadcast(outPacket);
-			}
-		}
-	}
+        public static void Notify(string message, NoticeType type = NoticeType.Notice)
+        {
+            using (Packet outPacket = new Packet(MapleServerOperationCode.ServerMessage))
+            {
+                outPacket.WriteByte((byte)type);
+                outPacket.WriteString(message);
+                World.Broadcast(outPacket);
+            }
+        }
+
+        public static void Tip(string message, string header = "MapleTip")
+        {
+            using (Packet outPacket = new Packet(MapleServerOperationCode.YellowTip))
+            {
+                outPacket.WriteByte(0xFF);
+                outPacket.WriteString("[{0}] {1}", header, message);
+                World.Broadcast(outPacket);
+            }
+        }
+    }
 }

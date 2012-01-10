@@ -9,50 +9,50 @@ using Loki.Net;
 
 namespace Loki
 {
-	public static class LoginServerSetup
-	{
-		public static void Run()
-		{
-			Log.Entitle("Login Server Setup");
+    public static class LoginServerSetup
+    {
+        public static void Run()
+        {
+            Log.Entitle("Login Server Setup");
 
-			Log.Inform("If you do not know a value, leave the field blank to apply default.");
+            Log.Inform("If you do not know a value, leave the field blank to apply default.");
 
-			Log.Entitle("Database Setup");
+            Log.Entitle("Database Setup");
 
-			string databaseHost = string.Empty;
-			string databaseSchema = string.Empty;
-			string databaseUsername = string.Empty;
-			string databasePassword = string.Empty;
+            string databaseHost = string.Empty;
+            string databaseSchema = string.Empty;
+            string databaseUsername = string.Empty;
+            string databasePassword = string.Empty;
 
-		databaseConfiguration:
+        databaseConfiguration:
 
-			Log.Inform("Please enter your database credentials: ");
+            Log.Inform("Please enter your database credentials: ");
 
-			Log.SkipLine();
+            Log.SkipLine();
 
-			try
-			{
-				databaseHost = Log.Input("Host: ", "localhost");
-				databaseSchema = Log.Input("Database: ", "login");
-				databaseUsername = Log.Input("Username: ", "root");
-				databasePassword = Log.Input("Password: ", "");
+            try
+            {
+                databaseHost = Log.Input("Host: ", "localhost");
+                databaseSchema = Log.Input("Database: ", "login");
+                databaseUsername = Log.Input("Username: ", "root");
+                databasePassword = Log.Input("Password: ", "");
 
-				using (Database.TemporaryConnection(databaseHost, databaseSchema, databaseUsername, databasePassword))
-				{
-					Database.Test();
-				}
-			}
-			catch (MySqlException e)
-			{
-				Log.SkipLine();
+                using (Database.TemporaryConnection(databaseHost, databaseSchema, databaseUsername, databasePassword))
+                {
+                    Database.Test();
+                }
+            }
+            catch (MySqlException e)
+            {
+                Log.SkipLine();
 
-				Log.Error(e);
+                Log.Error(e);
 
-				Log.SkipLine();
+                Log.SkipLine();
 
-				if (e.Message.Contains("Unknown database") && Log.YesNo("Create and populate the " + databaseSchema + " database? ", true))
-				{
-					Database.ExecuteScript(databaseHost, databaseUsername, databasePassword, @"
+                if (e.Message.Contains("Unknown database") && Log.YesNo("Create and populate the " + databaseSchema + " database? ", true))
+                {
+                    Database.ExecuteScript(databaseHost, databaseUsername, databasePassword, @"
 							CREATE DATABASE {0};
 							USE {0};
 
@@ -97,131 +97,131 @@ namespace Loki
 							INSERT INTO master_ip VALUES ('127.0.0.1');
 						", databaseSchema);
 
-					Log.Inform("Database '{0}' created.", databaseSchema);
-				}
-				else
-				{
-					goto databaseConfiguration;
-				}
-			}
-			catch
-			{
-				Log.SkipLine();
+                    Log.Inform("Database '{0}' created.", databaseSchema);
+                }
+                else
+                {
+                    goto databaseConfiguration;
+                }
+            }
+            catch
+            {
+                Log.SkipLine();
 
-				goto databaseConfiguration;
-			}
+                goto databaseConfiguration;
+            }
 
-			Log.SkipLine();
+            Log.SkipLine();
 
-			Log.Success("Database configured!");
+            Log.Success("Database configured!");
 
-			Log.Entitle("Server Configuration");
+            Log.Entitle("Server Configuration");
 
-			string securityCode = Log.Input("Assign a security code between servers: ", "");
-			bool requireStaffIP = Log.YesNo("Require staff to connect through specific IPs? ", true);
-			bool autoRegister = Log.YesNo("Allow players to register in-game? ", true);
-			bool requestPin = Log.YesNo("Require players to enter PIN on login? ", false);
-			bool requestDeletionBirthday = Log.YesNo("Require a valid birthday on character deletion? ", false);
-			int maxCharacters = Log.Input("Maximum characters per account: ", 3);
+            string securityCode = Log.Input("Assign a security code between servers: ", "");
+            bool requireStaffIP = Log.YesNo("Require staff to connect through specific IPs? ", true);
+            bool autoRegister = Log.YesNo("Allow players to register in-game? ", true);
+            bool requestPin = Log.YesNo("Require players to enter PIN on login? ", false);
+            bool requestDeletionBirthday = Log.YesNo("Require a valid birthday on character deletion? ", false);
+            int maxCharacters = Log.Input("Maximum characters per account: ", 3);
 
-			Log.SkipLine();
+            Log.SkipLine();
 
-			Log.Success("Server configured!");
+            Log.Success("Server configured!");
 
-			Log.Entitle("World Configuration");
+            Log.Entitle("World Configuration");
 
-			bool configuredWorld = true;
+            bool configuredWorld = true;
 
-			int WorldExperienceRate = 1;
-			int WorldQuestExperienceRate = 1;
-			int WorldPartyQuestExperienceRate = 1;
-			int WorldMesoDropRate = 1;
-			int WorldItemDropRate = 1;
-			string WorldName = string.Empty;
-			ServerFlag WorldFlag = ServerFlag.None;
-			IPAddress WorldIP = IPAddress.Loopback;
+            int WorldExperienceRate = 1;
+            int WorldQuestExperienceRate = 1;
+            int WorldPartyQuestExperienceRate = 1;
+            int WorldMesoDropRate = 1;
+            int WorldItemDropRate = 1;
+            string WorldName = string.Empty;
+            ServerFlag WorldFlag = ServerFlag.None;
+            IPAddress WorldIP = IPAddress.Loopback;
 
-			if (Log.YesNo("Skip World configuration (not recommended)? ", false))
-			{
-				configuredWorld = false;
-				goto userProfile;
-			}
+            if (Log.YesNo("Skip World configuration (not recommended)? ", false))
+            {
+                configuredWorld = false;
+                goto userProfile;
+            }
 
-			Log.SkipLine();
-			Log.Inform("Please enter the basic details: ");
+            Log.SkipLine();
+            Log.Inform("Please enter the basic details: ");
 
-			WorldName = string.Empty;
+            WorldName = string.Empty;
 
-			do
-			{
-				WorldName = Log.Input("World name (examples: Bera, Khaini): ", "Scania");
-			}
-			while (!WorldNameResolver.IsValid(WorldName));
+            do
+            {
+                WorldName = Log.Input("World name (examples: Bera, Khaini): ", "Scania");
+            }
+            while (!WorldNameResolver.IsValid(WorldName));
 
-			WorldIP = Log.Input("Host IP (external for remote only): ", IPAddress.Loopback);
+            WorldIP = Log.Input("Host IP (external for remote only): ", IPAddress.Loopback);
 
-			Log.SkipLine();
-			Log.Inform("Please specify the World rates: ");
+            Log.SkipLine();
+            Log.Inform("Please specify the World rates: ");
 
-			WorldExperienceRate = Log.Input("Normal experience: ", 1);
-			WorldQuestExperienceRate = Log.Input("Quest experience: ", 1);
-			WorldPartyQuestExperienceRate = Log.Input("Party quest experience: ", 1);
-			WorldMesoDropRate = Log.Input("Meso drop: ", 1);
-			WorldItemDropRate = Log.Input("Item drop: ", 1);
+            WorldExperienceRate = Log.Input("Normal experience: ", 1);
+            WorldQuestExperienceRate = Log.Input("Quest experience: ", 1);
+            WorldPartyQuestExperienceRate = Log.Input("Party quest experience: ", 1);
+            WorldMesoDropRate = Log.Input("Meso drop: ", 1);
+            WorldItemDropRate = Log.Input("Item drop: ", 1);
 
-			Log.SkipLine();
+            Log.SkipLine();
 
-			Log.Inform("Which flag should be shown with this World?\n  None\n  New\n  Hot\n  Event");
+            Log.Inform("Which flag should be shown with this World?\n  None\n  New\n  Hot\n  Event");
 
-		inputFlag:
-			Log.SkipLine();
-			try
-			{
-				WorldFlag = (ServerFlag)Enum.Parse(typeof(ServerFlag), Log.Input("World flag: ", "None"));
-			}
-			catch
-			{
-				goto inputFlag;
-			}
+        inputFlag:
+            Log.SkipLine();
+            try
+            {
+                WorldFlag = (ServerFlag)Enum.Parse(typeof(ServerFlag), Log.Input("World flag: ", "None"));
+            }
+            catch
+            {
+                goto inputFlag;
+            }
 
-			Log.SkipLine();
+            Log.SkipLine();
 
-			Log.Success("World '{0}' configured!", WorldName);
+            Log.Success("World '{0}' configured!", WorldName);
 
-		userProfile:
-			Log.Inform("Please choose what information to display.\n  A. Hide packets (recommended)\n  B. Show names\n  C. Show content");
-			Log.SkipLine();
+        userProfile:
+            Log.Inform("Please choose what information to display.\n  A. Hide packets (recommended)\n  B. Show names\n  C. Show content");
+            Log.SkipLine();
 
-			LogLevel logLevel;
+            LogLevel logLevel;
 
-		multipleChoice:
-			switch (Log.Input("Please enter yours choice: ", "Hide").ToLower())
-			{
-				case "a":
-				case "hide":
-					logLevel = LogLevel.None;
-					break;
+        multipleChoice:
+            switch (Log.Input("Please enter yours choice: ", "Hide").ToLower())
+            {
+                case "a":
+                case "hide":
+                    logLevel = LogLevel.None;
+                    break;
 
-				case "b":
-				case "names":
-					logLevel = LogLevel.Name;
-					break;
+                case "b":
+                case "names":
+                    logLevel = LogLevel.Name;
+                    break;
 
-				case "c":
-				case "content":
-					logLevel = LogLevel.Full;
-					break;
+                case "c":
+                case "content":
+                    logLevel = LogLevel.Full;
+                    break;
 
-				default:
-					goto multipleChoice;
-			}
+                default:
+                    goto multipleChoice;
+            }
 
-			Log.Entitle("Please wait...");
+            Log.Entitle("Please wait...");
 
-			Log.Inform("Applying settings to 'Configuration.ini'...");
+            Log.Inform("Applying settings to 'Configuration.ini'...");
 
-			string lines = string.Format(
-				@"[Log]
+            string lines = string.Format(
+                @"[Log]
 				Packets={0}
 				StackTrace=False
 				LoadTime=False
@@ -243,13 +243,13 @@ namespace Loki
 				Schema={8}
 				Username={9}
 				Password={10}",
-				logLevel, autoRegister, requestPin, requestDeletionBirthday,
-				maxCharacters, requireStaffIP, securityCode, databaseHost, databaseSchema,
-				databaseUsername, databasePassword).Replace("	", "");
+                logLevel, autoRegister, requestPin, requestDeletionBirthday,
+                maxCharacters, requireStaffIP, securityCode, databaseHost, databaseSchema,
+                databaseUsername, databasePassword).Replace("	", "");
 
-			if (configuredWorld)
-			{
-				lines += string.Format(@"
+            if (configuredWorld)
+            {
+                lines += string.Format(@"
 				
 				[{0}]
 				HostIP={1}
@@ -260,16 +260,16 @@ namespace Loki
 				PartyQuestExperienceRate={5}
 				MesoDropRate={6}
 				ItemDropRate={7}",
-				WorldName, WorldIP, WorldFlag, WorldExperienceRate, WorldQuestExperienceRate,
-				WorldPartyQuestExperienceRate, WorldMesoDropRate, WorldItemDropRate).Replace("	", "");
-			}
+                WorldName, WorldIP, WorldFlag, WorldExperienceRate, WorldQuestExperienceRate,
+                WorldPartyQuestExperienceRate, WorldMesoDropRate, WorldItemDropRate).Replace("	", "");
+            }
 
-			using (StreamWriter file = new StreamWriter(Application.ExecutablePath + "Configuration.ini"))
-			{
-				file.WriteLine(lines);
-			}
+            using (StreamWriter file = new StreamWriter(Application.ExecutablePath + "Configuration.ini"))
+            {
+                file.WriteLine(lines);
+            }
 
-			Log.Success("Configuration done!");
-		}
-	}
+            Log.Success("Configuration done!");
+        }
+    }
 }

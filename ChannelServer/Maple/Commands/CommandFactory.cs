@@ -4,27 +4,27 @@ using Loki.Maple.Characters;
 
 namespace Loki.Maple.Commands
 {
-	static class CommandFactory
-	{
-		public static Commands Commands { get; private set; }
+    static class CommandFactory
+    {
+        public static Commands Commands { get; private set; }
 
-		public static void Initialize()
-		{
-			CommandFactory.Commands = new Commands();
+        public static void Initialize()
+        {
+            CommandFactory.Commands = new Commands();
 
-			foreach (Type type in Assembly.GetExecutingAssembly().GetTypes())
-			{
-				if (type.IsSubclassOf(typeof(Command)))
-				{
-					CommandFactory.Commands.Add((Command)Activator.CreateInstance(type));
-				}
-			}
-		}
+            foreach (Type type in Assembly.GetExecutingAssembly().GetTypes())
+            {
+                if (type.IsSubclassOf(typeof(Command)))
+                {
+                    CommandFactory.Commands.Add((Command)Activator.CreateInstance(type));
+                }
+            }
+        }
 
-		public static void Execute(Character caller, string text)
-		{
-			string[] splitted = text.Split(' ');
-			splitted[0] = splitted[0].ToLower();
+        public static void Execute(Character caller, string text)
+        {
+            string[] splitted = text.Split(' ');
+            splitted[0] = splitted[0].ToLower();
             string commandName = "";
             if (text.StartsWith(Application.CommandIndicator))
                 commandName = splitted[0].TrimStart(Application.CommandIndicator.ToCharArray());
@@ -33,16 +33,16 @@ namespace Loki.Maple.Commands
             else
                 commandName = splitted[0];
 
-			string[] args = new string[splitted.Length - 1];
+            string[] args = new string[splitted.Length - 1];
 
-			for (int i = 1; i < splitted.Length; i++)
-			{
-				args[i - 1] = splitted[i];
-			}
+            for (int i = 1; i < splitted.Length; i++)
+            {
+                args[i - 1] = splitted[i];
+            }
 
-			if (CommandFactory.Commands.Contains(commandName))
-			{
-				Command command = CommandFactory.Commands[commandName];
+            if (CommandFactory.Commands.Contains(commandName))
+            {
+                Command command = CommandFactory.Commands[commandName];
 
                 if ((command.IsRestricted && text.StartsWith(Application.CommandIndicator)) || (!command.IsRestricted && text.StartsWith(Application.PlayerCommandIndicator)))
                 {
@@ -67,11 +67,11 @@ namespace Loki.Maple.Commands
                 {
                     caller.Notify("[Command] Invalid command.");
                 }
-			}
-			else
-			{
-				caller.Notify("[Command] Invalid command.");
-			}
-		}
-	}
+            }
+            else
+            {
+                caller.Notify("[Command] Invalid command.");
+            }
+        }
+    }
 }

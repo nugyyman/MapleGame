@@ -4,61 +4,61 @@ using System.Collections.Generic;
 
 namespace Loki.Maple
 {
-	public abstract class EnumerationHelper<TKey, TValue> : IEnumerable<TValue>
-	{
-		public EnumerationHelper() { }
+    public abstract class EnumerationHelper<TKey, TValue> : IEnumerable<TValue>
+    {
+        public EnumerationHelper() { }
 
-		public abstract TKey GetKeyForObject(TValue item);
+        public abstract TKey GetKeyForObject(TValue item);
 
-		public TValue this[TKey key]
-		{
-			get
-			{
-				foreach (TValue item in this)
-				{
-					if (EqualityComparer<TKey>.Default.Equals(key, this.GetKeyForObject(item)))
-					{
-						return item;
-					}
-				}
+        public TValue this[TKey key]
+        {
+            get
+            {
+                foreach (TValue item in this)
+                {
+                    if (EqualityComparer<TKey>.Default.Equals(key, this.GetKeyForObject(item)))
+                    {
+                        return item;
+                    }
+                }
 
-				throw new KeyNotFoundException();
-			}
-		}
+                throw new KeyNotFoundException();
+            }
+        }
 
-		public bool Contains(TKey key)
-		{
-			foreach (TValue item in this)
-			{
-				if (EqualityComparer<TKey>.Default.Equals(key, this.GetKeyForObject(item)))
-				{
-					return true;
-				}
-			}
+        public bool Contains(TKey key)
+        {
+            foreach (TValue item in this)
+            {
+                if (EqualityComparer<TKey>.Default.Equals(key, this.GetKeyForObject(item)))
+                {
+                    return true;
+                }
+            }
 
-			return false;
-		}
+            return false;
+        }
 
-		public abstract IEnumerator<TValue> GetEnumerator();
+        public abstract IEnumerator<TValue> GetEnumerator();
 
-		IEnumerator IEnumerable.GetEnumerator()
-		{
-			return (IEnumerator)this.GetEnumerator();
-		}
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return (IEnumerator)this.GetEnumerator();
+        }
 
-		public int Count
-		{
-			get
-			{
-				int count = 0;
+        public int Count
+        {
+            get
+            {
+                int count = 0;
 
-				foreach (TValue item in this)
-				{
-					count++;
-				}
+                foreach (TValue item in this)
+                {
+                    count++;
+                }
 
-				return count;
-			}
-		}
-	}
+                return count;
+            }
+        }
+    }
 }

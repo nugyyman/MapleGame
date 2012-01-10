@@ -7,22 +7,22 @@ using Loki.IO;
 
 namespace Loki.Maple.Commands.Implementation
 {
-	class LogLevelCommand : Command
-	{
-		public override bool IsRestricted { get { return true; } }
-		public override string Name { get { return "logLevel"; } }
-		public override string Parameters { get { return "level"; } }
+    class LogLevelCommand : Command
+    {
+        public override bool IsRestricted { get { return true; } }
+        public override string Name { get { return "logLevel"; } }
+        public override string Parameters { get { return "level"; } }
 
-		public override void Execute(Character caller, string[] args)
-		{
-			if (args.Length != 1)
-			{
-				ShowSyntax(caller);
-			}
-			else
-			{
-				Packet.LogLevel = (LogLevel)Enum.Parse(typeof(LogLevel), args[0]);
-			}
-		}
-	}
+        public override void Execute(Character caller, string[] args)
+        {
+            if (args.Length != 1)
+            {
+                ShowSyntax(caller);
+            }
+            else
+            {
+                Packet.LogLevel = (LogLevel)Enum.Parse(typeof(LogLevel), args[0]);
+            }
+        }
+    }
 }

@@ -13,199 +13,199 @@ using Loki.Shell;
 
 namespace Loki.Net
 {
-	public static class ChannelServer
-	{
-		private static bool isAlive;
-		private static byte channelID;
-		private static ManualResetEvent AcceptDone = new ManualResetEvent(false);
+    public static class ChannelServer
+    {
+        private static bool isAlive;
+        private static byte channelID;
+        private static ManualResetEvent AcceptDone = new ManualResetEvent(false);
 
-		public static TcpListener Listener { get; private set; }
-		public static IPEndPoint RemoteEndPoint { get; private set; }
-		public static InteroperabilityClient LoginServerConnection { get; set; }
-		public static List<int> LoggedIn { get; private set; }
-		public static List<ChannelClientHandler> Clients { get; private set; }
-		public static byte WorldID { get; set; }
-		public static int AutoRestartTime { get; set; }
+        public static TcpListener Listener { get; private set; }
+        public static IPEndPoint RemoteEndPoint { get; private set; }
+        public static InteroperabilityClient LoginServerConnection { get; set; }
+        public static List<int> LoggedIn { get; private set; }
+        public static List<ChannelClientHandler> Clients { get; private set; }
+        public static byte WorldID { get; set; }
+        public static int AutoRestartTime { get; set; }
 
-		public static int MaxUsers { get; set; }
-		public static int ExperienceRate { get; set; }
-		public static int QuestExperienceRate { get; set; }
-		public static int PartyQuestExperienceRate { get; set; }
-		public static int MesoRate { get; set; }
-		public static int DropRate { get; set; }
-		public static bool AllowMultiLeveling { get; set; } // TODO.
+        public static int MaxUsers { get; set; }
+        public static int ExperienceRate { get; set; }
+        public static int QuestExperienceRate { get; set; }
+        public static int PartyQuestExperienceRate { get; set; }
+        public static int MesoRate { get; set; }
+        public static int DropRate { get; set; }
+        public static bool AllowMultiLeveling { get; set; } // TODO.
 
-		public static bool IsAlive
-		{
-			get
-			{
-				return isAlive;
-			}
-			set
-			{
-				isAlive = value;
+        public static bool IsAlive
+        {
+            get
+            {
+                return isAlive;
+            }
+            set
+            {
+                isAlive = value;
 
-				if (!value)
-				{
-					ChannelServer.AcceptDone.Set();
-				}
-			}
-		}
+                if (!value)
+                {
+                    ChannelServer.AcceptDone.Set();
+                }
+            }
+        }
 
-		public static byte ChannelID
-		{
-			get
-			{
-				return channelID;
-			}
-			set
-			{
-				channelID = value;
+        public static byte ChannelID
+        {
+            get
+            {
+                return channelID;
+            }
+            set
+            {
+                channelID = value;
 
-				Console.Title = string.Format("Channel Server v.{0} ({1}-{2})",
-					Application.MapleVersion,
-					WorldNameResolver.GetName(ChannelServer.WorldID),
-					ChannelServer.ChannelID);
-			}
-		}
+                Console.Title = string.Format("Channel Server v.{0} ({1}-{2})",
+                    Application.MapleVersion,
+                    WorldNameResolver.GetName(ChannelServer.WorldID),
+                    ChannelServer.ChannelID);
+            }
+        }
 
-		public static byte InternalChannelID
-		{
-			get
-			{
-				return (byte)(ChannelServer.ChannelID - 1);
-			}
-		}
-		
-		[STAThread]
-		public static void Main(string[] args)
-		{
-			if (args.Length == 1 && args[0].ToLower() == "setup" || !File.Exists(Application.ExecutablePath + "Configuration.ini"))
-			{
-				ChannelServerSetup.Run();
-			}
+        public static byte InternalChannelID
+        {
+            get
+            {
+                return (byte)(ChannelServer.ChannelID - 1);
+            }
+        }
 
-			int port = 0;
+        [STAThread]
+        public static void Main(string[] args)
+        {
+            if (args.Length == 1 && args[0].ToLower() == "setup" || !File.Exists(Application.ExecutablePath + "Configuration.ini"))
+            {
+                ChannelServerSetup.Run();
+            }
 
-		start:
-			ChannelServer.LoggedIn = new List<int>();
-			ChannelServer.Clients = new List<ChannelClientHandler>();
-			
-			Log.Entitle("Channel Server v.{0}", Application.MapleVersion);
-			
-			try
-			{
-				if (port == 0)
-				{
-					try
-					{
-						port = int.Parse(args[0]);
-					}
-					catch
-					{
-						port = Log.Input("Port: ", 7575);
-					}
-				}
+            int port = 0;
 
-				Settings.Initialize();
-				Shortcuts.Apply();
+        start:
+            ChannelServer.LoggedIn = new List<int>();
+            ChannelServer.Clients = new List<ChannelClientHandler>();
 
-				ChannelServer.AutoRestartTime = Settings.GetInt("Server/AutoRestartTime");
-				Log.Inform("Automatic restart time set to {0} seconds.", ChannelServer.AutoRestartTime);
+            Log.Entitle("Channel Server v.{0}", Application.MapleVersion);
 
-				Database.Test();
-				Database.Analyze(true);
+            try
+            {
+                if (port == 0)
+                {
+                    try
+                    {
+                        port = int.Parse(args[0]);
+                    }
+                    catch
+                    {
+                        port = Log.Input("Port: ", 7575);
+                    }
+                }
 
-				ChannelServer.LoggedIn = new List<int>(Settings.GetInt("Server/MaxUsers"));
-				Log.Inform("Maximum of {0} simultaneous online users.", ChannelServer.LoggedIn.Capacity);
+                Settings.Initialize();
+                Shortcuts.Apply();
 
-				ChannelServer.RemoteEndPoint = new IPEndPoint(Settings.GetIPAddress("Server/ExternalIP"), port);
+                ChannelServer.AutoRestartTime = Settings.GetInt("Server/AutoRestartTime");
+                Log.Inform("Automatic restart time set to {0} seconds.", ChannelServer.AutoRestartTime);
 
-				World.Initialize();
+                Database.Test();
+                Database.Analyze(true);
 
-				ChannelServer.Listener = new TcpListener(IPAddress.Any, ChannelServer.RemoteEndPoint.Port);
-				ChannelServer.Listener.Start();
-				Log.Inform("Initialized clients listener on {0}.", ChannelServer.Listener.LocalEndpoint);
+                ChannelServer.LoggedIn = new List<int>(Settings.GetInt("Server/MaxUsers"));
+                Log.Inform("Maximum of {0} simultaneous online users.", ChannelServer.LoggedIn.Capacity);
 
-				ChannelServer.IsAlive = true;
-			}
-			catch (Exception e)
-			{
-				Log.Error(e);
-			}
+                ChannelServer.RemoteEndPoint = new IPEndPoint(Settings.GetIPAddress("Server/ExternalIP"), port);
 
-			if (ChannelServer.IsAlive)
-			{
-				Log.Success("Channel server started.");
+                World.Initialize();
 
-				new Thread(new ThreadStart(InteroperabilityClient.Main)).Start();
-			}
-			else
-			{
-				Log.Inform("Could not start server because of errors.");
-			}
+                ChannelServer.Listener = new TcpListener(IPAddress.Any, ChannelServer.RemoteEndPoint.Port);
+                ChannelServer.Listener.Start();
+                Log.Inform("Initialized clients listener on {0}.", ChannelServer.Listener.LocalEndpoint);
 
-			while (ChannelServer.IsAlive)
-			{
-				ChannelServer.AcceptDone.Reset();
+                ChannelServer.IsAlive = true;
+            }
+            catch (Exception e)
+            {
+                Log.Error(e);
+            }
 
-				ChannelServer.Listener.BeginAcceptSocket(new AsyncCallback(ChannelServer.OnAcceptSocket), null);
+            if (ChannelServer.IsAlive)
+            {
+                Log.Success("Channel server started.");
 
-				ChannelServer.AcceptDone.WaitOne();
-			}
+                new Thread(new ThreadStart(InteroperabilityClient.Main)).Start();
+            }
+            else
+            {
+                Log.Inform("Could not start server because of errors.");
+            }
 
-			ChannelClientHandler[] remainingClients = ChannelServer.Clients.ToArray();
+            while (ChannelServer.IsAlive)
+            {
+                ChannelServer.AcceptDone.Reset();
 
-			foreach (ChannelClientHandler client in remainingClients)
-			{
-				client.Stop();
-			}
+                ChannelServer.Listener.BeginAcceptSocket(new AsyncCallback(ChannelServer.OnAcceptSocket), null);
 
-			ChannelServer.Dispose();
+                ChannelServer.AcceptDone.WaitOne();
+            }
 
-			Log.Warn("Server stopped.");
+            ChannelClientHandler[] remainingClients = ChannelServer.Clients.ToArray();
 
-			if (ChannelServer.AutoRestartTime > 0)
-			{
-				Log.Inform("Attempting auto-restart in {0} seconds.", ChannelServer.AutoRestartTime);
-				Thread.Sleep(ChannelServer.AutoRestartTime * 1000);
-				goto start;
-			}
-			else
-			{
-				Console.Read();
-			}
-		}
+            foreach (ChannelClientHandler client in remainingClients)
+            {
+                client.Stop();
+            }
 
-		private static void OnAcceptSocket(IAsyncResult ar)
-		{
-			ChannelServer.AcceptDone.Set();
+            ChannelServer.Dispose();
 
-			try
-			{
-				new ChannelClientHandler(ChannelServer.Listener.EndAcceptSocket(ar));
-			}
-			catch (ObjectDisposedException) { }
-		}
+            Log.Warn("Server stopped.");
 
-		public static void Stop()
-		{
-			ChannelServer.IsAlive = false;
-		}
+            if (ChannelServer.AutoRestartTime > 0)
+            {
+                Log.Inform("Attempting auto-restart in {0} seconds.", ChannelServer.AutoRestartTime);
+                Thread.Sleep(ChannelServer.AutoRestartTime * 1000);
+                goto start;
+            }
+            else
+            {
+                Console.Read();
+            }
+        }
 
-		public static void Dispose()
-		{
-			if (ChannelServer.LoginServerConnection != null)
-			{
-				ChannelServer.LoginServerConnection.Dispose();
-			}
+        private static void OnAcceptSocket(IAsyncResult ar)
+        {
+            ChannelServer.AcceptDone.Set();
 
-			if (ChannelServer.Listener != null)
-			{
-				ChannelServer.Listener.Stop();
-			}
+            try
+            {
+                new ChannelClientHandler(ChannelServer.Listener.EndAcceptSocket(ar));
+            }
+            catch (ObjectDisposedException) { }
+        }
 
-			Log.Inform("Server disposed from thread {0}.", Thread.CurrentThread.ManagedThreadId);
-		}
-	}
+        public static void Stop()
+        {
+            ChannelServer.IsAlive = false;
+        }
+
+        public static void Dispose()
+        {
+            if (ChannelServer.LoginServerConnection != null)
+            {
+                ChannelServer.LoginServerConnection.Dispose();
+            }
+
+            if (ChannelServer.Listener != null)
+            {
+                ChannelServer.Listener.Stop();
+            }
+
+            Log.Inform("Server disposed from thread {0}.", Thread.CurrentThread.ManagedThreadId);
+        }
+    }
 }

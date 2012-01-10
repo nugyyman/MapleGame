@@ -5,377 +5,377 @@ using Loki.Net;
 
 namespace Loki.Maple
 {
-	public class Trade
-	{
-		public Character Owner { get; private set; }
-		public Character Visitor { get; private set; }
-		public int OwnerMeso { get; private set; }
-		public int VisitorMeso { get; private set; }
-		public List<Item> OwnerItems { get; private set; }
-		public List<Item> VisitorItems { get; private set; }
-		public bool Started { get; private set; }
-		public bool OwnerLocked { get; private set; }
-		public bool VisitorLocked { get; private set; }
-		
-		public Trade(Character owner)
-		{
-			this.Owner = owner;
-			this.OwnerItems = new List<Item>();
-			this.VisitorItems = new List<Item>();
-			this.OwnerMeso = 0;
-			this.VisitorMeso = 0;
-			this.Started = false;
-			this.OwnerLocked = false;
-			this.VisitorLocked = false;
+    public class Trade
+    {
+        public Character Owner { get; private set; }
+        public Character Visitor { get; private set; }
+        public int OwnerMeso { get; private set; }
+        public int VisitorMeso { get; private set; }
+        public List<Item> OwnerItems { get; private set; }
+        public List<Item> VisitorItems { get; private set; }
+        public bool Started { get; private set; }
+        public bool OwnerLocked { get; private set; }
+        public bool VisitorLocked { get; private set; }
 
-			using (Packet outPacket = new Packet(MapleServerOperationCode.PlayerInteraction))
-			{
-				outPacket.WriteBytes(5, 3, 2);
-				outPacket.WriteByte();
-				outPacket.WriteByte();
-				outPacket.WriteBytes(this.Owner.AppearanceToByteArray());
-				outPacket.WriteString(this.Owner.Name);
-				outPacket.WriteByte(0xFF);
+        public Trade(Character owner)
+        {
+            this.Owner = owner;
+            this.OwnerItems = new List<Item>();
+            this.VisitorItems = new List<Item>();
+            this.OwnerMeso = 0;
+            this.VisitorMeso = 0;
+            this.Started = false;
+            this.OwnerLocked = false;
+            this.VisitorLocked = false;
 
-				this.Owner.Client.Send(outPacket);
-			}
-		}
+            using (Packet outPacket = new Packet(MapleServerOperationCode.PlayerInteraction))
+            {
+                outPacket.WriteBytes(5, 3, 2);
+                outPacket.WriteByte();
+                outPacket.WriteByte();
+                outPacket.WriteBytes(this.Owner.AppearanceToByteArray());
+                outPacket.WriteString(this.Owner.Name);
+                outPacket.WriteByte(0xFF);
 
-		public void Complete()
-		{
-			if (this.Owner.Items.CouldReceive(this.VisitorItems) && this.Visitor.Items.CouldReceive(this.OwnerItems))
-			{
-				this.Owner.Meso += this.VisitorMeso;
-				this.Visitor.Meso += this.OwnerMeso;
+                this.Owner.Client.Send(outPacket);
+            }
+        }
 
-				this.Visitor.Items.AddRange(this.OwnerItems);
-				this.Owner.Items.AddRange(this.VisitorItems);
-			}
-			else
-			{
-				this.Owner.Notify("Trade was not successful.", NoticeType.Popup);
-				this.Visitor.Notify("Trade was not successful.", NoticeType.Popup);
+        public void Complete()
+        {
+            if (this.Owner.Items.CouldReceive(this.VisitorItems) && this.Visitor.Items.CouldReceive(this.OwnerItems))
+            {
+                this.Owner.Meso += this.VisitorMeso;
+                this.Visitor.Meso += this.OwnerMeso;
 
-				// TODO: (Rob) Cannot trade, inventory would be full.
-			}
-		}
+                this.Visitor.Items.AddRange(this.OwnerItems);
+                this.Owner.Items.AddRange(this.VisitorItems);
+            }
+            else
+            {
+                this.Owner.Notify("Trade was not successful.", NoticeType.Popup);
+                this.Visitor.Notify("Trade was not successful.", NoticeType.Popup);
 
-		public void Cancel()
-		{
-			this.Owner.Meso += this.OwnerMeso;
-			this.Visitor.Meso += this.VisitorMeso;
+                // TODO: (Rob) Cannot trade, inventory would be full.
+            }
+        }
 
-			this.Owner.Items.AddRange(this.OwnerItems);
-			this.Visitor.Items.AddRange(this.VisitorItems);
-		}
+        public void Cancel()
+        {
+            this.Owner.Meso += this.OwnerMeso;
+            this.Visitor.Meso += this.VisitorMeso;
 
-		public void Handle(Character player, InteractionCode action, Packet inPacket)
-		{
-			switch (action)
-			{
-				case InteractionCode.Invite:
-					Character invitee = this.Owner.Map.Characters[inPacket.ReadInt()];
+            this.Owner.Items.AddRange(this.OwnerItems);
+            this.Visitor.Items.AddRange(this.VisitorItems);
+        }
 
-					if (invitee.Trade != null)
-					{
-						using (Packet outPacket = new Packet(MapleServerOperationCode.PlayerInteraction))
-						{
-							outPacket.WriteByte(0xA);
-							outPacket.WriteByte();
-							outPacket.WriteBytes(PacketConstants.Trade);
-							outPacket.WriteByte(2);
-							this.Owner.Client.Send(outPacket);
-						}
+        public void Handle(Character player, InteractionCode action, Packet inPacket)
+        {
+            switch (action)
+            {
+                case InteractionCode.Invite:
+                    Character invitee = this.Owner.Map.Characters[inPacket.ReadInt()];
 
-						player.Notify("This player is already in a trade.", NoticeType.Pink);
-					}
-					else
-					{
-						invitee.Trade = this;
-						this.Visitor = invitee;
+                    if (invitee.Trade != null)
+                    {
+                        using (Packet outPacket = new Packet(MapleServerOperationCode.PlayerInteraction))
+                        {
+                            outPacket.WriteByte(0xA);
+                            outPacket.WriteByte();
+                            outPacket.WriteBytes(PacketConstants.Trade);
+                            outPacket.WriteByte(2);
+                            this.Owner.Client.Send(outPacket);
+                        }
 
-						using (Packet outPacket = new Packet(MapleServerOperationCode.PlayerInteraction))
-						{
-							outPacket.WriteBytes(2, 3);
-							outPacket.WriteString(this.Owner.Name);
-							outPacket.WriteBytes(PacketConstants.Trade);
+                        player.Notify("This player is already in a trade.", NoticeType.Pink);
+                    }
+                    else
+                    {
+                        invitee.Trade = this;
+                        this.Visitor = invitee;
 
-							this.Visitor.Client.Send(outPacket);
-						}
-					}
+                        using (Packet outPacket = new Packet(MapleServerOperationCode.PlayerInteraction))
+                        {
+                            outPacket.WriteBytes(2, 3);
+                            outPacket.WriteString(this.Owner.Name);
+                            outPacket.WriteBytes(PacketConstants.Trade);
 
-					break;
+                            this.Visitor.Client.Send(outPacket);
+                        }
+                    }
 
-				case InteractionCode.Decline:
-					this.Visitor.Trade = null;
-					this.Owner.Trade = null;
+                    break;
 
-					using (Packet outPacket = new Packet(MapleServerOperationCode.PlayerInteraction))
-					{
-						outPacket.WriteByte(0xA);
-						outPacket.WriteByte();
-						outPacket.WriteBytes(PacketConstants.Trade);
-						outPacket.WriteByte(2);
-						this.Owner.Client.Send(outPacket);
-					}
+                case InteractionCode.Decline:
+                    this.Visitor.Trade = null;
+                    this.Owner.Trade = null;
 
-					this.Owner.Notify("The trade has been declined.", NoticeType.Popup);
+                    using (Packet outPacket = new Packet(MapleServerOperationCode.PlayerInteraction))
+                    {
+                        outPacket.WriteByte(0xA);
+                        outPacket.WriteByte();
+                        outPacket.WriteBytes(PacketConstants.Trade);
+                        outPacket.WriteByte(2);
+                        this.Owner.Client.Send(outPacket);
+                    }
 
-					this.Owner = null;
-					this.Visitor = null;
+                    this.Owner.Notify("The trade has been declined.", NoticeType.Popup);
 
-					break;
+                    this.Owner = null;
+                    this.Visitor = null;
 
-				case InteractionCode.Visit:
+                    break;
 
-					if (this.Owner == null)
-					{
-						this.Visitor = null;
-						player.Trade = null;
+                case InteractionCode.Visit:
 
-						player.Notify("The trade has already been closed.", NoticeType.Popup);
-					}
-					else
-					{
-						this.Started = true;
+                    if (this.Owner == null)
+                    {
+                        this.Visitor = null;
+                        player.Trade = null;
 
-						using (Packet outPacket = new Packet(MapleServerOperationCode.PlayerInteraction))
-						{
-							outPacket.WriteBytes(4, 1);
-							outPacket.WriteBytes(this.Visitor.AppearanceToByteArray());
-							outPacket.WriteString(this.Visitor.Name);
-							this.Owner.Client.Send(outPacket);
-						}
+                        player.Notify("The trade has already been closed.", NoticeType.Popup);
+                    }
+                    else
+                    {
+                        this.Started = true;
 
-						using (Packet outPacket = new Packet(MapleServerOperationCode.PlayerInteraction))
-						{
-							outPacket.WriteBytes(5, 3, 2, 1, 0);
-							outPacket.WriteBytes(this.Owner.AppearanceToByteArray());
-							outPacket.WriteString(this.Owner.Name);
-							outPacket.WriteByte(1);
-							outPacket.WriteBytes(this.Visitor.AppearanceToByteArray());
-							outPacket.WriteString(this.Visitor.Name);
-							outPacket.WriteByte(0xFF);
+                        using (Packet outPacket = new Packet(MapleServerOperationCode.PlayerInteraction))
+                        {
+                            outPacket.WriteBytes(4, 1);
+                            outPacket.WriteBytes(this.Visitor.AppearanceToByteArray());
+                            outPacket.WriteString(this.Visitor.Name);
+                            this.Owner.Client.Send(outPacket);
+                        }
 
-							this.Visitor.Client.Send(outPacket);
-						}
-					}
+                        using (Packet outPacket = new Packet(MapleServerOperationCode.PlayerInteraction))
+                        {
+                            outPacket.WriteBytes(5, 3, 2, 1, 0);
+                            outPacket.WriteBytes(this.Owner.AppearanceToByteArray());
+                            outPacket.WriteString(this.Owner.Name);
+                            outPacket.WriteByte(1);
+                            outPacket.WriteBytes(this.Visitor.AppearanceToByteArray());
+                            outPacket.WriteString(this.Visitor.Name);
+                            outPacket.WriteByte(0xFF);
 
-					break;
+                            this.Visitor.Client.Send(outPacket);
+                        }
+                    }
 
-				case InteractionCode.SetItems:
-					ItemType type = (ItemType)inPacket.ReadByte();
-					sbyte slot = (sbyte)inPacket.ReadShort();
-					short quantity = inPacket.ReadShort();
-					byte targetSlot = inPacket.ReadByte();
+                    break;
 
-					Item item = player.Items[type, slot];
+                case InteractionCode.SetItems:
+                    ItemType type = (ItemType)inPacket.ReadByte();
+                    sbyte slot = (sbyte)inPacket.ReadShort();
+                    short quantity = inPacket.ReadShort();
+                    byte targetSlot = inPacket.ReadByte();
 
-					if (item.IsBlocked)
-					{
-						throw new HackException("Trading blocked item.");
-					}
-					else if (quantity > item.Quantity)
-					{
-						throw new HackException("Trading more items than available.");
-					}
-					else
-					{
-						if (quantity < item.Quantity)
-						{
-							item.Quantity -= quantity;
-							item.Update();
-							item = new Item(item.MapleID, quantity);
-						}
-						else
-						{
-							player.Items.Remove(item, true);
-						}
+                    Item item = player.Items[type, slot];
 
-						item.Slot = (sbyte)targetSlot;
+                    if (item.IsBlocked)
+                    {
+                        throw new HackException("Trading blocked item.");
+                    }
+                    else if (quantity > item.Quantity)
+                    {
+                        throw new HackException("Trading more items than available.");
+                    }
+                    else
+                    {
+                        if (quantity < item.Quantity)
+                        {
+                            item.Quantity -= quantity;
+                            item.Update();
+                            item = new Item(item.MapleID, quantity);
+                        }
+                        else
+                        {
+                            player.Items.Remove(item, true);
+                        }
 
-						using (Packet outPacket = new Packet(MapleServerOperationCode.PlayerInteraction))
-						{
-							outPacket.WriteBytes(0xE, 0);
-							outPacket.WriteBytes(item.ToByteArray());
+                        item.Slot = (sbyte)targetSlot;
 
-							if (player == this.Owner)
-							{
-								this.OwnerItems.Add(item);
-								this.Owner.Client.Send(outPacket);
+                        using (Packet outPacket = new Packet(MapleServerOperationCode.PlayerInteraction))
+                        {
+                            outPacket.WriteBytes(0xE, 0);
+                            outPacket.WriteBytes(item.ToByteArray());
 
-							}
-							else
-							{
-								this.VisitorItems.Add(item);
-								this.Visitor.Client.Send(outPacket);
-							}
-						}
+                            if (player == this.Owner)
+                            {
+                                this.OwnerItems.Add(item);
+                                this.Owner.Client.Send(outPacket);
 
-						using (Packet outPacket = new Packet(MapleServerOperationCode.PlayerInteraction))
-						{
-							outPacket.WriteBytes(0xE, 1);
-							outPacket.WriteBytes(item.ToByteArray());
+                            }
+                            else
+                            {
+                                this.VisitorItems.Add(item);
+                                this.Visitor.Client.Send(outPacket);
+                            }
+                        }
 
-							if (player == this.Owner)
-							{
-								this.Visitor.Client.Send(outPacket);
+                        using (Packet outPacket = new Packet(MapleServerOperationCode.PlayerInteraction))
+                        {
+                            outPacket.WriteBytes(0xE, 1);
+                            outPacket.WriteBytes(item.ToByteArray());
 
-							}
-							else
-							{
-								this.Owner.Client.Send(outPacket);
-							}
-						}
-					}
+                            if (player == this.Owner)
+                            {
+                                this.Visitor.Client.Send(outPacket);
 
-					break;
+                            }
+                            else
+                            {
+                                this.Owner.Client.Send(outPacket);
+                            }
+                        }
+                    }
 
-				case InteractionCode.SetMeso:
-					int meso = inPacket.ReadInt();
+                    break;
 
-					if (meso < 0 || meso > player.Meso)
-					{
-						throw new HackException("Invalid amount of meso in trade.");
-					}
-					else
-					{
-						using (Packet outPacket = new Packet(MapleServerOperationCode.PlayerInteraction))
-						{
-							outPacket.WriteBytes(0xF, 0);
-							outPacket.WriteInt(meso);
+                case InteractionCode.SetMeso:
+                    int meso = inPacket.ReadInt();
 
-							if (this.Owner == player)
-							{
-								if (this.OwnerLocked)
-								{
-									throw new InvalidOperationException("Adding mesos to locked trade.");
-								}
+                    if (meso < 0 || meso > player.Meso)
+                    {
+                        throw new HackException("Invalid amount of meso in trade.");
+                    }
+                    else
+                    {
+                        using (Packet outPacket = new Packet(MapleServerOperationCode.PlayerInteraction))
+                        {
+                            outPacket.WriteBytes(0xF, 0);
+                            outPacket.WriteInt(meso);
 
-								this.Owner.Client.Send(outPacket);
-								this.OwnerMeso += meso;
-								this.Owner.Meso -= meso;
-							}
-							else
-							{
-								if (this.VisitorLocked)
-								{
-									throw new InvalidOperationException("Adding mesos to locked trade.");
-								}
+                            if (this.Owner == player)
+                            {
+                                if (this.OwnerLocked)
+                                {
+                                    throw new InvalidOperationException("Adding mesos to locked trade.");
+                                }
 
-								this.Visitor.Client.Send(outPacket);
-								this.VisitorMeso += meso;
-								this.Visitor.Meso -= meso;
-							}
-						}
+                                this.Owner.Client.Send(outPacket);
+                                this.OwnerMeso += meso;
+                                this.Owner.Meso -= meso;
+                            }
+                            else
+                            {
+                                if (this.VisitorLocked)
+                                {
+                                    throw new InvalidOperationException("Adding mesos to locked trade.");
+                                }
 
-						using (Packet outPacket = new Packet(MapleServerOperationCode.PlayerInteraction))
-						{
-							outPacket.WriteBytes(0x0F, 0x01);
-							outPacket.WriteInt(meso);
+                                this.Visitor.Client.Send(outPacket);
+                                this.VisitorMeso += meso;
+                                this.Visitor.Meso -= meso;
+                            }
+                        }
 
-							if (this.Owner == player)
-							{
-								this.Visitor.Client.Send(outPacket);
-							}
-							else
-							{
-								this.Owner.Client.Send(outPacket);
-							}
-						}
-					}
+                        using (Packet outPacket = new Packet(MapleServerOperationCode.PlayerInteraction))
+                        {
+                            outPacket.WriteBytes(0x0F, 0x01);
+                            outPacket.WriteInt(meso);
 
-					break;
+                            if (this.Owner == player)
+                            {
+                                this.Visitor.Client.Send(outPacket);
+                            }
+                            else
+                            {
+                                this.Owner.Client.Send(outPacket);
+                            }
+                        }
+                    }
 
-				case InteractionCode.Exit:
+                    break;
 
-					if (this.Started)
-					{
-						this.Cancel();
+                case InteractionCode.Exit:
 
-						using (Packet outPacket = new Packet(MapleServerOperationCode.PlayerInteraction))
-						{
-							outPacket.WriteBytes(0x0A, 0x00);
-							outPacket.WriteByte(2);
-							this.Owner.Client.Send(outPacket);
-							this.Visitor.Client.Send(outPacket);
-						}
+                    if (this.Started)
+                    {
+                        this.Cancel();
 
-						this.Owner.Trade = null;
-						this.Visitor.Trade = null;
-						this.Owner = null;
-						this.Visitor = null;
-					}
-					else
-					{
-						using (Packet outPacket = new Packet(MapleServerOperationCode.PlayerInteraction))
-						{
-							outPacket.WriteBytes(0x0A, 0x00);
-							outPacket.WriteBytes(PacketConstants.Trade);
-							outPacket.WriteByte(2);
-							this.Owner.Client.Send(outPacket);
-						}
+                        using (Packet outPacket = new Packet(MapleServerOperationCode.PlayerInteraction))
+                        {
+                            outPacket.WriteBytes(0x0A, 0x00);
+                            outPacket.WriteByte(2);
+                            this.Owner.Client.Send(outPacket);
+                            this.Visitor.Client.Send(outPacket);
+                        }
 
-						this.Owner.Trade = null;
-						this.Owner = null;
-					}
+                        this.Owner.Trade = null;
+                        this.Visitor.Trade = null;
+                        this.Owner = null;
+                        this.Visitor = null;
+                    }
+                    else
+                    {
+                        using (Packet outPacket = new Packet(MapleServerOperationCode.PlayerInteraction))
+                        {
+                            outPacket.WriteBytes(0x0A, 0x00);
+                            outPacket.WriteBytes(PacketConstants.Trade);
+                            outPacket.WriteByte(2);
+                            this.Owner.Client.Send(outPacket);
+                        }
 
-					break;
+                        this.Owner.Trade = null;
+                        this.Owner = null;
+                    }
 
-				case InteractionCode.Confirm:
+                    break;
 
-					using (Packet outPacket = new Packet(MapleServerOperationCode.PlayerInteraction))
-					{
-						outPacket.WriteByte(0x10);
+                case InteractionCode.Confirm:
 
-						if (this.Owner == player)
-						{
-							this.OwnerLocked = true;
-							this.Visitor.Client.Send(outPacket);
-						}
-						else
-						{
-							this.VisitorLocked = true;
-							this.Owner.Client.Send(outPacket);
-						}
-					}
+                    using (Packet outPacket = new Packet(MapleServerOperationCode.PlayerInteraction))
+                    {
+                        outPacket.WriteByte(0x10);
 
-					if (this.OwnerLocked && this.VisitorLocked)
-					{
-						this.Complete();
+                        if (this.Owner == player)
+                        {
+                            this.OwnerLocked = true;
+                            this.Visitor.Client.Send(outPacket);
+                        }
+                        else
+                        {
+                            this.VisitorLocked = true;
+                            this.Owner.Client.Send(outPacket);
+                        }
+                    }
 
-						using (Packet outPacket = new Packet(MapleServerOperationCode.PlayerInteraction))
-						{
-							outPacket.WriteBytes(0x0A, 0x00);
-							outPacket.WriteByte(6);
-							this.Owner.Client.Send(outPacket);
-							this.Visitor.Client.Send(outPacket);
-						}
+                    if (this.OwnerLocked && this.VisitorLocked)
+                    {
+                        this.Complete();
 
-						this.Owner.Trade = null;
-						this.Visitor.Trade = null;
-						this.Owner = null;
-						this.Visitor = null;
-					}
+                        using (Packet outPacket = new Packet(MapleServerOperationCode.PlayerInteraction))
+                        {
+                            outPacket.WriteBytes(0x0A, 0x00);
+                            outPacket.WriteByte(6);
+                            this.Owner.Client.Send(outPacket);
+                            this.Visitor.Client.Send(outPacket);
+                        }
 
-					break;
+                        this.Owner.Trade = null;
+                        this.Visitor.Trade = null;
+                        this.Owner = null;
+                        this.Visitor = null;
+                    }
 
-				case InteractionCode.Chat:
+                    break;
 
-					string chat = inPacket.ReadString();
+                case InteractionCode.Chat:
 
-					using (Packet outPacket = new Packet(MapleServerOperationCode.PlayerInteraction))
-					{
-						outPacket.WriteBytes(6, 8);
-						outPacket.WriteBool(this.Owner != player);
-						outPacket.WriteString(player.Name + " : " + chat);
+                    string chat = inPacket.ReadString();
 
-						this.Owner.Client.Send(outPacket);
-						this.Visitor.Client.Send(outPacket);
-					}
+                    using (Packet outPacket = new Packet(MapleServerOperationCode.PlayerInteraction))
+                    {
+                        outPacket.WriteBytes(6, 8);
+                        outPacket.WriteBool(this.Owner != player);
+                        outPacket.WriteString(player.Name + " : " + chat);
 
-					break;
-			}
-		}
-	}
+                        this.Owner.Client.Send(outPacket);
+                        this.Visitor.Client.Send(outPacket);
+                    }
+
+                    break;
+            }
+        }
+    }
 }

@@ -4,11 +4,11 @@ using System.Security.Cryptography;
 
 namespace Loki.Security
 {
-	internal class AesCryptograph : IDisposable
-	{
-		#region Constants
+    internal class AesCryptograph : IDisposable
+    {
+        #region Constants
 
-		public static readonly byte[] Shufflers = new byte[256]
+        public static readonly byte[] Shufflers = new byte[256]
 		{
 			0xEC, 0x3F, 0x77, 0xA4, 0x45, 0xD0, 0x71, 0xBF, 0xB7, 0x98, 0x20, 0xFC, 0x4B, 0xE9, 0xB3, 0xE1,
 			0x5C, 0x22, 0xF7, 0x0C, 0x44, 0x1B, 0x81, 0xBD, 0x63, 0x8D, 0xD4, 0xC3, 0xF2, 0x10, 0x19, 0xE0,
@@ -28,171 +28,171 @@ namespace Loki.Security
 			0x84, 0x7F, 0x61, 0x1E, 0xCF, 0xC5, 0xD1, 0x56, 0x3D, 0xCA, 0xF4, 0x05, 0xC6, 0xE5, 0x08, 0x49
 		};
 
-		public static readonly byte[] UserKey = new byte[32]
+        public static readonly byte[] UserKey = new byte[32]
 		{
 			0x13, 0x00, 0x00, 0x00, 0x08, 0x00, 0x00, 0x00, 0x06, 0x00, 0x00, 0x00, 0xB4, 0x00, 0x00, 0x00,
 			0x1B, 0x00, 0x00, 0x00, 0x0F, 0x00, 0x00, 0x00, 0x33, 0x00, 0x00, 0x00, 0x52, 0x00, 0x00, 0x00
 		};
 
-		#endregion
+        #endregion
 
-		private short CryptedMapleVersion { get; set; }
+        private short CryptedMapleVersion { get; set; }
 
-		public byte[] IV { get; private set; }
-		public AesManaged Aes { get; private set; }
+        public byte[] IV { get; private set; }
+        public AesManaged Aes { get; private set; }
 
-		public AesCryptograph(byte[] iv, short version)
-		{
-			this.IV = iv;
-			this.CryptedMapleVersion = (short)(((version >> 8) & 0xFF) | ((version << 8) & 0xFF00)); ;
+        public AesCryptograph(byte[] iv, short version)
+        {
+            this.IV = iv;
+            this.CryptedMapleVersion = (short)(((version >> 8) & 0xFF) | ((version << 8) & 0xFF00)); ;
 
-			this.Aes = new AesManaged()
-			{
-				KeySize = 256,
-				Key = AesCryptograph.UserKey,
-				Mode = CipherMode.ECB
-			};
-		}
+            this.Aes = new AesManaged()
+            {
+                KeySize = 256,
+                Key = AesCryptograph.UserKey,
+                Mode = CipherMode.ECB
+            };
+        }
 
-		private static byte[] Shuffle(byte inputByte, byte[] data)
-		{
-			byte alpha = data[1];
-			byte beta = inputByte;
-			byte gamma = AesCryptograph.Shufflers[alpha];
+        private static byte[] Shuffle(byte inputByte, byte[] data)
+        {
+            byte alpha = data[1];
+            byte beta = inputByte;
+            byte gamma = AesCryptograph.Shufflers[alpha];
 
-			gamma -= inputByte;
-			data[0] += gamma;
-			gamma = data[2];
-			gamma ^= AesCryptograph.Shufflers[beta];
-			alpha -= gamma;
-			data[1] = alpha;
-			alpha = data[3];
-			gamma = alpha;
-			alpha -= data[0];
-			gamma = AesCryptograph.Shufflers[gamma];
-			gamma += inputByte;
-			gamma ^= data[2];
-			data[2] = gamma;
-			alpha += AesCryptograph.Shufflers[beta];
-			data[3] = alpha;
+            gamma -= inputByte;
+            data[0] += gamma;
+            gamma = data[2];
+            gamma ^= AesCryptograph.Shufflers[beta];
+            alpha -= gamma;
+            data[1] = alpha;
+            alpha = data[3];
+            gamma = alpha;
+            alpha -= data[0];
+            gamma = AesCryptograph.Shufflers[gamma];
+            gamma += inputByte;
+            gamma ^= data[2];
+            data[2] = gamma;
+            alpha += AesCryptograph.Shufflers[beta];
+            data[3] = alpha;
 
-			int delta = data[0];
-			delta |= (data[1] << 8);
-			delta |= (data[2] << 16);
-			delta |= (data[3] << 24);
+            int delta = data[0];
+            delta |= (data[1] << 8);
+            delta |= (data[2] << 16);
+            delta |= (data[3] << 24);
 
-			int epsilon = delta;
-			epsilon = (int)((uint)epsilon >> 0x1d);
-			delta = delta << 3;
-			epsilon |= delta;
+            int epsilon = delta;
+            epsilon = (int)((uint)epsilon >> 0x1d);
+            delta = delta << 3;
+            epsilon |= delta;
 
-			data[0] = (byte)epsilon;
-			data[1] = (byte)(epsilon >> 8);
-			data[2] = (byte)(epsilon >> 16);
-			data[3] = (byte)(epsilon >> 24);
+            data[0] = (byte)epsilon;
+            data[1] = (byte)(epsilon >> 8);
+            data[2] = (byte)(epsilon >> 16);
+            data[3] = (byte)(epsilon >> 24);
 
-			return data;
-		}
+            return data;
+        }
 
-		public void Crypt(byte[] data)
-		{
-			MemoryStream memoryStream = new MemoryStream();
-			CryptoStream cryptoStream = new CryptoStream(memoryStream, this.Aes.CreateEncryptor(), CryptoStreamMode.Write);
+        public void Crypt(byte[] data)
+        {
+            MemoryStream memoryStream = new MemoryStream();
+            CryptoStream cryptoStream = new CryptoStream(memoryStream, this.Aes.CreateEncryptor(), CryptoStreamMode.Write);
 
-			int remaining = data.Length;
-			int length = 0x5B0;
-			int start = 0;
+            int remaining = data.Length;
+            int length = 0x5B0;
+            int start = 0;
 
-			while (remaining > 0)
-			{
-				byte[] iv = BitTools.MultiplyBytes(this.IV, 4, 4);
+            while (remaining > 0)
+            {
+                byte[] iv = BitTools.MultiplyBytes(this.IV, 4, 4);
 
-				if (remaining < length)
-				{
-					length = remaining;
-				}
+                if (remaining < length)
+                {
+                    length = remaining;
+                }
 
-				for (int x = start; x < (start + length); x++)
-				{
-					if ((x - start) % iv.Length == 0)
-					{
-						cryptoStream.Write(iv, 0, iv.Length);
-						byte[] newIV = memoryStream.ToArray();
-						Array.Copy(newIV, iv, iv.Length);
-						memoryStream.Position = 0;
-					}
+                for (int x = start; x < (start + length); x++)
+                {
+                    if ((x - start) % iv.Length == 0)
+                    {
+                        cryptoStream.Write(iv, 0, iv.Length);
+                        byte[] newIV = memoryStream.ToArray();
+                        Array.Copy(newIV, iv, iv.Length);
+                        memoryStream.Position = 0;
+                    }
 
-					data[x] ^= iv[(x - start) % iv.Length];
-				}
+                    data[x] ^= iv[(x - start) % iv.Length];
+                }
 
-				start += length;
-				remaining -= length;
-				length = 0x5B4;
-			}
+                start += length;
+                remaining -= length;
+                length = 0x5B4;
+            }
 
-			cryptoStream.Dispose();
-			memoryStream.Dispose();
+            cryptoStream.Dispose();
+            memoryStream.Dispose();
 
-			this.UpdateIV();
-		}
+            this.UpdateIV();
+        }
 
-		public void UpdateIV()
-		{
-			byte[] newIV = new byte[4] { 0xF2, 0x53, 0x50, 0xC6 };
+        public void UpdateIV()
+        {
+            byte[] newIV = new byte[4] { 0xF2, 0x53, 0x50, 0xC6 };
 
-			for (int i = 0; i < 4; i++)
-			{
-				AesCryptograph.Shuffle(this.IV[i], newIV);
-			}
+            for (int i = 0; i < 4; i++)
+            {
+                AesCryptograph.Shuffle(this.IV[i], newIV);
+            }
 
-			this.IV = newIV;
-		}
+            this.IV = newIV;
+        }
 
-		public byte[] GenerateHeader(int length)
-		{
-			int alpha = this.IV[3];
-			alpha |= (this.IV[2] << 8);
+        public byte[] GenerateHeader(int length)
+        {
+            int alpha = this.IV[3];
+            alpha |= (this.IV[2] << 8);
 
-			alpha ^= this.CryptedMapleVersion;
-			int mLength = (length << 8) | (int)((uint)length >> 8);
-			int beta = alpha ^ mLength;
+            alpha ^= this.CryptedMapleVersion;
+            int mLength = (length << 8) | (int)((uint)length >> 8);
+            int beta = alpha ^ mLength;
 
-			byte[] gamma = new byte[4];
-			gamma[0] = (byte)(((uint)alpha >> 8));
-			gamma[1] = (byte)(alpha);
-			gamma[2] = (byte)(((uint)beta >> 8));
-			gamma[3] = (byte)(beta);
+            byte[] gamma = new byte[4];
+            gamma[0] = (byte)(((uint)alpha >> 8));
+            gamma[1] = (byte)(alpha);
+            gamma[2] = (byte)(((uint)beta >> 8));
+            gamma[3] = (byte)(beta);
 
-			return gamma;
-		}
+            return gamma;
+        }
 
-		public static int RetrieveLength(byte[] header)
-		{
-			if (header.Length < 4)
-			{
-				return -1;
-			}
-			else
-			{
-				return (header[0] + (header[1] << 8)) ^ (header[2] + (header[3] << 8));
-			}
-		}
+        public static int RetrieveLength(byte[] header)
+        {
+            if (header.Length < 4)
+            {
+                return -1;
+            }
+            else
+            {
+                return (header[0] + (header[1] << 8)) ^ (header[2] + (header[3] << 8));
+            }
+        }
 
-		public bool IsValidPacket(byte[] packet)
-		{
-			try
-			{
-				return ((((packet[0] ^ this.IV[2]) & 0xFF) == ((this.CryptedMapleVersion >> 8) & 0xFF)) && (((packet[1] ^ this.IV[3]) & 0xFF) == (this.CryptedMapleVersion & 0xFF)));
-			}
-			catch
-			{
-				return false;
-			}
-		}
+        public bool IsValidPacket(byte[] packet)
+        {
+            try
+            {
+                return ((((packet[0] ^ this.IV[2]) & 0xFF) == ((this.CryptedMapleVersion >> 8) & 0xFF)) && (((packet[1] ^ this.IV[3]) & 0xFF) == (this.CryptedMapleVersion & 0xFF)));
+            }
+            catch
+            {
+                return false;
+            }
+        }
 
-		public void Dispose()
-		{
-			this.Aes.Dispose();
-		}
-	}
+        public void Dispose()
+        {
+            this.Aes.Dispose();
+        }
+    }
 }

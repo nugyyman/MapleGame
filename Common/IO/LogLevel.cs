@@ -1,9 +1,9 @@
 ﻿namespace Loki.IO
 {
-	public enum LogLevel
-	{
-		None,
-		Name,
-		Full
-	}
+    public enum LogLevel
+    {
+        None,
+        Name,
+        Full
+    }
 }

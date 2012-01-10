@@ -2,10 +2,10 @@
 
 namespace Loki.Maple
 {
-	public class HackException : Exception
-	{
-		public HackException() : base("Player operation is illegal.") { }
+    public class HackException : Exception
+    {
+        public HackException() : base("Player operation is illegal.") { }
 
-		public HackException(string message) : base(message) { }
-	}
+        public HackException(string message) : base(message) { }
+    }
 }

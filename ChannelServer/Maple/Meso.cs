@@ -4,25 +4,25 @@ using Loki.Maple.Characters;
 
 namespace Loki.Maple
 {
-	public class Meso : Drop
-	{
-		public int Amount { get; private set; }
+    public class Meso : Drop
+    {
+        public int Amount { get; private set; }
 
-		public Meso(int amount)
-			: base()
-		{
-			this.Amount = amount;
-		}
+        public Meso(int amount)
+            : base()
+        {
+            this.Amount = amount;
+        }
 
-		public override Packet GetShowGainPacket()
-		{
-			Packet showGain = new Packet(MapleServerOperationCode.ShowLog);
+        public override Packet GetShowGainPacket()
+        {
+            Packet showGain = new Packet(MapleServerOperationCode.ShowLog);
 
-			showGain.WriteBytes(0, 1);
-			showGain.WriteInt(((Meso)this).Amount);
-			showGain.WriteShort();
+            showGain.WriteBytes(0, 1);
+            showGain.WriteInt(((Meso)this).Amount);
+            showGain.WriteShort();
 
-			return showGain;
-		}
-	}
+            return showGain;
+        }
+    }
 }

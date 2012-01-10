@@ -2,8 +2,8 @@
 
 namespace Loki.Maple.Maps
 {
-	public class MapSpawnPoints : MapObjects<SpawnPoint>
-	{
-		public MapSpawnPoints(Map parent) : base(parent) { }
-	}
+    public class MapSpawnPoints : MapObjects<SpawnPoint>
+    {
+        public MapSpawnPoints(Map parent) : base(parent) { }
+    }
 }

@@ -10,145 +10,145 @@ using Loki.IO;
 
 namespace Loki.Net
 {
-	public static class LoginServer
-	{
-		private static bool isAlive;
-		private static ManualResetEvent AcceptDone = new ManualResetEvent(false);
+    public static class LoginServer
+    {
+        private static bool isAlive;
+        private static ManualResetEvent AcceptDone = new ManualResetEvent(false);
 
-		public static TcpListener Listener { get; private set; }
-		public static Worlds Worlds { get; private set; }
-		public static ChannelsHelper Channels { get; private set; }
-		public static List<int> LoggedIn { get; private set; }
-		public static List<LoginClientHandler> Clients { get; private set; }
+        public static TcpListener Listener { get; private set; }
+        public static Worlds Worlds { get; private set; }
+        public static ChannelsHelper Channels { get; private set; }
+        public static List<int> LoggedIn { get; private set; }
+        public static List<LoginClientHandler> Clients { get; private set; }
 
-		public static bool AutoRegister { get; private set; }
-		public static bool RequireStaffIP { get; private set; }
-		public static bool RequestPin { get; private set; }
-		public static bool RequestDeletionBirthday { get; private set; }
-		public static int MaxCharacters { get; private set; }
+        public static bool AutoRegister { get; private set; }
+        public static bool RequireStaffIP { get; private set; }
+        public static bool RequestPin { get; private set; }
+        public static bool RequestDeletionBirthday { get; private set; }
+        public static int MaxCharacters { get; private set; }
 
-		public static bool IsAlive
-		{
-			get
-			{
-				return isAlive;
-			}
-			set
-			{
-				isAlive = value;
+        public static bool IsAlive
+        {
+            get
+            {
+                return isAlive;
+            }
+            set
+            {
+                isAlive = value;
 
-				if (!value)
-				{
-					LoginServer.AcceptDone.Set();
-				}
-			}
-		}
+                if (!value)
+                {
+                    LoginServer.AcceptDone.Set();
+                }
+            }
+        }
 
-		private static void Main(string[] args)
-		{
-			if (args.Length == 1 && args[0].ToLower() == "setup" || !File.Exists(Application.ExecutablePath + "Configuration.ini"))
-			{
-				LoginServerSetup.Run();
-			}
+        private static void Main(string[] args)
+        {
+            if (args.Length == 1 && args[0].ToLower() == "setup" || !File.Exists(Application.ExecutablePath + "Configuration.ini"))
+            {
+                LoginServerSetup.Run();
+            }
 
-			LoginServer.Worlds = new Worlds();
-			LoginServer.Channels = new ChannelsHelper();
-			LoginServer.LoggedIn = new List<int>();
-			LoginServer.Clients = new List<LoginClientHandler>();
-			
-			Log.Entitle("Login Server v.{0}", Application.MapleVersion);
+            LoginServer.Worlds = new Worlds();
+            LoginServer.Channels = new ChannelsHelper();
+            LoginServer.LoggedIn = new List<int>();
+            LoginServer.Clients = new List<LoginClientHandler>();
 
-			try
-			{
-				Settings.Initialize();
+            Log.Entitle("Login Server v.{0}", Application.MapleVersion);
 
-				Database.Test();
-				Database.Analyze(false);
+            try
+            {
+                Settings.Initialize();
 
-				ChannelServerHandler.SecurityCode = Settings.GetString("Channels/SecurityCode");
-				Log.Inform("Cross-servers code '{0}' assigned.", Log.MaskString(ChannelServerHandler.SecurityCode));
+                Database.Test();
+                Database.Analyze(false);
 
-				LoginServer.RequireStaffIP = Settings.GetBool("Server/RequireStaffIP");
-				Log.Inform("Staff will{0}be required to connect through a staff IP.", LoginServer.RequireStaffIP ? " " : " not ");
+                ChannelServerHandler.SecurityCode = Settings.GetString("Channels/SecurityCode");
+                Log.Inform("Cross-servers code '{0}' assigned.", Log.MaskString(ChannelServerHandler.SecurityCode));
 
-				LoginServer.AutoRegister = Settings.GetBool("Server/AutoRegister");
-				Log.Inform("Automatic registration {0}.", LoginServer.AutoRegister ? "enabled" : "disabled");
+                LoginServer.RequireStaffIP = Settings.GetBool("Server/RequireStaffIP");
+                Log.Inform("Staff will{0}be required to connect through a staff IP.", LoginServer.RequireStaffIP ? " " : " not ");
 
-				LoginServer.RequestPin = Settings.GetBool("Server/RequestPin");
-				Log.Inform("Pin will{0}be requested upon login.", LoginServer.RequestPin ? " " : " not ");
+                LoginServer.AutoRegister = Settings.GetBool("Server/AutoRegister");
+                Log.Inform("Automatic registration {0}.", LoginServer.AutoRegister ? "enabled" : "disabled");
 
-				LoginServer.RequestDeletionBirthday = Settings.GetBool("Server/RequestDeletionBirthday");
-				Log.Inform("Valid birthday will{0}be requested upon deletion.", LoginServer.RequestDeletionBirthday ? " " : " not ");
+                LoginServer.RequestPin = Settings.GetBool("Server/RequestPin");
+                Log.Inform("Pin will{0}be requested upon login.", LoginServer.RequestPin ? " " : " not ");
 
-				LoginServer.MaxCharacters = Settings.GetInt("Server/MaxCharacters");
-				Log.Inform("Maximum of {0} characters per account.", LoginServer.MaxCharacters);
+                LoginServer.RequestDeletionBirthday = Settings.GetBool("Server/RequestDeletionBirthday");
+                Log.Inform("Valid birthday will{0}be requested upon deletion.", LoginServer.RequestDeletionBirthday ? " " : " not ");
 
-				LoginServer.Listener = new TcpListener(IPAddress.Any, Settings.GetInt("Server/Port"));
-				LoginServer.Listener.Start();
-				Log.Inform("Initialized clients listener on {0}.", LoginServer.Listener.LocalEndpoint);
+                LoginServer.MaxCharacters = Settings.GetInt("Server/MaxCharacters");
+                Log.Inform("Maximum of {0} characters per account.", LoginServer.MaxCharacters);
 
-				LoginServer.IsAlive = true;
-			}
-			catch (Exception e)
-			{
-				Log.Error(e);
-			}
+                LoginServer.Listener = new TcpListener(IPAddress.Any, Settings.GetInt("Server/Port"));
+                LoginServer.Listener.Start();
+                Log.Inform("Initialized clients listener on {0}.", LoginServer.Listener.LocalEndpoint);
 
-			if (LoginServer.IsAlive)
-			{
-				Log.Success("Server started on thread {0}.", Thread.CurrentThread.ManagedThreadId);
+                LoginServer.IsAlive = true;
+            }
+            catch (Exception e)
+            {
+                Log.Error(e);
+            }
 
-				new Thread(new ThreadStart(InteroperabilityServer.Main)).Start();
-			}
-			else
-			{
-				Log.Inform("Could not start server because of errors.");
-			}
+            if (LoginServer.IsAlive)
+            {
+                Log.Success("Server started on thread {0}.", Thread.CurrentThread.ManagedThreadId);
 
-			while (LoginServer.IsAlive)
-			{
-				LoginServer.AcceptDone.Reset();
+                new Thread(new ThreadStart(InteroperabilityServer.Main)).Start();
+            }
+            else
+            {
+                Log.Inform("Could not start server because of errors.");
+            }
 
-				LoginServer.Listener.BeginAcceptSocket(new AsyncCallback(LoginServer.OnAcceptSocket), null);
+            while (LoginServer.IsAlive)
+            {
+                LoginServer.AcceptDone.Reset();
 
-				LoginServer.AcceptDone.WaitOne();
-			}
+                LoginServer.Listener.BeginAcceptSocket(new AsyncCallback(LoginServer.OnAcceptSocket), null);
 
-			InteroperabilityServer.Stop();
+                LoginServer.AcceptDone.WaitOne();
+            }
 
-			LoginClientHandler[] remainingClients = LoginServer.Clients.ToArray();
+            InteroperabilityServer.Stop();
 
-			foreach (LoginClientHandler client in remainingClients)
-			{
-				client.Stop();
-			}
+            LoginClientHandler[] remainingClients = LoginServer.Clients.ToArray();
 
-			LoginServer.Dispose();
+            foreach (LoginClientHandler client in remainingClients)
+            {
+                client.Stop();
+            }
 
-			Log.Warn("Server stopped.");
+            LoginServer.Dispose();
 
-			Console.Read();
-		}
+            Log.Warn("Server stopped.");
 
-		private static void OnAcceptSocket(IAsyncResult ar)
-		{
-			LoginServer.AcceptDone.Set();
-			new LoginClientHandler(LoginServer.Listener.EndAcceptSocket(ar));
-		}
+            Console.Read();
+        }
 
-		public static void Stop()
-		{
-			LoginServer.IsAlive = false;
-		}
+        private static void OnAcceptSocket(IAsyncResult ar)
+        {
+            LoginServer.AcceptDone.Set();
+            new LoginClientHandler(LoginServer.Listener.EndAcceptSocket(ar));
+        }
 
-		private static void Dispose()
-		{
-			if (LoginServer.Listener != null)
-			{
-				LoginServer.Listener.Stop();
-			}
+        public static void Stop()
+        {
+            LoginServer.IsAlive = false;
+        }
 
-			Log.Inform("Server disposed.", Thread.CurrentThread.ManagedThreadId);
-		}
-	}
+        private static void Dispose()
+        {
+            if (LoginServer.Listener != null)
+            {
+                LoginServer.Listener.Stop();
+            }
+
+            Log.Inform("Server disposed.", Thread.CurrentThread.ManagedThreadId);
+        }
+    }
 }
