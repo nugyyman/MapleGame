@@ -16,6 +16,7 @@ namespace Loki.Maple
         public string Password { get; set; }
         public string Salt { get; set; }
         public string Pin { get; set; }
+        public string Pic { get; set; }
         public DateTime Birthday { get; set; }
         public DateTime Creation { get; set; }
         public bool IsBanned { get; set; }
@@ -94,6 +95,7 @@ namespace Loki.Maple
             this.Password = datum.Password;
             this.Salt = datum.Salt;
             this.Pin = datum.Pin;
+            this.Pic = datum.Pic;
             this.Birthday = datum.Birthday;
             this.Creation = datum.Creation;
             this.IsBanned = datum.IsBanned;
@@ -111,6 +113,7 @@ namespace Loki.Maple
             datum.Password = this.Password;
             datum.Salt = this.Salt;
             datum.Pin = this.Pin;
+            datum.Pic = this.Pic;
             datum.Birthday = this.Birthday;
             datum.Creation = this.Creation;
             datum.IsBanned = this.IsBanned;

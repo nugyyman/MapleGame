@@ -69,6 +69,12 @@ namespace Loki.Maple.Characters
                     buffer.WriteInt(loopSkill.MapleID);
                     buffer.WriteInt(loopSkill.CurrentLevel);
 
+                    // TODO: This is expiration time: Implement it.
+                    buffer.WriteByte();
+                    buffer.WriteBytes(PacketConstants.Item);
+                    buffer.WriteInt(400967355);
+                    buffer.WriteByte(2); // 1 to show it, 2 to hide it.
+
                     if (loopSkill.IsFromFourthJob)
                     {
                         buffer.WriteInt(loopSkill.MaxLevel);

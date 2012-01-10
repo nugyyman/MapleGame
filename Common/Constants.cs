@@ -252,7 +252,14 @@ namespace Loki.Maple
 
         ThunderBreaker1 = 1500,
         ThunderBreaker2 = 1510,
-        ThunderBreaker3 = 1511
+        ThunderBreaker3 = 1511,
+
+        Legend = 2000,
+
+        Aran1 = 2100,
+        Aran2 = 2110,
+        Aran3 = 2111,
+        Aran4 = 2112
     }
 
     public enum ItemType : byte

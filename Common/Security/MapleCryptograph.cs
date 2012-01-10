@@ -16,11 +16,12 @@ namespace Loki.Security
             this.Encryptograph = new AesCryptograph(sendIV, unchecked((short)(0xFFFF - Application.MapleVersion)));
             this.Decryptograph = new AesCryptograph(receiveIV, Application.MapleVersion);
 
-            using (ByteBuffer buffer = new ByteBuffer(15))
+            using (ByteBuffer buffer = new ByteBuffer(16))
             {
-                buffer.WriteShort(0x0D);
+                buffer.WriteShort(0x0E);
                 buffer.WriteShort(Application.MapleVersion);
-                buffer.WriteShort(0);
+                buffer.WriteShort(1);
+                buffer.WriteByte(49);
                 buffer.WriteBytes(receiveIV);
                 buffer.WriteBytes(sendIV);
                 buffer.WriteByte(8);

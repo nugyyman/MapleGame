@@ -205,6 +205,10 @@ namespace Loki.Net
                 case MapleClientOperationCode.CancelItemEffect:
                     this.Character.Buffs.CancelItemEffect(inPacket);
                     break;
+
+                case MapleClientOperationCode.ClientError:
+                    this.ClientError(inPacket);
+                    break;
             }
         }
 
@@ -220,6 +224,11 @@ namespace Loki.Net
 
                 this.Send(outPacket);
             }
+        }
+
+        private void ClientError(Packet inPacket)
+        {
+            Log.Warn(inPacket.ReadString());
         }
     }
 }

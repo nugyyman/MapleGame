@@ -1114,24 +1114,30 @@ namespace Loki.Maple
                 }
                 else if (!zeroPosition && !leaveOut)
                 {
-                    buffer.WriteByte(this.ComputedSlot);
+                    byte pos = this.ComputedSlot;
+                    if (pos < 0)
+                        pos = (byte)(pos * -1);
+                    if (pos > 100)
+                        pos -= 100;
+                    if (this.Type == ItemType.Equipment)
+                        buffer.WriteShort(pos);
+                    else
+                        buffer.WriteByte(pos);
                 }
 
                 buffer.WriteByte((byte)(this.Type == ItemType.Equipment ? 1 : 2));
                 buffer.WriteInt(this.MapleID);
+                buffer.WriteBool(this.IsCash);
 
                 if (this.IsEquippedCash)
                 {
                     // TODO: Maybe this is purchase time: Figure out.
                     buffer.WriteBytes(0x01, 0xBE, 0x50, 0x17, 0x00, 0x00, 0x00, 0x00, 0x00, 0xB0, 0xCE, 0xEB);
                 }
-                else
-                {
-                    buffer.WriteShort();
-                    buffer.WriteBytes(PacketConstants.Item);
-                }
 
                 // TODO: This is expiration time: Implement it.
+                buffer.WriteByte();
+                buffer.WriteBytes(PacketConstants.Item);
                 buffer.WriteInt(400967355);
                 buffer.WriteByte(2); // 1 to show it, 2 to hide it.
 
@@ -1155,17 +1161,15 @@ namespace Loki.Maple
                     buffer.WriteShort(this.Speed);
                     buffer.WriteShort(this.Jump);
                     buffer.WriteString(this.Creator);
-                    buffer.WriteByte(this.Flags);
-                    buffer.WriteByte();
+                    buffer.WriteShort(this.Flags);
 
                     if (!this.IsEquippedCash)
                     {
                         buffer.WriteByte();
                         buffer.WriteByte(); // TODO: Item level. Timeless has it.
                         buffer.WriteShort(); // UNK.
-                        buffer.WriteShort(1); // TODO: Item EXP. Timeless has it.
-                        buffer.WriteShort(this.ViciousHammerApplied);
-                        buffer.WriteShort();
+                        buffer.WriteShort(); // TODO: Item EXP. Timeless has it.
+                        buffer.WriteInt(this.ViciousHammerApplied);
                         buffer.WriteLong();
                         buffer.WriteBytes(0x00, 0x40, 0xE0, 0xFD, 0x3B, 0x37, 0x4F, 0x01);
                     }
@@ -1174,14 +1178,13 @@ namespace Loki.Maple
                         buffer.WriteBytes(0x65, 0x0A, 0x28, 0x27, 0xF4, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x40, 0xE0, 0xFD, 0x3B, 0x37, 0x4F, 0x01);
                     }
 
-                    buffer.WriteInt(int.MaxValue);
+                    buffer.WriteUInt(uint.MaxValue);
                 }
                 else
                 {
                     buffer.WriteShort(this.Quantity);
                     buffer.WriteString(this.Creator);
-                    buffer.WriteByte(this.Flags);
-                    buffer.WriteByte();
+                    buffer.WriteShort(this.Flags);
 
                     if (this.IsRechargeable)
                     {

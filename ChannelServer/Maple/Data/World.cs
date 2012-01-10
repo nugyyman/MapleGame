@@ -25,7 +25,7 @@ namespace Loki.Maple.Data
 
         public static void Initialize()
         {
-            using (Database.TemporarySchema("mcdb"))
+            using (Database.TemporarySchema("mcdb83"))
             {
                 World.IsInitialized = false;
 

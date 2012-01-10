@@ -10,7 +10,7 @@ namespace Loki
 {
     public static class ChannelServerSetup
     {
-        private const string McdbFileName = "mcdb-4.3-75.sql";
+        private const string McdbFileName = "mcdb-4.3-83.sql";
 
         public static void Run()
         {
@@ -202,7 +202,7 @@ namespace Loki
 
             try
             {
-                using (Database.TemporaryConnection(databaseHost, "mcdb", databaseUsername, databasePassword))
+                using (Database.TemporaryConnection(databaseHost, "mcdb83", databaseUsername, databasePassword))
                 {
                     Database.Test();
                 }
@@ -221,11 +221,11 @@ namespace Loki
 
                         Database.ExecuteFile(databaseHost, databaseUsername, databasePassword, Application.ExecutablePath + ChannelServerSetup.McdbFileName);
 
-                        Log.Inform("Database 'mcdb' created.", databaseSchema);
+                        Log.Inform("Database 'mcdb83' created.", databaseSchema);
                     }
                     catch (Exception mcdbE)
                     {
-                        Log.Error("Error while creating 'mcdb': ", mcdbE);
+                        Log.Error("Error while creating 'mcdb83': ", mcdbE);
                         goto mcdbConfiguration;
                     }
                 }

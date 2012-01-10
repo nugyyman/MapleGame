@@ -512,27 +512,28 @@ namespace Loki.Maple.Characters
                 buffer.WriteByte(this.MaxSlots[ItemType.Setup]);
                 buffer.WriteByte(this.MaxSlots[ItemType.Etcetera]);
                 buffer.WriteByte(this.MaxSlots[ItemType.Cash]);
+                buffer.WriteBytes(new byte[] { 0, (byte)0x40, (byte)0xE0, (byte)0xFD, (byte)0x3B, (byte)0x37, (byte)0x4F, 1 });
 
                 foreach (Item item in this.GetEquipped(EquippedQueryMode.Normal))
                 {
                     buffer.WriteBytes(item.ToByteArray());
                 }
 
-                buffer.WriteByte();
+                buffer.WriteShort();
 
                 foreach (Item item in this.GetEquipped(EquippedQueryMode.Cash))
                 {
                     buffer.WriteBytes(item.ToByteArray());
                 }
 
-                buffer.WriteByte();
+                buffer.WriteShort();
 
                 foreach (Item item in this[ItemType.Equipment])
                 {
                     buffer.WriteBytes(item.ToByteArray());
                 }
 
-                buffer.WriteByte();
+                buffer.WriteInt();
 
                 foreach (Item item in this[ItemType.Usable])
                 {

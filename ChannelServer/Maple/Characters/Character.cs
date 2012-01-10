@@ -841,6 +841,9 @@ namespace Loki.Maple.Characters
             {
                 buffer.WriteBytes(this.StatisticsToByteArray());
                 buffer.WriteBytes(this.AppearanceToByteArray(false));
+                buffer.WriteByte();
+                if (this.IsMaster)
+                    buffer.WriteByte();
 
                 buffer.WriteBool(true); // World rank enabled (next 4 ints are not sent if disabled)
 
@@ -1001,9 +1004,11 @@ namespace Loki.Maple.Characters
                     outPacket.WriteInt(Application.Random.Next());
                 }
 
-                outPacket.WriteLong(long.MaxValue);
+                outPacket.WriteBytes(new byte[] { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF });
+                outPacket.WriteByte();
                 outPacket.WriteBytes(this.StatisticsToByteArray());
                 outPacket.WriteByte(this.MaxBuddies);
+                outPacket.WriteByte();
                 outPacket.WriteInt(this.Meso);
                 outPacket.WriteBytes(this.Items.ToByteArray());
                 outPacket.WriteBytes(this.Skills.ToByteArray());
@@ -1058,6 +1063,7 @@ namespace Loki.Maple.Characters
             Packet spawn = new Packet(MapleServerOperationCode.SpawnCharacter);
 
             spawn.WriteInt(this.ID);
+            spawn.WriteInt(this.Level);
             spawn.WriteString(this.Name);
 
             // If not in guild:
@@ -1065,9 +1071,9 @@ namespace Loki.Maple.Characters
             spawn.Skip(6);
 
             spawn.WriteInt(); // UNK: Maybe not an int.
-            spawn.WriteByte(0xF8);
-            spawn.WriteByte(0x03);
             spawn.WriteShort();
+            spawn.WriteByte(0xFC);
+            spawn.WriteByte(1);
             spawn.WriteInt(0x00); // TODO: 2 if morphed.
 
             // TODO: Buffs?
@@ -1118,7 +1124,8 @@ namespace Loki.Maple.Characters
             spawn.WriteShort(this.Position.X);
             spawn.WriteShort(this.Position.Y);
             spawn.WriteByte(this.Stance);
-            spawn.WriteInt();
+            spawn.WriteShort();
+            spawn.WriteByte();
 
             spawn.WriteInt(1); // TODO: Mount level.
             spawn.WriteInt(); // TODO: Mount experience.
