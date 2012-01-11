@@ -136,7 +136,7 @@ namespace Loki.Net
                     break;
 
                 case MapleClientOperationCode.SelectCharacterWithPic:
-                    this.SelectCharacterWithPic(inPacket);
+                    this.SelectCharacterWithPic(inPacket, false);
                     break;
 
                 case MapleClientOperationCode.ClientStartError:
@@ -145,6 +145,14 @@ namespace Loki.Net
 
                 case MapleClientOperationCode.ClientError:
                     this.ClientError(inPacket);
+                    break;
+
+                case MapleClientOperationCode.ViewAllWithPic:
+                    this.SelectCharacterWithPic(inPacket, true);
+                    break;
+
+                case MapleClientOperationCode.ViewAllPicRegister:
+                    this.SelectCharacterWithPic(inPacket, true, true);
                     break;
             }
         }
@@ -179,7 +187,10 @@ namespace Loki.Net
                     outPacket.WriteDateTime(this.Account.Creation);
                     outPacket.WriteInt();
                     outPacket.WriteByte(0); // pin 0 = Enable, 1 = Disable
-                    outPacket.WriteByte(2); // pic 0 = Register, 1 = Request, 2 = Disable
+                    if (LoginServer.RequestPic) // pic 0 = Register, 1 = Request, 2 = Disable
+                        outPacket.WriteByte((byte)(this.Account.Pic == null || this.Account.Pic.Length == 0 ? 0 : 1));
+                    else
+                        outPacket.WriteByte(2);
                 }
                 else
                 {
@@ -456,8 +467,10 @@ namespace Loki.Net
                     outPacket.WriteBytes(characterBytes);
                 }
 
-                outPacket.WriteByte((byte)(this.Account.Pic == null || this.Account.Pic == "" ? 0 : 1));
-                outPacket.WriteShort(1);
+                if (LoginServer.RequestPic)
+                    outPacket.WriteByte((byte)(this.Account.Pic == null || this.Account.Pic.Length == 0 ? 0 : 1));
+                else
+                    outPacket.WriteByte(2);
                 outPacket.WriteInt(LoginServer.MaxCharacters);
 
                 this.Send(outPacket);
@@ -507,21 +520,14 @@ namespace Loki.Net
 
         private void DeleteCharacter(Packet inPacket)
         {
-            int intDate = inPacket.ReadInt();
+            string pic = inPacket.ReadString();
             int characterID = inPacket.ReadInt();
-
-            int inputYear = intDate / 10000;
-            int inputMonth = (intDate - inputYear * 10000) / 100;
-            int inputDay = intDate - inputYear * 10000 - (inputMonth * 100);
-
-            string inputDate = string.Format("{0}-{1}-{2}", inputYear, inputMonth, inputDay);
-            string referenceDate = this.Account.Birthday.ToString("yyyy'-'MM'-'DD");
 
             using (Packet outPacket = new Packet(MapleServerOperationCode.DeleteCharacter))
             {
                 outPacket.WriteInt(characterID);
 
-                if (inputDate == referenceDate || !LoginServer.RequestDeletionBirthday)
+                if (this.Account.Pic.Equals(pic))
                 {
                     this.World.DeleteCharacter(characterID);
                     outPacket.WriteByte((byte)CharacterDeletionResponse.Valid);
@@ -565,6 +571,12 @@ namespace Loki.Net
         {
             int characterID = inPacket.ReadInt();
 
+            if (fromViewAll)
+            {
+                this.WorldID = (byte)inPacket.ReadInt();
+                this.Channel = this.World.LeastLoadedChannel;
+            }
+
             this.MacAddresses = inPacket.ReadString().Split(new char[] { ',', ' ' });
 
             bool isMacBanned = false;
@@ -585,12 +597,6 @@ namespace Loki.Net
             }
             else
             {
-                if (fromViewAll)
-                {
-                    this.WorldID = (byte)inPacket.ReadInt();
-                    this.Channel = this.World.LeastLoadedChannel;
-                }
-
                 using (Packet outPacket = new Packet(MapleServerOperationCode.ServerIP))
                 {
                     outPacket.WriteShort();
@@ -614,32 +620,74 @@ namespace Loki.Net
             }
         }
 
-        private void SelectCharacterWithPic(Packet inPacket)
+        private void SelectCharacterWithPic(Packet inPacket, bool fromViewAll, bool registerPic = false)
         {
-            string pic = inPacket.ReadString();
+            string pic = "";
+            if (registerPic)
+                inPacket.ReadByte();
+            else
+                pic = inPacket.ReadString();
             int charId = inPacket.ReadInt();
-            inPacket.ReadString();
-            if (this.Account.Pic.Equals(pic))
-            {
-                using (Packet outPacket = new Packet(MapleServerOperationCode.ServerIP))
-                {
-                    outPacket.WriteShort();
-                    outPacket.WriteIPAddress(this.Channel.RemoteEndPoint.Address);
-                    outPacket.WriteShort((short)this.Channel.RemoteEndPoint.Port);
-                    outPacket.WriteInt(charId);
-                    outPacket.WriteInt();
-                    outPacket.WriteByte();
 
-                    this.Send(outPacket);
+            if (fromViewAll)
+            {
+                this.WorldID = (byte)inPacket.ReadInt();
+                this.Channel = this.World.LeastLoadedChannel;
+            }
+
+            this.MacAddresses = inPacket.ReadString().Split(new char[] { ',', ' ' });
+
+            bool isMacBanned = false;
+
+            foreach (string loopMac in this.MacAddresses)
+            {
+                if (Database.Exists("banned_mac", "Address = '{0}'", loopMac))
+                {
+                    Log.Warn("Disconnecting banned MAC address {0}.", loopMac);
+                    isMacBanned = true;
+                    break;
                 }
+            }
+
+            if (isMacBanned)
+            {
+                this.Stop();
             }
             else
             {
-                using (Packet outPacket = new Packet(MapleServerOperationCode.WrongPic))
+                if (fromViewAll)
                 {
-                    outPacket.WriteByte(20);
+                    if (registerPic)
+                    {
+                        inPacket.ReadString();
+                        pic = inPacket.ReadString();
+                        this.Account.Pic = pic;
+                        this.Account.Save();
+                    }
+                }
 
-                    this.Send(outPacket);
+                if (this.Account.Pic.Equals(pic))
+                {
+                    using (Packet outPacket = new Packet(MapleServerOperationCode.ServerIP))
+                    {
+                        outPacket.WriteShort();
+                        outPacket.WriteIPAddress(this.Channel.RemoteEndPoint.Address);
+                        outPacket.WriteShort((short)this.Channel.RemoteEndPoint.Port);
+                        outPacket.WriteInt(charId);
+                        outPacket.WriteInt();
+                        outPacket.WriteByte();
+
+                        this.Send(outPacket);
+                    }
+                }
+                else
+                {
+                    using (Packet outPacket = new Packet(MapleServerOperationCode.WrongPic))
+                    {
+                        outPacket.WriteByte(20);
+
+                        this.Send(outPacket);
+                    }
                 }
             }
         }

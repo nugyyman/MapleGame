@@ -121,7 +121,7 @@ namespace Loki
             bool requireStaffIP = Log.YesNo("Require staff to connect through specific IPs? ", true);
             bool autoRegister = Log.YesNo("Allow players to register in-game? ", true);
             bool requestPin = Log.YesNo("Require players to enter PIN on login? ", false);
-            bool requestDeletionBirthday = Log.YesNo("Require a valid birthday on character deletion? ", false);
+            bool requestPic = Log.YesNo("Require players to enter PIC on character selection? ", false);
             int maxCharacters = Log.Input("Maximum characters per account: ", 3);
 
             Log.SkipLine();
@@ -230,7 +230,7 @@ namespace Loki
 				Port=8484
 				AutoRegister={1}
 				RequestPin={2}
-				RequestDeletionBirthday={3}
+                RequestPic={3}
 				MaxCharacters={4}
 				RequireStaffIP={5}
 				
@@ -243,7 +243,7 @@ namespace Loki
 				Schema={8}
 				Username={9}
 				Password={10}",
-                logLevel, autoRegister, requestPin, requestDeletionBirthday,
+                logLevel, autoRegister, requestPin, requestPic, 
                 maxCharacters, requireStaffIP, securityCode, databaseHost, databaseSchema,
                 databaseUsername, databasePassword).Replace("	", "");
 

@@ -155,7 +155,7 @@ namespace Loki.Maple
     public enum CharacterDeletionResponse : byte
     {
         Valid,
-        Invalid = 0x12
+        Invalid = 0x14
     }
 
     public enum ServerFlag : byte

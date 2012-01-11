@@ -24,7 +24,7 @@ namespace Loki.Net
         public static bool AutoRegister { get; private set; }
         public static bool RequireStaffIP { get; private set; }
         public static bool RequestPin { get; private set; }
-        public static bool RequestDeletionBirthday { get; private set; }
+        public static bool RequestPic { get; private set; }
         public static int MaxCharacters { get; private set; }
 
         public static bool IsAlive
@@ -77,8 +77,8 @@ namespace Loki.Net
                 LoginServer.RequestPin = Settings.GetBool("Server/RequestPin");
                 Log.Inform("Pin will{0}be requested upon login.", LoginServer.RequestPin ? " " : " not ");
 
-                LoginServer.RequestDeletionBirthday = Settings.GetBool("Server/RequestDeletionBirthday");
-                Log.Inform("Valid birthday will{0}be requested upon deletion.", LoginServer.RequestDeletionBirthday ? " " : " not ");
+                LoginServer.RequestPic = Settings.GetBool("Server/RequestPic");
+                Log.Inform("Pic will{0}be requested upon login.", LoginServer.RequestPic ? " " : " not ");
 
                 LoginServer.MaxCharacters = Settings.GetInt("Server/MaxCharacters");
                 Log.Inform("Maximum of {0} characters per account.", LoginServer.MaxCharacters);

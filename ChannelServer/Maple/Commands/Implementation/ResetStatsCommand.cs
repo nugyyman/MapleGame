@@ -25,22 +25,22 @@ namespace Loki.Maple.Commands.Implementation
                 if (availableAp + caller.Strength - 4 > short.MaxValue)
                     availableAp = short.MaxValue;
                 else
-                    availableAp += caller.Strength;
+                    availableAp += (short)(caller.Strength - 4);
                 caller.Strength = 4;
                 if (availableAp + caller.Dexterity - 4 > short.MaxValue)
                     availableAp = short.MaxValue;
                 else
-                    availableAp += caller.Dexterity;
+                    availableAp += (short)(caller.Dexterity - 4);
                 caller.Dexterity = 4;
                 if (availableAp + caller.Intelligence - 4 > short.MaxValue)
                     availableAp = short.MaxValue;
                 else
-                    availableAp += caller.Intelligence;
+                    availableAp += (short)(caller.Intelligence - 4);
                 caller.Intelligence = 4;
                 if (availableAp + caller.Luck - 4 > short.MaxValue)
                     availableAp = short.MaxValue;
                 else
-                    availableAp += caller.Luck;
+                    availableAp += (short)(caller.Luck - 4);
                 caller.Luck = 4;
                 if (availableAp + caller.AvailableAP > short.MaxValue)
                     caller.AvailableAP = short.MaxValue;

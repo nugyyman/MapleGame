@@ -210,6 +210,7 @@ namespace Loki.Interoperability
             int accountID = inPacket.ReadInt();
 
             string name = inPacket.ReadString();
+            int job = inPacket.ReadInt();
             int face = inPacket.ReadInt();
             int hair = inPacket.ReadInt();
             int hair_color = inPacket.ReadInt();
@@ -225,7 +226,12 @@ namespace Loki.Interoperability
             character.AccountID = accountID;
 
             character.Level = 1;
-            character.Job = Job.Beginner;
+            if (job == 0)
+                character.Job = Job.Noblesse;
+            else if (job == 1)
+                character.Job = Job.Beginner;
+            else if (job == 2)
+                character.Job = Job.Legend;
             character.MaxHP = 50;
             character.MaxMP = 5;
             character.CurrentHP = 50;
