@@ -9,6 +9,7 @@ using Loki.Maple;
 using Loki.Maple.Characters;
 using Loki.Net;
 using Loki.Security;
+using Loki.Maple.Data;
 
 namespace Loki.Interoperability
 {
@@ -263,14 +264,35 @@ namespace Loki.Interoperability
                 character.KeyMap.Add(key[i], new Shortcut(type[i], action[i]));
             }
 
-            character.Save();
+            bool charOk = true;
 
-            using (Packet outPacket = new Packet(InteroperabilityOperationCode.CharacterCreationResponse))
+            if (Database.Exists("characters", "Name = '{0}'", name) || World.ForbiddenNames.Contains(name))
+                charOk = false;
+
+            if (!World.CharacterCreationData.checkData(job, gender, face, hair, hair_color, skin, topID, bottomID, shoesID, weaponID))
+                charOk = false;
+
+            if (charOk)
             {
-                outPacket.WriteInt(accountID);
-                outPacket.WriteBytes(character.ToByteArray());
+                character.Save();
 
-                this.Send(outPacket);
+                using (Packet outPacket = new Packet(InteroperabilityOperationCode.CharacterCreationResponse))
+                {
+                    outPacket.WriteInt(accountID);
+                    outPacket.WriteBytes(character.ToByteArray());
+
+                    this.Send(outPacket);
+                }
+            }
+            else
+            {
+                using (Packet outPacket = new Packet(InteroperabilityOperationCode.CharacterCreationResponse))
+                {
+                    outPacket.WriteInt(accountID);
+                    outPacket.WriteByte();
+
+                    this.Send(outPacket);
+                }
             }
         }
 

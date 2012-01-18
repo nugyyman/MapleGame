@@ -87,6 +87,7 @@
     <Compile Include="Interoperability\Worlds.cs" />
     <Compile Include="Interoperability\World.cs" />
     <Compile Include="Maple\Account.cs" />
+    <Compile Include="Maple\HackException.cs" />
     <Compile Include="Maple\NoAccountException.cs" />
     <Compile Include="Interoperability\InteroperabilityServer.cs" />
     <Compile Include="Net\LoginClientHandler.cs" />

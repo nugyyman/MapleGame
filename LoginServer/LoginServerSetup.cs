@@ -65,6 +65,7 @@ namespace Loki
 							  `Password` varchar(128) NOT NULL,
 							  `Salt` varchar(32) NOT NULL,
 							  `Pin` varchar(64) NOT NULL DEFAULT '',
+							  `Pic` varchar(26) DEFAULT NULL,
 							  `IsBanned` tinyint(1) unsigned NOT NULL,
 							  `IsMaster` tinyint(1) unsigned NOT NULL,
 							  `Birthday` date NOT NULL,
@@ -230,7 +231,7 @@ namespace Loki
 				Port=8484
 				AutoRegister={1}
 				RequestPin={2}
-                RequestPic={3}
+				RequestPic={3}
 				MaxCharacters={4}
 				RequireStaffIP={5}
 				

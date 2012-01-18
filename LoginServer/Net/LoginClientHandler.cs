@@ -528,13 +528,21 @@ namespace Loki.Net
         private void CreateCharacter(Packet inPacket)
         {
             byte[] characterData = inPacket.ReadBytes();
+            byte[] characterInfo = this.World.CreateCharacter(this.Account.ID, characterData);
 
-            using (Packet outPacket = new Packet(MapleServerOperationCode.AddNewCharacterEntry))
+            if (characterInfo.Length > 1)
             {
-                outPacket.WriteByte(); // NOTE: 1 for failure. Could be implemented as anti-packet editing.
-                outPacket.WriteBytes(this.World.CreateCharacter(this.Account.ID, characterData));
+                using (Packet outPacket = new Packet(MapleServerOperationCode.AddNewCharacterEntry))
+                {
+                    outPacket.WriteByte(); // NOTE: 1 for failure. Could be implemented as anti-packet editing.
+                    outPacket.WriteBytes(characterInfo);
 
-                this.Send(outPacket);
+                    this.Send(outPacket);
+                }
+            }
+            else
+            {
+                throw new HackException();
             }
         }
 
