@@ -542,7 +542,7 @@ namespace Loki.Net
             }
             else
             {
-                throw new HackException();
+                throw new HackException("Trying to PE character creation.");
             }
         }
 

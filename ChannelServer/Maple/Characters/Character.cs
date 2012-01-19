@@ -1237,8 +1237,8 @@ namespace Loki.Maple.Characters
             using (Packet outPacket = new Packet(MapleServerOperationCode.WarpToMap))
             {
                 outPacket.WriteInt(ChannelServer.InternalChannelID);
-                outPacket.WriteShort(2);
-                outPacket.WriteShort(0);
+                outPacket.WriteInt();
+                outPacket.WriteByte();
                 outPacket.WriteInt(destinationMapId);
                 outPacket.WriteByte(portalId);
                 outPacket.WriteShort(this.CurrentHP);

@@ -237,19 +237,20 @@ namespace Loki.Maple.Life
         {
             short movementId = inPacket.ReadShort();
 
-            bool randomSkill = inPacket.ReadBool(); // TODO: Might be a byte!
+            byte randomSkill = inPacket.ReadByte(); // TODO: Might be a byte!
             byte skillUnknown1 = inPacket.ReadByte();
             byte skillId = inPacket.ReadByte();
             byte skillLevel = inPacket.ReadByte();
             byte skillUnknown2 = inPacket.ReadByte();
             inPacket.ReadByte();
+            inPacket.Skip(8);
             inPacket.ReadByte();
             inPacket.ReadInt();
             Point startPosition = new Point(inPacket.ReadShort(), inPacket.ReadShort());
             Movements movements = Movements.Parse(inPacket.ReadBytes());
             MobSkill skill = null;
 
-            if (randomSkill && this.Skills.Count > 0)
+            if (randomSkill == 1 && this.Skills.Count > 0)
             {
                 skill = this.Skills.Random;
             }
@@ -277,7 +278,7 @@ namespace Loki.Maple.Life
             {
                 outPacket.WriteInt(this.ObjectID);
                 outPacket.WriteShort(movementId);
-                outPacket.WriteBool(randomSkill);
+                outPacket.WriteByte(randomSkill);
                 outPacket.WriteShort((short)this.CurrentMP);
                 outPacket.WriteByte((byte)(skill == null ? 0 : skill.MapleID));
                 outPacket.WriteByte((byte)(skill == null ? 0 : skill.Level));
@@ -288,7 +289,7 @@ namespace Loki.Maple.Life
             using (Packet outPacket = new Packet(MapleServerOperationCode.MoveMonster))
             {
                 outPacket.WriteInt(this.ObjectID);
-                outPacket.WriteBool(randomSkill);
+                outPacket.WriteByte(randomSkill);
                 outPacket.WriteByte(skillUnknown1);
                 outPacket.WriteByte(skillId);
                 outPacket.WriteByte(skillLevel);
@@ -417,10 +418,9 @@ namespace Loki.Maple.Life
             spawn.WriteInt(this.ObjectID);
             spawn.WriteByte(5);
             spawn.WriteInt(this.MapleID);
-            spawn.WriteByte();
-            spawn.WriteShort();
-            spawn.WriteByte(8);
-            spawn.WriteInt();
+            spawn.Skip(15);
+            spawn.WriteByte(0x88);
+            spawn.Skip(6);
             spawn.WriteShort(this.Position.X);
             spawn.WriteShort(this.Position.Y);
             spawn.WriteByte(this.Stance);
@@ -429,7 +429,7 @@ namespace Loki.Maple.Life
 
             if (this.SpawnEffect > 0)
             {
-                spawn.WriteInt(this.SpawnEffect);
+                spawn.WriteByte((byte)this.SpawnEffect);
                 spawn.WriteByte();
                 spawn.WriteShort();
 
