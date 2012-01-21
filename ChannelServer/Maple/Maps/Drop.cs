@@ -78,15 +78,7 @@ namespace Loki.Maple.Maps
             {
                 spawn.WriteShort(this.Origin.X);
                 spawn.WriteShort(this.Origin.Y);
-            }
-
-            //spawn.WriteByte();
-
-            if (dropped)
-            {
-                spawn.WriteByte();
-                spawn.WriteByte();
-                //spawn.WriteByte(1); // Pet meso pickup.
+                spawn.WriteShort();
             }
 
             if (!(this is Meso)) // TODO: This is expiration time: Implement it.

@@ -205,17 +205,30 @@ namespace Loki.Maple.Characters
 
                                 level++;
 
-                                if (this.IsCygnus)
+                                if (this.job == Maple.Job.Beginner && Level < 11)
                                 {
-                                    this.AvailableAP += 6;
+                                    if (this.Level < 6)
+                                    {
+                                        this.Strength += 5;
+                                    }
+                                    else
+                                    {
+                                        this.Strength += 4;
+                                        this.Dexterity += 1;
+                                    }
                                 }
-                                else if (this.IsExplorer)
+                                else if (this.job == Maple.Job.Beginner && Level == 11)
+                                {
+                                    this.ResetStats();
+                                }
+                                else
                                 {
                                     this.AvailableAP += 5;
-                                }
-                                else if (this.Job == Job.GM || this.Job == Job.SuperGM)
-                                {
-                                    this.AvailableAP += 10;
+
+                                    if (this.IsCygnus && this.Level < 70)
+                                    {
+                                        this.AvailableAP++;
+                                    }
                                 }
 
                                 if (this.Job != Job.Beginner && this.Job != Job.Noblesse)
@@ -1618,7 +1631,7 @@ namespace Loki.Maple.Characters
                         this.AvailableSP--;
                     }
 
-                    this.UpdateStatistics(StatisticType.AvailableSP);
+                    this.Release();
 
                     skill.CurrentLevel++;
                 }
@@ -2628,6 +2641,35 @@ namespace Loki.Maple.Characters
                 this.Buffs.Add(buff);
                 this.Items.Remove(itemId, 1);
             }
+        }
+
+        public void ResetStats()
+        {
+            short availableAp = 0;
+            if (availableAp + this.Strength - 4 > short.MaxValue)
+                availableAp = short.MaxValue;
+            else
+                availableAp += (short)(this.Strength - 4);
+            this.Strength = 4;
+            if (availableAp + this.Dexterity - 4 > short.MaxValue)
+                availableAp = short.MaxValue;
+            else
+                availableAp += (short)(this.Dexterity - 4);
+            this.Dexterity = 4;
+            if (availableAp + this.Intelligence - 4 > short.MaxValue)
+                availableAp = short.MaxValue;
+            else
+                availableAp += (short)(this.Intelligence - 4);
+            this.Intelligence = 4;
+            if (availableAp + this.Luck - 4 > short.MaxValue)
+                availableAp = short.MaxValue;
+            else
+                availableAp += (short)(this.Luck - 4);
+            this.Luck = 4;
+            if (availableAp + this.AvailableAP > short.MaxValue)
+                this.AvailableAP = short.MaxValue;
+            else
+                this.AvailableAP += availableAp;
         }
     }
 }

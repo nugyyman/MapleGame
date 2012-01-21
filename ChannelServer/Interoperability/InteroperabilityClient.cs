@@ -234,6 +234,10 @@ namespace Loki.Interoperability
             character.MaxMP = 5;
             character.CurrentHP = 50;
             character.CurrentMP = 5;
+            character.Strength = 12;
+            character.Dexterity = 5;
+            character.Intelligence = 4;
+            character.Luck = 4;
             character.Meso = 0;
             character.Fame = 0;
             character.AvailableAP = 0;
