@@ -80,21 +80,24 @@ namespace Loki.Maple.Maps
                 spawn.WriteShort(this.Origin.Y);
             }
 
-            spawn.WriteByte();
+            //spawn.WriteByte();
 
             if (dropped)
             {
                 spawn.WriteByte();
-                spawn.WriteByte(1); // Pet meso pickup.
+                spawn.WriteByte();
+                //spawn.WriteByte(1); // Pet meso pickup.
             }
 
-            if (!(this is Meso))
+            if (!(this is Meso)) // TODO: This is expiration time: Implement it.
             {
+                spawn.WriteByte();
                 spawn.WriteBytes(PacketConstants.Item);
-                spawn.WriteInt(); // Expiration time.
-                spawn.WriteByte(2); // Expiration time.
-                spawn.WriteByte(1); // Pet equip pickup.
+                spawn.WriteInt(400967355);
+                spawn.WriteByte(2); // 1 to show it, 2 to hide it.
             }
+
+            spawn.WriteByte(1); // Pet equip pickup.
 
             return spawn;
         }

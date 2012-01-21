@@ -205,9 +205,6 @@ namespace Loki.Interoperability
 
         public void CreateCharacter(Packet inPacket)
         {
-            // TODO: Check if name is already taken and return error packet.
-            // TODO: Check if items are OK (if they're not, the client will not create AFAIK).
-
             int accountID = inPacket.ReadInt();
 
             string name = inPacket.ReadString();

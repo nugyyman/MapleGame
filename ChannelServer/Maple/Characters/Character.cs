@@ -483,10 +483,15 @@ namespace Loki.Maple.Characters
                         outPacket.WriteByte(3); // 3 = exp, 4 = fame, 5 = mesos, 6 = guildpoints
                         outPacket.WriteBool(true); // White?
                         outPacket.WriteInt(delta);
-                        outPacket.WriteInt();
-                        outPacket.WriteInt();
-                        outPacket.WriteInt();
-                        outPacket.WriteInt();
+                        outPacket.WriteByte();
+                        outPacket.WriteInt(); // monster book bonus (Bonus Event Exp)
+                        outPacket.WriteShort(); //Weird stuff
+                        outPacket.WriteInt(); //wedding bonus
+                        outPacket.WriteByte(); //0 = party bonus, 1 = Bonus Event party Exp () x0
+                        outPacket.WriteInt(); // party bonus
+                        outPacket.WriteInt(); //equip bonus
+                        outPacket.WriteInt(); //Internet Cafe Bonus
+                        outPacket.WriteInt(); //Rainbow Week Bonus
 
                         this.Client.Send(outPacket);
                     }
@@ -1613,7 +1618,7 @@ namespace Loki.Maple.Characters
                         this.AvailableSP--;
                     }
 
-                    this.Release();
+                    this.UpdateStatistics(StatisticType.AvailableSP);
 
                     skill.CurrentLevel++;
                 }
@@ -1723,7 +1728,7 @@ namespace Loki.Maple.Characters
                 charge = 0;
             }
 
-            inPacket.Skip(9);
+            inPacket.Skip(10);
             byte stance = inPacket.ReadByte();
 
             if (skillID == 4211006)
@@ -1764,17 +1769,21 @@ namespace Loki.Maple.Characters
                     {
                         outPacket.WriteInt(this.ID);
                         outPacket.WriteByte(amountAttackedDamaged);
+                        outPacket.WriteByte(0x5B);
 
-                        if (skillID > 0)
+                        if (this.Skills.Contains(skillID))
                         {
-                            outPacket.WriteByte(0xFF);
-                            outPacket.WriteInt(skillID);
+                            outPacket.WriteByte(this.Skills[skillID].CurrentLevel);
+
+                            if (this.Skills[skillID].CurrentLevel > 0)
+                                outPacket.WriteInt(skillID);
                         }
                         else
                         {
                             outPacket.WriteByte();
                         }
 
+                        outPacket.WriteByte();
                         outPacket.WriteByte();
                         outPacket.WriteByte(stance);
                         outPacket.WriteByte(speed);
@@ -1838,17 +1847,21 @@ namespace Loki.Maple.Characters
                 {
                     outPacket.WriteInt(this.ID);
                     outPacket.WriteByte(amountAttackedDamaged);
+                    outPacket.WriteByte(0x5B);
 
-                    if (skillID > 0)
+                    if (this.Skills.Contains(skillID))
                     {
-                        outPacket.WriteByte(0xFF);
-                        outPacket.WriteInt(skillID);
+                        outPacket.WriteByte(this.Skills[skillID].CurrentLevel);
+
+                        if (this.Skills[skillID].CurrentLevel > 0)
+                            outPacket.WriteInt(skillID);
                     }
                     else
                     {
                         outPacket.WriteByte();
                     }
 
+                    outPacket.WriteByte();
                     outPacket.WriteByte();
                     outPacket.WriteByte(stance);
                     outPacket.WriteByte(speed);
@@ -1899,17 +1912,21 @@ namespace Loki.Maple.Characters
                 {
                     outPacket.WriteInt(this.ID);
                     outPacket.WriteByte(amountAttackedDamaged);
+                    outPacket.WriteByte(0x5B);
 
-                    if (skillID > 0)
+                    if (this.Skills.Contains(skillID))
                     {
-                        outPacket.WriteByte(0xFF);
-                        outPacket.WriteInt(skillID);
+                        outPacket.WriteByte(this.Skills[skillID].CurrentLevel);
+
+                        if (this.Skills[skillID].CurrentLevel > 0)
+                            outPacket.WriteInt(skillID);
                     }
                     else
                     {
                         outPacket.WriteByte();
                     }
 
+                    outPacket.WriteByte();
                     outPacket.WriteByte();
                     outPacket.WriteByte(stance);
                     outPacket.WriteByte(speed);
