@@ -11,7 +11,7 @@ namespace Loki.Maple.Life.Implementation
         {
             if (talker.IsMaster)
             {
-                ShowChoiceDialog(talker, "Please select a style category.", new NpcEventHandler(OnCategoryChosen), "Hair", "Face", "Skin");
+                ShowChoiceDialog(talker, "Please select a style category.", new NpcEventHandler(OnCategoryChosen), 0, 0, "Hair", "Face", "Skin");
             }
             else
             {
@@ -29,11 +29,11 @@ namespace Loki.Maple.Life.Implementation
             switch (args.Selection)
             {
                 case 0:
-                    ShowChoiceDialog(talker, "Please select a hair operation.", new NpcEventHandler(OnHairOperationChosen), "Style", "Color");
+                    ShowChoiceDialog(talker, "Please select a hair operation.", new NpcEventHandler(OnHairOperationChosen), 0, 0, "Style", "Color");
                     break;
 
                 case 1:
-                    ShowChoiceDialog(talker, "Please select a face operation.", new NpcEventHandler(OnFaceOperationChosen), "Style", "Color");
+                    ShowChoiceDialog(talker, "Please select a face operation.", new NpcEventHandler(OnFaceOperationChosen), 0, 0, "Style", "Color");
                     break;
 
                 case 2:

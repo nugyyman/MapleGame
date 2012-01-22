@@ -183,13 +183,18 @@ namespace Loki.Maple.Life
             }
         }
 
-        private void SendDialog(Character talker, string text, NpcMessageType messageType, params byte[] footer)
+        private void SendDialog(Character talker, string text, NpcMessageType messageType, byte speaker, int speakerNpc, params byte[] footer)
         {
             using (Packet outPacket = new Packet(MapleServerOperationCode.NpcTalk))
             {
                 outPacket.WriteByte(4); // UNK
                 outPacket.WriteInt(this.MapleID);
                 outPacket.WriteByte((byte)messageType);
+                outPacket.WriteByte(speaker);
+
+                if(speaker > 3)
+                    outPacket.WriteInt(speakerNpc);
+
                 outPacket.WriteString(Npc.Format(text));
                 outPacket.WriteBytes(footer);
 
@@ -197,9 +202,9 @@ namespace Loki.Maple.Life
             }
         }
 
-        public void ShowOkDialog(Character talker, string text, NpcEventHandler handler = null)
+        public void ShowOkDialog(Character talker, string text, NpcEventHandler handler = null, byte speaker = 0, int speakerNpc = 0)
         {
-            this.SendDialog(talker, text, NpcMessageType.Standard, 0, 0);
+            this.SendDialog(talker, text, NpcMessageType.Standard, speaker, speakerNpc, 0, 0);
 
             if (handler != null)
             {
@@ -218,9 +223,9 @@ namespace Loki.Maple.Life
             }
         }
 
-        public void ShowYesNoDialog(Character talker, string text, NpcEventHandler yesHandler, NpcEventHandler noHandler = null)
+        public void ShowYesNoDialog(Character talker, string text, NpcEventHandler yesHandler, NpcEventHandler noHandler = null, byte speaker = 0, int speakerNpc = 0)
         {
-            this.SendDialog(talker, text, NpcMessageType.YesNo);
+            this.SendDialog(talker, text, NpcMessageType.YesNo, speaker, speakerNpc);
 
             NpcEventHandler handler = new NpcEventHandler(delegate(Character _talker, NpcEventArgs args)
             {
@@ -247,9 +252,9 @@ namespace Loki.Maple.Life
             }
         }
 
-        public void ShowNextDialog(Character talker, string text, NpcEventHandler nextHandler)
+        public void ShowNextDialog(Character talker, string text, NpcEventHandler nextHandler, byte speaker = 0, int speakerNpc = 0)
         {
-            this.SendDialog(talker, text, NpcMessageType.Standard, 0, 1);
+            this.SendDialog(talker, text, NpcMessageType.Standard, speaker, speakerNpc, 0, 1);
 
             if (this.Callbacks.ContainsKey(talker))
             {
@@ -261,9 +266,9 @@ namespace Loki.Maple.Life
             }
         }
 
-        public void ShowNextPreviousDialog(Character talker, string text, NpcEventHandler nextHandler, NpcEventHandler previousHandler)
+        public void ShowNextPreviousDialog(Character talker, string text, NpcEventHandler nextHandler, NpcEventHandler previousHandler, byte speaker = 0, int speakerNpc = 0)
         {
-            this.SendDialog(talker, text, NpcMessageType.Standard, 1, 1);
+            this.SendDialog(talker, text, NpcMessageType.Standard, speaker, speakerNpc, 1, 1);
 
             NpcEventHandler handler = new NpcEventHandler(delegate(Character _talker, NpcEventArgs args)
             {
@@ -287,7 +292,7 @@ namespace Loki.Maple.Life
             }
         }
 
-        public void ShowChoiceDialog(Character talker, string text, NpcEventHandler handler, params string[] choices)
+        public void ShowChoiceDialog(Character talker, string text, NpcEventHandler handler, byte speaker = 0, int speakerNpc = 0, params string[] choices)
         {
             text += "#b\r\n";
 
@@ -296,7 +301,7 @@ namespace Loki.Maple.Life
                 text += string.Format("#L{0}#{1}#l\r\n", i, choices[i]);
             }
 
-            this.SendDialog(talker, text, NpcMessageType.Choice);
+            this.SendDialog(talker, text, NpcMessageType.Choice, speaker, speakerNpc);
 
             if (this.Callbacks.ContainsKey(talker))
             {
@@ -308,9 +313,9 @@ namespace Loki.Maple.Life
             }
         }
 
-        public void ShowAcceptDeclineDialog(Character talker, string text, NpcEventHandler acceptHandler, NpcEventHandler declineHandler)
+        public void ShowAcceptDeclineDialog(Character talker, string text, NpcEventHandler acceptHandler, NpcEventHandler declineHandler, byte speaker = 0, int speakerNpc = 0)
         {
-            this.SendDialog(talker, text, NpcMessageType.AcceptDecline);
+            this.SendDialog(talker, text, NpcMessageType.AcceptDecline, speaker, speakerNpc);
 
             NpcEventHandler handler = new NpcEventHandler(delegate(Character _talker, NpcEventArgs args)
             {
@@ -334,15 +339,20 @@ namespace Loki.Maple.Life
             }
         }
 
-        public void ShowTextRequestDialog(Character talker, string text, NpcTextEventHandler handler)
+        public void ShowTextRequestDialog(Character talker, string text, NpcTextEventHandler handler, string defaultText = "", byte speaker = 0, int speakerNpc = 0)
         {
             using (Packet outPacket = new Packet(MapleServerOperationCode.NpcTalk))
             {
                 outPacket.WriteByte(4); // UNK
                 outPacket.WriteInt(this.MapleID);
                 outPacket.WriteByte((byte)NpcMessageType.RequestText);
+                outPacket.WriteByte(speaker);
+
+                if (speaker > 3)
+                    outPacket.WriteInt(speakerNpc);
+
                 outPacket.WriteString(Npc.Format(text));
-                outPacket.WriteInt();
+                outPacket.WriteString(defaultText);
                 outPacket.WriteInt();
 
                 talker.Client.Send(outPacket);
@@ -358,13 +368,18 @@ namespace Loki.Maple.Life
             }
         }
 
-        public void ShowNumberRequestDialog(Character talker, string text, NpcEventHandler handler, int defaultValue, int minimum, int maximum)
+        public void ShowNumberRequestDialog(Character talker, string text, NpcEventHandler handler, int defaultValue, int minimum, int maximum, byte speaker = 0, int speakerNpc = 0)
         {
             using (Packet outPacket = new Packet(MapleServerOperationCode.NpcTalk))
             {
                 outPacket.WriteByte(4); // UNK
                 outPacket.WriteInt(this.MapleID);
                 outPacket.WriteByte((byte)NpcMessageType.RequestNumber);
+                outPacket.WriteByte(speaker);
+
+                if (speaker > 3)
+                    outPacket.WriteInt(speakerNpc);
+
                 outPacket.WriteString(Npc.Format(text));
                 outPacket.WriteInt(defaultValue);
                 outPacket.WriteInt(minimum);
@@ -405,6 +420,7 @@ namespace Loki.Maple.Life
                 outPacket.WriteByte(4); // UNK
                 outPacket.WriteInt(this.MapleID);
                 outPacket.WriteByte((byte)NpcMessageType.RequestStyle);
+                outPacket.WriteByte(); // speaker
                 outPacket.WriteString(Npc.Format(text));
 
                 outPacket.WriteByte((byte)validStyles.Count);

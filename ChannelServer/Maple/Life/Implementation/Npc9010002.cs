@@ -20,7 +20,7 @@ namespace Loki.Maple.Life.Implementation
 
         void Converse3(Character talker, NpcEventArgs args)
         {
-            ShowChoiceDialog(talker, "Whatever. Wanna travel?", new NpcEventHandler(Selection), "Henesys", "Ellinia");
+            ShowChoiceDialog(talker, "Whatever. Wanna travel?", new NpcEventHandler(Selection), 0, 0, "Henesys", "Ellinia");
         }
 
         void Selection(Character talker, NpcEventArgs args)
