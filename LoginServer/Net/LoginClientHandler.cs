@@ -426,7 +426,7 @@ namespace Loki.Net
             this.WorldID = inPacket.ReadByte();
             this.ChannelID = inPacket.ReadByte();
 
-            List<byte[]> WorldCharacters = this.World.GetCharacters(this.Account.ID);
+            List<byte[]> WorldCharacters = this.World.GetCharacters(this.Account.ID, false);
 
             using (Packet outPacket = new Packet(MapleServerOperationCode.CharacterList))
             {
@@ -456,7 +456,7 @@ namespace Loki.Net
 
             foreach (World loopWorld in LoginServer.Worlds)
             {
-                List<byte[]> WorldCharacters = loopWorld.GetCharacters(this.Account.ID);
+                List<byte[]> WorldCharacters = loopWorld.GetCharacters(this.Account.ID, true);
                 count += WorldCharacters.Count;
 
                 allCharacters.Add(loopWorld.ID, WorldCharacters);

@@ -116,10 +116,11 @@ namespace Loki.Interoperability
             return this[internalChannelID].LoadProportion;
         }
 
-        public List<byte[]> GetCharacters(int accountID)
+        public List<byte[]> GetCharacters(int accountID, bool fromViewAll)
         {
             using (Packet outPacket = new Packet(InteroperabilityOperationCode.CharacterEntriesRequest))
             {
+                outPacket.WriteBool(fromViewAll);
                 outPacket.WriteInt(accountID);
 
                 this.RandomChannel.Send(outPacket);

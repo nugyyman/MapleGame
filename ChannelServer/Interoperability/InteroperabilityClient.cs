@@ -161,6 +161,7 @@ namespace Loki.Interoperability
 
         public void SendCharacters(Packet inPacket)
         {
+            bool fromViewAll = inPacket.ReadBool();
             int accountID = inPacket.ReadInt();
 
             using (Packet outPacket = new Packet(InteroperabilityOperationCode.CharacterEntriesResponse))
@@ -172,7 +173,7 @@ namespace Loki.Interoperability
                     Character character = new Character(datum.ID);
                     character.Load();
 
-                    byte[] entry = character.ToByteArray();
+                    byte[] entry = character.ToByteArray(fromViewAll);
 
                     outPacket.WriteByte((byte)entry.Length);
                     outPacket.WriteBytes(entry);
@@ -280,7 +281,7 @@ namespace Loki.Interoperability
                 using (Packet outPacket = new Packet(InteroperabilityOperationCode.CharacterCreationResponse))
                 {
                     outPacket.WriteInt(accountID);
-                    outPacket.WriteBytes(character.ToByteArray());
+                    outPacket.WriteBytes(character.ToByteArray(false));
 
                     this.Send(outPacket);
                 }

@@ -853,13 +853,14 @@ namespace Loki.Maple.Characters
             this.Assigned = false;
         }
 
-        public byte[] ToByteArray()
+        public byte[] ToByteArray(bool fromViewAll)
         {
             using (ByteBuffer buffer = new ByteBuffer())
             {
                 buffer.WriteBytes(this.StatisticsToByteArray());
                 buffer.WriteBytes(this.AppearanceToByteArray(false));
-                buffer.WriteByte();
+                if (!fromViewAll)
+                    buffer.WriteByte();
                 if (this.IsMaster)
                     buffer.WriteByte();
 
