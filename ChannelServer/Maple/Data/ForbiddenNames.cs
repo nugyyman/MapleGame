@@ -8,7 +8,7 @@ namespace Loki.Maple.Data
         public ForbiddenNames()
             : base()
         {
-            using (Log.Load("ForbiddenNames"))
+            using (Log.Load("Forbidden Names"))
             {
                 foreach (dynamic nameDatum in new Datums("character_forbidden_names").Populate())
                 {

@@ -41,10 +41,6 @@ namespace Loki.Maple.Characters
                     {
                         inPacket.ReadInt();
                     }
-                    else
-                    {
-                        inPacket.ReadShort();
-                    }
 
                     this.Started.Add(quest.ID, new Dictionary<int, short>());
 
@@ -58,14 +54,12 @@ namespace Loki.Maple.Characters
                         outPacket.WriteByte(1);
                         outPacket.WriteUShort(quest.ID);
                         outPacket.WriteByte(1);
-                        outPacket.WriteInt();
-                        outPacket.WriteInt();
-                        outPacket.WriteShort();
+                        outPacket.WriteString("");
 
                         this.Parent.Client.Send(outPacket);
                     }
 
-                    this.Update(quest.ID, npcId, 8);
+                    //this.Update(quest.ID, npcId, 8);
 
                     break;
 
@@ -134,14 +128,15 @@ namespace Loki.Maple.Characters
                     break;
 
                 case QuestAction.ScriptStart:
-                    inPacket.ReadInt();
+                    //inPacket.ReadInt();
 
-                    throw new NotImplementedException("Scripted quests not implemented.");
+                    //throw new NotImplementedException("Scripted quests not implemented.");
 
                 case QuestAction.ScriptEnd:
                     inPacket.ReadInt();
 
-                    throw new NotImplementedException("Scripted quests not implemented.");
+                    //throw new NotImplementedException("Scripted quests not implemented.");
+                    return;
             }
         }
 

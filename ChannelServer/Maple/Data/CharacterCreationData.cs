@@ -116,7 +116,7 @@ namespace Loki.Maple.Data
             this.AranFemaleShoes = new List<int>();
             this.AranFemaleWeapon = new List<int>();
 
-            using (Log.Load("Character creation data"))
+            using (Log.Load("Character Creation Data"))
             {
                 foreach (dynamic dataDatum in new Datums("character_creation_data").Populate())
                 {

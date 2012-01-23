@@ -73,6 +73,9 @@ namespace Loki.Maple.Shops
                 {
                     outPacket.WriteInt(loopShopItem.MapleID);
                     outPacket.WriteInt(loopShopItem.PurchasePrice);
+                    outPacket.WriteInt();
+                    outPacket.WriteInt();
+                    outPacket.WriteInt();
 
                     if (loopShopItem.IsRechargeable)
                     {
