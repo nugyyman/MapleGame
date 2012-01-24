@@ -8,7 +8,7 @@ namespace Loki
     public static class Application
     {
         public static readonly Random Random = new Random();
-        public const int DefaultBufferSize = 4096;
+        public const int DefaultBufferSize = 8192;
         public const int MapleVersion = 83;
         public const string CommandIndicator = "!";
         public const string PlayerCommandIndicator = "@";

@@ -1082,7 +1082,7 @@ namespace Loki.Maple.Characters
             Packet spawn = new Packet(MapleServerOperationCode.SpawnCharacter);
 
             spawn.WriteInt(this.ID);
-            spawn.WriteInt(this.Level);
+            spawn.WriteByte(this.Level);
             spawn.WriteString(this.Name);
 
             // If not in guild:
@@ -1123,19 +1123,7 @@ namespace Loki.Maple.Characters
             spawn.WriteInt(characterSpawn);
             spawn.Skip(3);
 
-            // UNK: WTF?
-            short job = 412;
-
-            foreach (Skill loopSkill in this.Skills)
-            {
-                if (loopSkill.ID == 11101005 || loopSkill.ID == 14101004)
-                {
-                    job = (short)(loopSkill.ID / 10000);
-                    break;
-                }
-            }
-
-            spawn.WriteShort(job);
+            spawn.WriteShort((short)this.Job);
             spawn.WriteBytes(this.AppearanceToByteArray(false));
             spawn.WriteInt();
             spawn.WriteInt(); // TODO: Item effect.
@@ -1146,15 +1134,29 @@ namespace Loki.Maple.Characters
             spawn.WriteShort();
             spawn.WriteByte();
 
+            // TODO: Pets.
+            spawn.WriteByte();
+
             spawn.WriteInt(1); // TODO: Mount level.
             spawn.WriteInt(); // TODO: Mount experience.
             spawn.WriteInt(); // TODO: Mount tiredness.
 
-            spawn.WriteShort();
+            // TODO: Player interaction.
+            spawn.WriteByte();
 
-            spawn.Skip(10); // TODO: Ring.
+            // TODO: Chalkboard.
+            spawn.WriteByte();
 
-            spawn.WriteInt();
+            // TODO: Rings.
+            spawn.WriteByte();
+            spawn.WriteByte();
+
+            // TODO: Marriage rings.
+            spawn.WriteByte();
+
+            spawn.Skip(3);
+
+            spawn.WriteByte();
 
             return spawn;
         }
@@ -2671,6 +2673,27 @@ namespace Loki.Maple.Characters
                 this.AvailableAP = short.MaxValue;
             else
                 this.AvailableAP += availableAp;
+        }
+
+        public void MaxSkills()
+        {
+            foreach (int skill in World.CachedSkills.Keys)
+            {
+                byte masterLevel = (byte)World.CachedSkills[skill].Count;
+                if (!this.Skills.Contains(skill))
+                {
+                    if (masterLevel > 0 && (skill / 1000000 != 9 || this.IsMaster))
+                        this.Skills.Add(World.CachedSkills[skill][masterLevel]);
+                }
+                else
+                {
+                    this.Skills[skill].MaxLevel = masterLevel;
+                    this.Skills[skill].CurrentLevel = masterLevel;
+                }
+
+                if (masterLevel > 0 && (skill / 1000000 != 9 || this.IsMaster))
+                    this.Skills[skill].Update();
+            }
         }
     }
 }

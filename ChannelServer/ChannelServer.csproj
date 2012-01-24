@@ -77,6 +77,7 @@
     <Compile Include="Maple\Commands\Implementation\DexCommand.cs" />
     <Compile Include="Maple\Commands\Implementation\IntCommand.cs" />
     <Compile Include="Maple\Commands\Implementation\LukCommand.cs" />
+    <Compile Include="Maple\Commands\Implementation\MasterMaxSkills.cs" />
     <Compile Include="Maple\Commands\Implementation\ResetStatsCommand.cs" />
     <Compile Include="Maple\Commands\Implementation\SkillCommand.cs" />
     <Compile Include="Maple\Commands\Implementation\HorntailCommand.cs" />
