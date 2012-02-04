@@ -141,9 +141,9 @@ namespace Loki.Maple
                         outPacket.WriteInt((int)(this.End - DateTime.Now).TotalMilliseconds);
                     }
 
-                    outPacket.WriteShort();
-                    outPacket.WriteShort();
+                    outPacket.WriteInt();
                     outPacket.WriteByte();
+                    //outPacket.WriteInt();
 
                     this.Character.Client.Send(outPacket);
                 }
@@ -243,6 +243,9 @@ namespace Loki.Maple
                             outPacket.WriteShort();
                             outPacket.WriteShort();
                             outPacket.WriteByte();
+                            //outPacket.WriteInt();
+
+                            //TODO: Monster riding.
 
                             this.Character.Client.Send(outPacket);
                         }
@@ -263,8 +266,8 @@ namespace Loki.Maple
                                 outPacket.WriteShort(secondaryStatup.Value);
                             }
 
+                            outPacket.WriteInt();
                             outPacket.WriteShort();
-                            outPacket.WriteByte();
 
                             this.Character.Map.Broadcast(outPacket);
                         }
@@ -331,8 +334,8 @@ namespace Loki.Maple
                             outPacket.WriteShort(secondaryStatup.Value);
                         }
 
+                        outPacket.WriteInt();
                         outPacket.WriteShort();
-                        outPacket.WriteByte();
 
                         return outPacket;
                     }
@@ -345,7 +348,7 @@ namespace Loki.Maple
             {
                 outPacket.WriteLong(this.PrimaryBuffMask);
                 outPacket.WriteLong(this.SecondaryBuffMask);
-                outPacket.WriteByte(3);
+                outPacket.WriteByte(1);
 
                 this.Character.Client.Send(outPacket);
             }
@@ -366,7 +369,7 @@ namespace Loki.Maple
             {
                 outPacket.WriteLong(0);
                 outPacket.WriteLong(this.SecondaryBuffMask);
-                outPacket.WriteByte(3);
+                outPacket.WriteByte(1);
 
                 this.Character.Client.Send(outPacket);
             }

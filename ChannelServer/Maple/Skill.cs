@@ -389,6 +389,7 @@ namespace Loki.Maple
             {
                 outPacket.WriteByte(effect);
                 outPacket.WriteInt(this.MapleID);
+                outPacket.WriteByte(0xA9);
                 outPacket.WriteByte(1);
 
                 character.Client.Send(outPacket);

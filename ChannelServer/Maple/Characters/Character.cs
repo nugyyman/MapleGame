@@ -2012,6 +2012,7 @@ namespace Loki.Maple.Characters
             }
             else
             {
+                skill.Recalculate();
                 skill.Cast();
             }
         }
@@ -2628,10 +2629,10 @@ namespace Loki.Maple.Characters
             Item consume = this.Items[ItemType.Usable, slot];
             if (consume.CFlags == "" && consume.CBuffTime == 0 && consume.CEffect == 0 && consume.CMoveTo == 0 && consume.CDropUp.Equals("none"))
             {
-                this.CurrentHP = (short)(this.CurrentHP + consume.CHP);
-                this.CurrentMP = (short)(this.CurrentMP + consume.CMP);
-                this.CurrentHP = (this.CurrentHP + ((this.maxHP * consume.CHPPercentage) / 100)) >= 30000 ? this.MaxHP : (short)(this.CurrentHP + ((this.maxHP * consume.CHPPercentage) / 100));
-                this.CurrentMP = (this.CurrentMP + ((this.maxMP * consume.CMPPercentage) / 100)) >= 30000 ? this.MaxMP : (short)(this.CurrentMP + ((this.maxMP * consume.CMPPercentage) / 100));
+                this.CurrentHP = (short)(this.CurrentHP + consume.CHP >= this.MaxHP ? this.MaxHP : this.CurrentHP + consume.CHP);
+                this.CurrentMP = (short)(this.CurrentMP + consume.CMP >= this.MaxMP ? this.MaxMP : this.CurrentMP + consume.CMP);
+                this.CurrentHP = (this.CurrentHP + ((this.MaxHP * consume.CHPPercentage) / 100)) >= this.MaxHP ? this.MaxHP : (short)(this.CurrentHP + ((this.MaxHP * consume.CHPPercentage) / 100));
+                this.CurrentMP = (this.CurrentMP + ((this.MaxMP * consume.CMPPercentage) / 100)) >= this.MaxMP ? this.MaxMP : (short)(this.CurrentMP + ((this.MaxMP * consume.CMPPercentage) / 100));
                 this.UpdateStatistics(StatisticType.CurrentHP);
                 this.UpdateStatistics(StatisticType.CurrentMP);
                 this.Items.Remove(itemId, 1);
