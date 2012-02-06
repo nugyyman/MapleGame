@@ -267,6 +267,8 @@ namespace Loki.Maple.Characters
 
                     this.ShowEffect(ForeignEffect.JobAdvance);
                 }
+
+                this.Skills.DeleteJobSkills();
             }
         }
 
@@ -2683,7 +2685,7 @@ namespace Loki.Maple.Characters
                 byte masterLevel = (byte)World.CachedSkills[skill].Count;
                 if (!this.Skills.Contains(skill))
                 {
-                    if (masterLevel > 0 && (skill / 1000000 != 9 || this.IsMaster))
+                    if (masterLevel > 0 && (skill / 1000000 == (short)this.Job / 100))
                         this.Skills.Add(World.CachedSkills[skill][masterLevel]);
                 }
                 else
@@ -2692,7 +2694,7 @@ namespace Loki.Maple.Characters
                     this.Skills[skill].CurrentLevel = masterLevel;
                 }
 
-                if (masterLevel > 0 && (skill / 1000000 != 9 || this.IsMaster))
+                if (masterLevel > 0 && (skill / 1000000 == (short)this.Job / 100))
                     this.Skills[skill].Update();
             }
         }

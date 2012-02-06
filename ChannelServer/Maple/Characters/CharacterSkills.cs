@@ -55,6 +55,29 @@ namespace Loki.Maple.Characters
             }
         }
 
+        public void DeleteJobSkills()
+        {
+            lock (this)
+            {
+                List<Skill> toRemove = new List<Skill>();
+
+                foreach (Skill loopSkill in this)
+                {
+                    toRemove.Add(loopSkill);
+                }
+
+                foreach (Skill loopSkill in toRemove)
+                {
+                    if (loopSkill.MapleID / 1000000 != (short)this.Parent.Job / 100)
+                    {
+                        loopSkill.Delete();
+                        loopSkill.Update();
+                        base.Remove(loopSkill);
+                    }
+                }
+            }
+        }
+
         public byte[] ToByteArray()
         {
             using (ByteBuffer buffer = new ByteBuffer())
