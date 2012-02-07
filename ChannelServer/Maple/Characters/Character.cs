@@ -268,7 +268,7 @@ namespace Loki.Maple.Characters
                     this.ShowEffect(ForeignEffect.JobAdvance);
                 }
 
-                this.Skills.DeleteJobSkills();
+                //this.Skills.DeleteJobSkills();
             }
         }
 
