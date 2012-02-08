@@ -1203,4 +1203,17 @@ namespace Loki.Maple
         Fail = 2,
         Curse = 3
     }
+
+    public enum BuddyAddResults
+    {
+        BuddyListFull,
+        AlreadyOnList,
+        Ok
+    }
+
+    public enum BuddyOperation
+    {
+        Added,
+        Deleted
+    }
 }

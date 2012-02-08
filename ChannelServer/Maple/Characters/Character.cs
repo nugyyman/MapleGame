@@ -20,6 +20,7 @@ namespace Loki.Maple.Characters
         public CharacterQuests Quests { get; private set; }
         public CharacterBuffs Buffs { get; private set; }
         public CharacterKeyMap KeyMap { get; set; }
+        public CharacterBuddyList BuddyList { get; private set; }
         public ControlledMobs ControlledMobs { get; private set; }
         public ControlledNpcs ControlledNpcs { get; private set; }
         public Trade Trade { get; set; }
@@ -729,6 +730,7 @@ namespace Loki.Maple.Characters
             this.Quests = new CharacterQuests(this);
             this.Buffs = new CharacterBuffs(this);
             this.KeyMap = new CharacterKeyMap(this);
+            this.BuddyList = new CharacterBuddyList(this);
 
             this.Position = new Point(0, 0);
             this.ControlledMobs = new ControlledMobs(this);
@@ -779,6 +781,7 @@ namespace Loki.Maple.Characters
             this.Buffs.Load();
             this.Quests.Load();
             this.KeyMap.Load();
+            this.BuddyList.Load();
         }
 
         public void Save()
@@ -838,6 +841,7 @@ namespace Loki.Maple.Characters
             this.Buffs.Save();
             this.Quests.Save();
             this.KeyMap.Save();
+            this.BuddyList.Save();
 
             Log.Inform("Saved character '{0}' to database.", this.Name);
         }
@@ -2697,6 +2701,10 @@ namespace Loki.Maple.Characters
                 if (masterLevel > 0 && (skill / 1000000 == (short)this.Job / 100))
                     this.Skills[skill].Update();
             }
+        }
+
+        public void BuddyListModify(Packet inPacket)
+        {
         }
     }
 }

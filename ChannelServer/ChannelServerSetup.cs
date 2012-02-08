@@ -179,6 +179,16 @@ namespace Loki
 							  `Action` int(11) NOT NULL,
 							  PRIMARY KEY (`ID`)
 							) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+                            DROP TABLE IF EXISTS `buddies`;
+                            CREATE TABLE `buddies` (
+                              `ID` int(11) NOT NULL AUTO_INCREMENT,
+                              `CharacterID` int(11) NOT NULL,
+                              `BuddyID` int(11) NOT NULL,
+                              `Pending` tinyint(4) NOT NULL DEFAULT '0',
+                              `Group` varchar(13) DEFAULT '0',
+                              PRIMARY KEY (`ID`)
+                            ) ENGINE=InnoDB DEFAULT CHARSET=latin1$$
 						", databaseSchema);
 
                     Log.Inform("Database '{0}' created.", databaseSchema);

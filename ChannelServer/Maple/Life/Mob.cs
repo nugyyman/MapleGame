@@ -220,16 +220,16 @@ namespace Loki.Maple.Life
         {
             lock (this)
             {
-                Log.Warn(1);
+                //Log.Warn(1);
                 if (this.Controller != newController)
                 {
-                    Log.Warn(2);
+                    //Log.Warn(2);
                     this.Controller.ControlledMobs.Remove(this);
-                    Log.Warn(3);
+                    //Log.Warn(3);
                     newController.ControlledMobs.Add(this);
-                    Log.Warn(4);
+                    //Log.Warn(4);
                 }
-                Log.Warn(5);
+                //Log.Warn(5);
             }
         }
 

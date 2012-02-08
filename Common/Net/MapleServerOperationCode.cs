@@ -47,6 +47,7 @@
         ReportResponse = 0x37,
         MesoLimit = 0x39,
         CharacterInformation = 0x3D,
+        BuddyList = 0x3F,
         AvatarMegaphone = 0x6F,
         WarpToMap = 0x7D,
         SpawnCharacter = 0xA0,

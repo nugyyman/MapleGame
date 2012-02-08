@@ -209,6 +209,10 @@ namespace Loki.Net
                 case MapleClientOperationCode.ClientError:
                     this.ClientError(inPacket);
                     break;
+
+                case MapleClientOperationCode.BuddyListModify:
+                    this.Character.BuddyListModify(inPacket);
+                    break;
             }
         }
 

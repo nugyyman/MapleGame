@@ -63,8 +63,10 @@
     <Content Include="Loki.ico" />
     <Compile Include="Interoperability\InteroperabilityClient.cs" />
     <Compile Include="ChannelServerSetup.cs" />
+    <Compile Include="Maple\Buddy.cs" />
     <Compile Include="Maple\Buff.cs" />
     <Compile Include="Maple\CashShop\UseCashItems.cs" />
+    <Compile Include="Maple\Characters\CharacterBuddyList.cs" />
     <Compile Include="Maple\Characters\CharacterBuffs.cs" />
     <Compile Include="Maple\Characters\CharacterKeyMap.cs" />
     <Compile Include="Maple\Characters\CharacterQuests.cs" />
