@@ -38,6 +38,7 @@ namespace Loki.Net
                 this.Character.Save();
                 this.Character.LastNpc = null;
                 this.Character.Map.Characters.Remove(this.Character);
+                this.Character.UpdateBuddies(false);
             }
         }
 

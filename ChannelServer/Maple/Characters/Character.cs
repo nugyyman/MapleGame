@@ -718,6 +718,14 @@ namespace Loki.Maple.Characters
             }
         }
 
+        public byte Channel
+        {
+            get
+            {
+                return ChannelServer.ChannelID;
+            }
+        }
+
         private bool Assigned { get; set; }
 
         public Character(int id = 0, ChannelClientHandler client = null)
@@ -853,6 +861,7 @@ namespace Loki.Maple.Characters
             this.Buffs.Delete();
             this.Quests.Delete();
             this.KeyMap.Delete();
+            this.BuddyList.Delete();
 
             Database.Delete("characters", "ID = '{0}'", this.ID);
 
@@ -1069,6 +1078,7 @@ namespace Loki.Maple.Characters
             this.IsInitialized = true;
 
             this.KeyMap.Send();
+            this.BuddyList.Update();
 
             // NOTE: Until we find out more about buffs in the SpawnPlayer packet
 
@@ -1076,6 +1086,8 @@ namespace Loki.Maple.Characters
             {
                 loopBuff.Apply();
             }
+
+            this.UpdateBuddies(true);
         }
 
         public Packet GetCreatePacket()
@@ -2700,6 +2712,23 @@ namespace Loki.Maple.Characters
 
                 if (masterLevel > 0 && (skill / 1000000 == (short)this.Job / 100))
                     this.Skills[skill].Update();
+            }
+        }
+
+        public void UpdateBuddies(bool Initialize)
+        {
+            foreach (Buddy loopBuddy in this.BuddyList.Values)
+            {
+                if (loopBuddy.IsOnline)
+                {
+                    Character buddy = World.Characters[loopBuddy.Name];
+
+                    if (buddy.BuddyList.ContainsKey(this.ID))
+                    {
+                        buddy.BuddyList[this.ID].Channel = (byte)(Initialize ? ChannelServer.ChannelID : 0);
+                        buddy.BuddyList.UpdateBuddyChannel(buddy.BuddyList[this.ID]);
+                    }
+                }
             }
         }
 

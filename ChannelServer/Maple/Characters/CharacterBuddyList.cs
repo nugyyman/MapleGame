@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using Loki.Net;
 using Loki.Data;
+using Loki.Maple.Data;
 
 namespace Loki.Maple.Characters
 {
@@ -26,9 +27,12 @@ namespace Loki.Maple.Characters
 
         public void Load()
         {
+            string name;
+
             foreach (dynamic datum in new Datums("buddies").Populate("CharacterID = '{0}'", this.Parent.ID))
             {
-                this.Add(datum.KeyID, new Buddy(Database.Fetch("characters", "Name", "ID = '{0}'", datum.BuddyID), datum.Group, datum.BuddyID, -1, true));
+                name = Database.Fetch("characters", "Name", "ID = '{0}'", datum.BuddyID);
+                this.Add(datum.BuddyID, new Buddy(name, datum.GroupName, datum.BuddyID, (byte)(ChannelServer.LoggedIn.Contains(Database.Fetch("characters", "AccountID", "ID = '{0}'", datum.BuddyID)) ? World.Characters[name].Channel : 0), true));
             }
         }
 
@@ -39,8 +43,6 @@ namespace Loki.Maple.Characters
 
         public void Save()
         {
-            this.Delete();
-
             foreach (Buddy loopBuddy in this.Values)
             {
                 dynamic datum = new Datum("buddies");
@@ -48,9 +50,16 @@ namespace Loki.Maple.Characters
                 datum.CharacterID = this.Parent.ID;
                 datum.BuddyID = loopBuddy.CharacterID;
                 datum.Pending = 0;
-                datum.Group = loopBuddy.Group;
+                datum.GroupName = loopBuddy.Group;
 
-                datum.Insert();
+                if (loopBuddy.Assigned)
+                {
+                    datum.Update("CharacterID = '{0}' AND BuddyID = '{1}'", this.Parent.ID, loopBuddy.CharacterID);
+                }
+                else
+                {
+                    datum.Insert();
+                }
             }
         }
 
@@ -66,11 +75,10 @@ namespace Loki.Maple.Characters
                     if (buddy.Visible)
                     {
                         outPacket.WriteInt(buddy.CharacterID);
-                        outPacket.WriteString(GetRightPaddedStr(buddy.Name, '\0', 13));
+                        outPacket.WriteStringFixed(buddy.Name, 13);
                         outPacket.WriteByte();
                         outPacket.WriteInt(buddy.Channel - 1);
-                        outPacket.WriteString(GetRightPaddedStr(buddy.Group, '\0', 13));
-                        outPacket.WriteInt();
+                        outPacket.WriteStringFixed(buddy.Group, 17);
                     }
                 }
 
@@ -81,16 +89,18 @@ namespace Loki.Maple.Characters
             }
         }
 
-        private static string GetRightPaddedStr(string n, char padchar, int length)
+        public void UpdateBuddyChannel(Buddy buddy)
         {
-            string name = n
-                ;
-            for (int i = name.Length; i < length; i++)
+            using (Packet outPacket = new Packet(MapleServerOperationCode.BuddyList))
             {
-                name += padchar;
-            }
+                outPacket.WriteByte(0x14);
+                outPacket.WriteInt(buddy.CharacterID);
+                outPacket.WriteByte();
+                outPacket.WriteInt(buddy.Channel - 1);
 
-            return name;
+
+                this.Parent.Client.Send(outPacket);
+            }
         }
     }
 }

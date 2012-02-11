@@ -10,21 +10,26 @@ namespace Loki.Maple
         public string Name { get; set; }
         public string Group { get; set; }
         public int CharacterID { get; set; }
-        public short Channel { get; set; }
+        public byte Channel { get; set; }
         public bool Visible { get; set; }
+        public bool Assigned { get; set; }
 
-        public Buddy(string name, string group, int cid, short channel, bool visible = false)
+        public Buddy(string name, string group, int cid, byte channel, bool assigned, bool visible = true)
         {
             this.Name = name;
             this.Group = group;
             this.CharacterID = cid;
             this.Channel = channel;
             this.Visible = visible;
+            this.Assigned = assigned;
         }
 
-        public bool IsOnline()
+        public bool IsOnline
         {
-            return this.Channel > -1;
+            get
+            {
+                return this.Channel > 0;
+            }
         }
     }
 }
