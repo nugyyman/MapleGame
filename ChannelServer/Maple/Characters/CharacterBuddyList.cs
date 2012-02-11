@@ -11,18 +11,19 @@ namespace Loki.Maple.Characters
     public class CharacterBuddyList : Dictionary<int, Buddy>
     {
         public Character Parent { get; private set; }
-        public int Capacity { get; set; }
 
         public CharacterBuddyList(Character parent)
             : base()
         {
             this.Parent = parent;
-            this.Capacity = parent.MaxBuddies;
         }
 
-        public bool IsFull()
+        public bool IsFull
         {
-            return this.Count >= this.Capacity;
+            get
+            {
+                return this.Count >= this.Parent.MaxBuddies;
+            }
         }
 
         public void Load()
