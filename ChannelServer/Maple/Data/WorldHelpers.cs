@@ -40,7 +40,7 @@ namespace Loki.Maple.Maps
                     }
                 }
 
-                throw new KeyNotFoundException();
+                return null;
             }
         }
     }

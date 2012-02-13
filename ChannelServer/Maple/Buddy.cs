@@ -11,16 +11,14 @@ namespace Loki.Maple
         public string Group { get; set; }
         public int CharacterID { get; set; }
         public byte Channel { get; set; }
-        public bool Visible { get; set; }
         public bool Assigned { get; set; }
 
-        public Buddy(string name, string group, int cid, byte channel, bool assigned, bool visible = true)
+        public Buddy(string name, string group, int cid, byte channel, bool assigned)
         {
             this.Name = name;
             this.Group = group;
             this.CharacterID = cid;
             this.Channel = channel;
-            this.Visible = visible;
             this.Assigned = assigned;
         }
 

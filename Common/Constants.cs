@@ -1208,12 +1208,6 @@ namespace Loki.Maple
     {
         BuddyListFull,
         AlreadyOnList,
-        Ok
-    }
-
-    public enum BuddyOperation
-    {
-        Added,
-        Deleted
+        Success
     }
 }
