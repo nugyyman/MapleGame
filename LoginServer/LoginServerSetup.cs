@@ -139,6 +139,7 @@ namespace Loki
             int WorldMesoDropRate = 1;
             int WorldItemDropRate = 1;
             string WorldName = string.Empty;
+            string WorldRecommendedMessage = string.Empty;
             ServerFlag WorldFlag = ServerFlag.None;
             IPAddress WorldIP = IPAddress.Loopback;
 
@@ -160,6 +161,7 @@ namespace Loki
             while (!WorldNameResolver.IsValid(WorldName));
 
             WorldIP = Log.Input("Host IP (external for remote only): ", IPAddress.Loopback);
+            WorldRecommendedMessage = Log.Input("World recommended message (leave blank if you don't want to have one.): ", "");
 
             Log.SkipLine();
             Log.Inform("Please specify the World rates: ");
@@ -254,6 +256,7 @@ namespace Loki
 				
 				[{0}]
 				HostIP={1}
+				RecommendedMessage={2}
 				StaffOnly=False
 				Flag={2}
 				ExperienceRate={3}

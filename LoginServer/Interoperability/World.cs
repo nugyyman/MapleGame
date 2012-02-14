@@ -12,6 +12,7 @@ namespace Loki.Interoperability
     {
         public byte ID { get; private set; }
         public IPAddress HostIP { get; private set; }
+        public string RecommendedMessage { get; private set; }
         public int ExperienceRate { get; private set; }
         public int QuestExperienceRate { get; private set; }
         public int PartyQuestExperienceRate { get; private set; }
@@ -97,6 +98,7 @@ namespace Loki.Interoperability
             Settings.Refresh();
 
             this.HostIP = Settings.GetIPAddress("{0}/HostIP", this.Name);
+            this.RecommendedMessage = Settings.GetString("{0}/RecommendedMessage", this.Name);
             this.IsStaffOnly = Settings.GetBool("{0}/StaffOnly", this.Name);
             this.Flag = Settings.GetEnum<ServerFlag>("{0}/Flag", this.Name);
             this.ExperienceRate = Settings.GetInt("{0}/ExperienceRate", this.Name);

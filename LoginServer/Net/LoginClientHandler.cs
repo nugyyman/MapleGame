@@ -398,6 +398,31 @@ namespace Loki.Net
                 outPacket.WriteByte(byte.MaxValue);
                 this.Send(outPacket);
             }
+
+            using (Packet outPacket = new Packet(MapleServerOperationCode.SendRecommended))
+            {
+                byte count = 0;
+
+                foreach (World loopWorld in LoginServer.Worlds)
+                {
+                    if (!loopWorld.RecommendedMessage.Equals(""))
+                        count++;
+                }
+
+                outPacket.WriteByte(count);
+
+                foreach (World loopWorld in LoginServer.Worlds)
+                {
+                    if (!loopWorld.RecommendedMessage.Equals(""))
+                    {
+                        outPacket.WriteInt(loopWorld.ID);
+                        outPacket.WriteString(loopWorld.RecommendedMessage);
+                    }
+                }
+                
+
+                this.Send(outPacket);
+            }
         }
 
         private void InformStatus(Packet inPacket)
