@@ -75,10 +75,6 @@ namespace Loki.Net
                     this.Character.Talk(inPacket);
                     break;
 
-                case MapleClientOperationCode.PlayerUpdate:
-                    //this.Character.Save(); Commented until moved to another thread
-                    break;
-
                 case MapleClientOperationCode.CharacterInformation:
                     this.Character.InformOnCharacter(inPacket);
                     break;

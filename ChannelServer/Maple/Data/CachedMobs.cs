@@ -26,7 +26,7 @@ namespace Loki.Maple.Data
                     }
                 }
 
-                foreach (dynamic mobSkillDatum in new Datums("skill_mob_data").Populate())
+                /*foreach (dynamic mobSkillDatum in new Datums("skill_mob_data").Populate())
                 {
                     foreach (Mob loopMob in this)
                     {
@@ -50,7 +50,7 @@ namespace Loki.Maple.Data
                     }
 
                     MobSkill.Summons[mobSummonDatum.level].Add(mobSummonDatum.mobid);
-                }
+                }*/
 
                 foreach (dynamic mobSummonDatum in new Datums("mob_summons").Populate())
                 {
@@ -61,7 +61,7 @@ namespace Loki.Maple.Data
                 }
             }
 
-            using (Log.Load("Loots"))
+            /*using (Log.Load("Loots"))
             {
                 foreach (dynamic lootDatum in new Datums("drop_data").Populate())
                 {
@@ -72,7 +72,7 @@ namespace Loki.Maple.Data
                         this[dropperId].Loots.Add(new Loot(lootDatum));
                     }
                 }
-            }
+            }*/
         }
 
         protected override int GetKeyForItem(Mob item)

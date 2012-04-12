@@ -88,7 +88,7 @@ namespace Loki.Maple.Life
             this.ExplodeHP = datum.explode_hp;
             this.Experience = datum.experience;
             this.Link = datum.link;
-            this.SummonType = datum.summon_type;
+            this.SummonType = (short)datum.summon_type;
             this.KnockBack = datum.knockback;
             this.FixedDamage = datum.fixed_damage;
             this.DeathBuff = datum.death_buff;
@@ -96,7 +96,7 @@ namespace Loki.Maple.Life
             this.Traction = datum.traction;
             this.DamagedBySkillOnly = datum.damaged_by_skill_only;
             this.DamagedByMobOnly = datum.damaged_by_mob_only;
-            this.DropItemPeriod = datum.drop_item_period;
+            //this.DropItemPeriod = datum.drop_item_period;
             this.HpBarForeColor = datum.hp_bar_color;
             this.HpBarBackColor = datum.hp_bar_bg_color;
             this.CarnivalPoints = datum.carnival_points;
@@ -104,10 +104,10 @@ namespace Loki.Maple.Life
             this.WeaponDefense = datum.physical_defense;
             this.MagicAttack = datum.magical_attack;
             this.MagicDefense = datum.magical_defense;
-            this.Accuracy = datum.accuracy;
-            this.Avoidability = datum.avoidability;
-            this.Speed = datum.speed;
-            this.ChaseSpeed = datum.chase_speed;
+            this.Accuracy = (short)datum.accuracy;
+            this.Avoidability = (short)datum.avoidability;
+            this.Speed = (short)datum.speed;
+            this.ChaseSpeed = (short)datum.chase_speed;
 
             this.Loots = new List<Loot>();
             this.Skills = new MobSkills(this);

@@ -102,7 +102,7 @@ namespace Loki.Maple.Maps
                         {
                             loopStartedQuest.Value[item.MapleID]++;
 
-                            using (Packet outPacket = new Packet(MapleServerOperationCode.ShowStatusInfo))
+                            using (Packet outPacket = new Packet(MapleServerOperationCode.ShowLog))
                             {
                                 outPacket.WriteByte(1);
                                 outPacket.WriteUShort(loopStartedQuest.Key);

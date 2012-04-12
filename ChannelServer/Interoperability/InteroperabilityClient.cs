@@ -210,6 +210,7 @@ namespace Loki.Interoperability
 
             string name = inPacket.ReadString();
             int job = inPacket.ReadInt();
+            short DB = inPacket.ReadShort();
             int face = inPacket.ReadInt();
             int hair = inPacket.ReadInt();
             int hair_color = inPacket.ReadInt();
@@ -226,11 +227,21 @@ namespace Loki.Interoperability
 
             character.Level = 1;
             if (job == 0)
-                character.Job = Job.Noblesse;
+                character.Job = Job.Citizen;
             else if (job == 1)
-                character.Job = Job.Beginner;
+            {
+                if (DB == 1)
+                    character.Job = Job.BladeAcolyte;
+                else
+                    character.Job = Job.Beginner;
+            }
             else if (job == 2)
+                character.Job = Job.Noblesse;
+            else if (job == 3)
                 character.Job = Job.Legend;
+            else if (job == 4)
+                character.Job = Job.Farmer;
+
             character.MaxHP = 50;
             character.MaxMP = 5;
             character.CurrentHP = 50;
@@ -252,10 +263,19 @@ namespace Loki.Interoperability
             character.Skin = (byte)skin;
             character.Gender = (Gender)gender;
 
-            character.Items.Add(new Item(topID, equipped: true));
-            character.Items.Add(new Item(bottomID, equipped: true));
-            character.Items.Add(new Item(shoesID, equipped: true));
-            character.Items.Add(new Item(weaponID, equipped: true));
+            if (character.Job != Job.Citizen)
+            {
+                character.Items.Add(new Item(topID, equipped: true));
+                character.Items.Add(new Item(bottomID, equipped: true));
+                character.Items.Add(new Item(shoesID, equipped: true));
+                character.Items.Add(new Item(weaponID, equipped: true));
+            }
+            else
+            {
+                character.Items.Add(new Item(topID, equipped: true));
+                character.Items.Add(new Item(shoesID, equipped: true));
+                character.Items.Add(new Item(weaponID, equipped: true));
+            }
 
             int[] key = { 18, 65, 2, 23, 3, 4, 5, 6, 16, 17, 19, 25, 26, 27, 31, 34, 35, 37, 38, 40, 43, 44, 45, 46, 50, 56, 59, 60, 61, 62, 63, 64, 57, 48, 29, 7, 24, 33, 41 };
             byte[] type = { 4, 6, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 5, 5, 4, 4, 5, 6, 6, 6, 6, 6, 6, 5, 4, 5, 4, 4, 4, 4 };
@@ -268,11 +288,11 @@ namespace Loki.Interoperability
 
             bool charOk = true;
 
-            if (Database.Exists("characters", "Name = '{0}'", name) || World.ForbiddenNames.Contains(name))
+            /*if (Database.Exists("characters", "Name = '{0}'", name) || World.ForbiddenNames.Contains(name))
                 charOk = false;
 
             if (!World.CharacterCreationData.checkData(job, gender, face, hair, hair_color, skin, topID, bottomID, shoesID, weaponID))
-                charOk = false;
+                charOk = false;*/
 
             if (charOk)
             {

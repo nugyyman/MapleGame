@@ -52,10 +52,10 @@ namespace Loki.Maple.Characters
         private short dexterity;
         private short intelligence;
         private short luck;
-        private short currentHP;
-        private short maxHP;
-        private short currentMP;
-        private short maxMP;
+        private int currentHP;
+        private int maxHP;
+        private int currentMP;
+        private int maxMP;
         private short availableAP;
         private short availableSP;
         private int experience;
@@ -341,7 +341,7 @@ namespace Loki.Maple.Characters
             }
         }
 
-        public short CurrentHP
+        public int CurrentHP
         {
             get
             {
@@ -369,7 +369,7 @@ namespace Loki.Maple.Characters
             }
         }
 
-        public short MaxHP
+        public int MaxHP
         {
             get
             {
@@ -386,7 +386,7 @@ namespace Loki.Maple.Characters
             }
         }
 
-        public short CurrentMP
+        public int CurrentMP
         {
             get
             {
@@ -403,7 +403,7 @@ namespace Loki.Maple.Characters
             }
         }
 
-        public short MaxMP
+        public int MaxMP
         {
             get
             {
@@ -494,7 +494,7 @@ namespace Loki.Maple.Characters
                 {
                     this.UpdateStatistics(StatisticType.Experience);
 
-                    using (Packet outPacket = new Packet(MapleServerOperationCode.ShowStatusInfo))
+                    using (Packet outPacket = new Packet(MapleServerOperationCode.ShowLog))
                     {
                         outPacket.WriteByte(3); // 3 = exp, 4 = fame, 5 = mesos, 6 = guildpoints
                         outPacket.WriteBool(true); // White?
@@ -877,7 +877,11 @@ namespace Loki.Maple.Characters
                 if (!fromViewAll)
                     buffer.WriteByte();
                 if (this.IsMaster)
+                {
                     buffer.WriteByte();
+                    buffer.Flip();
+                    return buffer.GetContent();
+                }
 
                 buffer.WriteBool(true); // World rank enabled (next 4 ints are not sent if disabled)
 
@@ -911,10 +915,10 @@ namespace Loki.Maple.Characters
                 buffer.WriteShort(this.Dexterity);
                 buffer.WriteShort(this.Intelligence);
                 buffer.WriteShort(this.Luck);
-                buffer.WriteShort(this.CurrentHP);
-                buffer.WriteShort(this.MaxHP);
-                buffer.WriteShort(this.CurrentMP);
-                buffer.WriteShort(this.MaxMP);
+                buffer.WriteInt(this.CurrentHP);
+                buffer.WriteInt(this.MaxHP);
+                buffer.WriteInt(this.CurrentMP);
+                buffer.WriteInt(this.MaxMP);
                 buffer.WriteShort(this.AvailableAP);
                 buffer.WriteShort(this.AvailableSP);
                 buffer.WriteInt(this.Experience);
@@ -923,6 +927,7 @@ namespace Loki.Maple.Characters
                 buffer.WriteInt(this.Map.MapleID);
                 buffer.WriteByte(this.SpawnPoint);
                 buffer.WriteInt();
+                buffer.WriteShort(0); // DualBlade
 
                 buffer.Flip();
                 return buffer.GetContent();
@@ -1028,8 +1033,14 @@ namespace Loki.Maple.Characters
         {
             using (Packet outPacket = new Packet(MapleServerOperationCode.WarpToMap))
             {
+                outPacket.WriteShort(2);
+                outPacket.WriteLong(1);
+                outPacket.WriteLong(2);
                 outPacket.WriteInt(ChannelServer.InternalChannelID);
+                outPacket.WriteInt();
+
                 outPacket.WriteByte(1);
+                outPacket.WriteInt();
                 outPacket.WriteByte(1);
                 outPacket.WriteShort();
 
@@ -1038,12 +1049,13 @@ namespace Loki.Maple.Characters
                     outPacket.WriteInt(Application.Random.Next());
                 }
 
-                outPacket.WriteBytes(new byte[] { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF });
+                outPacket.WriteLong(-1);
+                outPacket.WriteByte();
                 outPacket.WriteByte();
                 outPacket.WriteBytes(this.StatisticsToByteArray());
                 outPacket.WriteByte(this.MaxBuddies);
                 outPacket.WriteByte();
-                outPacket.WriteInt(this.Meso);
+                outPacket.WriteShort();
                 outPacket.WriteBytes(this.Items.ToByteArray());
                 outPacket.WriteBytes(this.Skills.ToByteArray());
                 outPacket.WriteBytes(this.Quests.ToByteArray());
@@ -1054,21 +1066,28 @@ namespace Loki.Maple.Characters
                 outPacket.WriteShort();
                 outPacket.WriteShort(); // Somehow ring footer.
 
-                for (int i = 0; i < 15; i++)
+                for (int i = 0; i < 28; i++)
                 {
                     outPacket.WriteBytes(PacketConstants.Character);
                 }
 
                 // TODO: Monster book.
-                outPacket.WriteInt(); // Cover.
-                outPacket.WriteByte();
+                //outPacket.WriteInt(); // Cover.
+                //outPacket.WriteByte();
                 outPacket.WriteShort(0); // Cards length.
 
                 outPacket.WriteShort(); // UNK: PQ Information?
                 outPacket.WriteShort();
                 outPacket.WriteShort();
 
+                outPacket.WriteInt(0);
+                outPacket.WriteInt(0); // Lucky reward after long unactivity; Received/do not show = 1; not received/show = 0
+                outPacket.WriteInt(30100003); // SN of cash item #1
+                outPacket.WriteInt(30100003); // SN #2
+                outPacket.WriteInt(30100003); // SN #3
+                outPacket.WriteByte(0);
                 outPacket.WriteDateTime(DateTime.UtcNow);
+                outPacket.WriteInt(100);
 
                 this.Client.Send(outPacket);
             }
@@ -1078,8 +1097,8 @@ namespace Loki.Maple.Characters
             this.IsInitialized = true;
 
             this.KeyMap.Send();
-            this.UpdateBuddies(true);
-            this.BuddyList.Update();
+            //this.UpdateBuddies(true);
+            //this.BuddyList.Update();
 
             // NOTE: Until we find out more about buffs in the SpawnPlayer packet
 
@@ -1088,7 +1107,7 @@ namespace Loki.Maple.Characters
                 loopBuff.Apply();
             }
 
-            this.BuddyList.LoadPendingBuddies();
+            /*this.BuddyList.LoadPendingBuddies();
 
             foreach (Buddy loopBuddy in this.BuddyList.pendingBuddies)
             {
@@ -1110,7 +1129,7 @@ namespace Loki.Maple.Characters
                 }
             }
 
-            this.BuddyList.pendingBuddies.Clear();
+            this.BuddyList.pendingBuddies.Clear();*/
         }
 
         public Packet GetCreatePacket()
@@ -1130,10 +1149,10 @@ namespace Loki.Maple.Characters
             spawn.WriteString(string.Empty);
             spawn.Skip(6);
 
+            spawn.WriteByte(3);
             spawn.WriteInt(); // UNK: Maybe not an int.
             spawn.WriteShort();
-            spawn.WriteByte(0xFC);
-            spawn.WriteByte(1);
+            spawn.WriteByte(0xF8);
             spawn.WriteInt(0x00); // TODO: 2 if morphed.
 
             // TODO: Buffs?
@@ -1141,8 +1160,8 @@ namespace Loki.Maple.Characters
             spawn.WriteInt((int)((buffMask >> 32) & 0xffffffffL));
             spawn.WriteInt((int)(buffMask & 0xffffffffL));
 
-            int characterSpawn = Application.Random.Next();
-            spawn.Skip(6);
+            int characterSpawn = Application.Random.Next(5000000);
+            spawn.Skip(10);
             spawn.WriteInt(characterSpawn);
             spawn.Skip(11);
             spawn.WriteInt(characterSpawn);
@@ -1166,6 +1185,8 @@ namespace Loki.Maple.Characters
 
             spawn.WriteShort((short)this.Job);
             spawn.WriteBytes(this.AppearanceToByteArray(false));
+            spawn.WriteLong();
+            spawn.WriteInt();
             spawn.WriteInt();
             spawn.WriteInt(); // TODO: Item effect.
             spawn.WriteInt(); // TODO: Chair.
@@ -1195,9 +1216,7 @@ namespace Loki.Maple.Characters
             // TODO: Marriage rings.
             spawn.WriteByte();
 
-            spawn.Skip(3);
-
-            spawn.WriteByte();
+            spawn.Skip(6);
 
             return spawn;
         }
@@ -1213,7 +1232,7 @@ namespace Loki.Maple.Characters
 
         public void Move(ByteBuffer reader)
         {
-            reader.Skip(9);
+            reader.Skip(37);
 
             Movements movements = Movements.Parse(reader.ReadBytes());
 
@@ -1233,6 +1252,7 @@ namespace Loki.Maple.Characters
             using (Packet outPacket = new Packet(MapleServerOperationCode.MoveCharacter))
             {
                 outPacket.WriteInt(this.ID);
+                outPacket.WriteInt();
                 outPacket.WriteInt();
                 outPacket.WriteBytes(movements.ToByteArray());
 
@@ -1298,14 +1318,19 @@ namespace Loki.Maple.Characters
         {
             using (Packet outPacket = new Packet(MapleServerOperationCode.WarpToMap))
             {
+                outPacket.WriteShort(2);
+                outPacket.WriteLong(1);
+                outPacket.WriteLong(2);
                 outPacket.WriteInt(ChannelServer.InternalChannelID);
                 outPacket.WriteInt();
+                outPacket.WriteLong();
                 outPacket.WriteByte();
                 outPacket.WriteInt(destinationMapId);
                 outPacket.WriteByte(portalId);
-                outPacket.WriteShort(this.CurrentHP);
+                outPacket.WriteInt(this.CurrentHP);
                 outPacket.WriteByte();
-                outPacket.WriteLong(0x1FFFFFFFFFFFFFFL); // Quest mask?
+                outPacket.WriteDateTime(DateTime.UtcNow);
+                outPacket.WriteInt(100);
 
                 this.Client.Send(outPacket);
             }

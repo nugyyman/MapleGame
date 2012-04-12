@@ -26,7 +26,7 @@ namespace Loki.Maple.Data
 
         public static void Initialize()
         {
-            using (Database.TemporarySchema("mcdb83"))
+            using (Database.TemporarySchema("mcdb97"))
             {
                 World.IsInitialized = false;
 
@@ -152,8 +152,8 @@ namespace Loki.Maple.Data
                 World.CachedItems = new CachedItems();
                 World.CachedSkills = new CachedSkills();
                 World.Maps = new WorldMaps();
-                World.Quests = new QuestData();
-                World.CharacterCreationData = new CharacterCreationData();
+                //World.Quests = new QuestData();
+                //World.CharacterCreationData = new CharacterCreationData();
                 World.ForbiddenNames = new ForbiddenNames();
 
                 Strings.Load();

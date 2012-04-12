@@ -20,8 +20,7 @@ namespace Loki.Security
             {
                 buffer.WriteShort(0x0E);
                 buffer.WriteShort(Application.MapleVersion);
-                buffer.WriteShort(1);
-                buffer.WriteByte(49);
+                buffer.WriteString(Application.PatchVersion);
                 buffer.WriteBytes(receiveIV);
                 buffer.WriteBytes(sendIV);
                 buffer.WriteByte(8);

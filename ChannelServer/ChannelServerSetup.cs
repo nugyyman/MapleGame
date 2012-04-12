@@ -213,7 +213,7 @@ namespace Loki
 
             try
             {
-                using (Database.TemporaryConnection(databaseHost, "mcdb83", databaseUsername, databasePassword))
+                using (Database.TemporaryConnection(databaseHost, "mcdb97", databaseUsername, databasePassword))
                 {
                     Database.Test();
                 }
@@ -232,11 +232,11 @@ namespace Loki
 
                         Database.ExecuteFile(databaseHost, databaseUsername, databasePassword, Application.ExecutablePath + ChannelServerSetup.McdbFileName);
 
-                        Log.Inform("Database 'mcdb83' created.", databaseSchema);
+                        Log.Inform("Database 'mcdb97' created.", databaseSchema);
                     }
                     catch (Exception mcdbE)
                     {
-                        Log.Error("Error while creating 'mcdb83': ", mcdbE);
+                        Log.Error("Error while creating 'mcdb97': ", mcdbE);
                         goto mcdbConfiguration;
                     }
                 }

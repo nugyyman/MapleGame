@@ -220,6 +220,11 @@ namespace Loki.Maple
         Bandit = 420,
         ChiefBandit,
         Shadower,
+        BladeRecruit = 430,
+        BladeAcolyte,
+        BladeSpecialist,
+        BladeLord,
+        BladeMaster,
 
         Pirate = 500,
         Brawler = 510,
@@ -236,30 +241,57 @@ namespace Loki.Maple
 
         DawnWarrior1 = 1100,
         DawnWarrior2 = 1110,
-        DawnWarrior3 = 1111,
+        DawnWarrior3,
 
         BlazeWizard1 = 1200,
         BlazeWizard2 = 1210,
-        BlazeWizard3 = 1211,
+        BlazeWizard3,
 
         WindArcher1 = 1300,
         WindArcher2 = 1310,
-        WindArcher3 = 1311,
+        WindArcher3,
 
         NightWalker1 = 1400,
         NightWalker2 = 1410,
-        NightWalker3 = 1411,
+        NightWalker3,
 
         ThunderBreaker1 = 1500,
         ThunderBreaker2 = 1510,
-        ThunderBreaker3 = 1511,
+        ThunderBreaker3,
 
         Legend = 2000,
+        Farmer,
 
         Aran1 = 2100,
         Aran2 = 2110,
-        Aran3 = 2111,
-        Aran4 = 2112
+        Aran3,
+        Aran4,
+
+        Evan1 = 2200,
+        Evan2 = 2210,
+        Evan3,
+        Evan4,
+        Evan5,
+        Evan6,
+        Evan7,
+        Evan8,
+        Evan9,
+        Evan10,
+
+        Citizen = 3000,
+
+        BattleMage1 = 3200,
+        BattleMage2 = 3210,
+        BattleMage3,
+        BattleMage4,
+        WildHunter1 = 3300,
+        WildHunter2 = 3310,
+        WildHunter3,
+        WildHunter4,
+        Mechanic1 = 3500,
+        Mechanic2 = 3510,
+        Mechanic3,
+        Mechanic4
     }
 
     public enum ItemType : byte

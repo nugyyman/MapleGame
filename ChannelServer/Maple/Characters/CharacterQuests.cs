@@ -49,7 +49,7 @@ namespace Loki.Maple.Characters
                         this.Started[quest.ID].Add(requiredKills.Key, 0);
                     }
 
-                    using (Packet outPacket = new Packet(MapleServerOperationCode.ShowStatusInfo))
+                    using (Packet outPacket = new Packet(MapleServerOperationCode.ShowLog))
                     {
                         outPacket.WriteByte(1);
                         outPacket.WriteUShort(quest.ID);
@@ -96,7 +96,7 @@ namespace Loki.Maple.Characters
                         //this.Parent.Items.Add(new Item(itemChoiceId, quest.SelectibleItemRewards[itemChoiceId]));
                     }
 
-                    using (Packet outPacket = new Packet(MapleServerOperationCode.ShowStatusInfo))
+                    using (Packet outPacket = new Packet(MapleServerOperationCode.ShowLog))
                     {
                         outPacket.WriteByte(1);
                         outPacket.WriteUShort(quest.ID);
@@ -116,7 +116,7 @@ namespace Loki.Maple.Characters
                 case QuestAction.Forfeit:
                     this.Delete(quest.ID);
 
-                    using (Packet outPacket = new Packet(MapleServerOperationCode.ShowStatusInfo))
+                    using (Packet outPacket = new Packet(MapleServerOperationCode.ShowLog))
                     {
                         outPacket.WriteByte(1);
                         outPacket.WriteUShort(quest.ID);

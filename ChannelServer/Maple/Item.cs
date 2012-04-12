@@ -636,7 +636,7 @@ namespace Loki.Maple
         public void LoadSkillBookData(dynamic skillBookDatum)
         {
             this.SkillId.Add(skillBookDatum.skillid);
-            this.RequestSkillLevel = skillBookDatum.req_skill_level;
+            this.RequestSkillLevel = skillBookDatum.skill_level;
             this.MasterLevel = skillBookDatum.master_level;
             this.Chance = skillBookDatum.chance;
         }
@@ -1138,8 +1138,9 @@ namespace Loki.Maple
                 // TODO: This is expiration time: Implement it.
                 buffer.WriteByte();
                 buffer.WriteBytes(PacketConstants.Item);
-                buffer.WriteInt(400967355);
+                buffer.WriteBytes((byte)0xBB, 0x46, (byte)0xE6, 0x17);
                 buffer.WriteByte(2); // 1 to show it, 2 to hide it.
+                buffer.WriteInt(-1);
 
                 if (this.Type == ItemType.Equipment)
                 {
@@ -1162,23 +1163,31 @@ namespace Loki.Maple
                     buffer.WriteShort(this.Jump);
                     buffer.WriteString(this.Creator);
                     buffer.WriteShort(this.Flags);
+                    buffer.WriteByte();
 
                     if (!this.IsEquippedCash)
                     {
-                        buffer.WriteByte();
                         buffer.WriteByte(); // TODO: Item level. Timeless has it.
                         buffer.WriteShort(); // UNK.
                         buffer.WriteShort(); // TODO: Item EXP. Timeless has it.
+                        buffer.WriteInt(-1);
                         buffer.WriteInt(this.ViciousHammerApplied);
-                        buffer.WriteLong();
-                        buffer.WriteBytes(0x00, 0x40, 0xE0, 0xFD, 0x3B, 0x37, 0x4F, 0x01);
+                        buffer.WriteByte(7); // pot zero // 1 = is potential
+                        buffer.WriteByte(2); // starz
+                        buffer.WriteShort(30044); // pot 1
+                        buffer.WriteShort(30044);// pot 2
+                        buffer.WriteShort(30044);// pot 3
+                        buffer.WriteShort(30044);//hp ratio
+                        buffer.WriteShort(30044);//mp ratio
+                        buffer.WriteLong(-1);
                     }
                     else
                     {
                         buffer.WriteBytes(0x65, 0x0A, 0x28, 0x27, 0xF4, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x40, 0xE0, 0xFD, 0x3B, 0x37, 0x4F, 0x01);
                     }
-
-                    buffer.WriteUInt(uint.MaxValue);
+                    
+                    buffer.WriteBytes(0x00, 0x40, 0xE0, 0xFD, 0x3B, 0x37, 0x4F, 0x01);
+                    buffer.WriteInt(-1);
                 }
                 else
                 {

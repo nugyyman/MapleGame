@@ -8,19 +8,21 @@ namespace Loki.Maple.Data
         public CachedSkills()
             : base()
         {
-            Dictionary<int, short> weaponType = new Dictionary<int, short>();
+            //Dictionary<int, short> weaponType = new Dictionary<int, short>();
 
             using (Log.Load("Skills"))
             {
-                foreach (dynamic skillDatum in new Datums("skill_player_data").Populate())
+                /*foreach (dynamic skillDatum in new Datums("skill_player_data").Populate())
                 {
                     weaponType.Add(skillDatum.skillid, skillDatum.weapon);
                     this.Add(skillDatum.skillid, new Dictionary<byte, Skill>());
-                }
+                }*/
 
                 foreach (dynamic skillLevelDatum in new Datums("skill_player_level_data").Populate())
                 {
-                    this[skillLevelDatum.skillid].Add(skillLevelDatum.skill_level, new Skill(skillLevelDatum));
+                    if(!this.ContainsKey(skillLevelDatum.skillid))
+                        this.Add(skillLevelDatum.skillid, new Dictionary<byte, Skill>());
+                    this[skillLevelDatum.skillid].Add((byte)skillLevelDatum.skill_level, new Skill(skillLevelDatum));
                 }
             }
         }

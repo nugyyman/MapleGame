@@ -108,7 +108,18 @@ namespace Loki.Data
             using (MySqlConnection connection = new MySqlConnection(Database.ConnectionString))
             {
                 connection.Open();
-                Log.Inform("Able to connect to database '{0}'.", connection.Database);
+                if (connection.Database.Contains("mcdb"))
+                {
+                    int version = (int)Database.Fetch("mcdb_info", "maple_version", "maple_locale", "global");
+                    if(version == Application.MapleVersion)
+                        Log.Inform("Able to connect to database '{0}'.", connection.Database);
+                    else
+                        Log.Warn("You are not using the correct version of MCDB.");
+                }
+                else
+                {
+                    Log.Inform("Able to connect to database '{0}'.", connection.Database);
+                }
                 connection.Close();
             }
         }

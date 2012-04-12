@@ -246,7 +246,7 @@ namespace Loki.Maple.Characters
 
         public void NotifyStatus(byte status)
         {
-            using (Packet outPacket = new Packet(MapleServerOperationCode.ShowStatusInfo))
+            using (Packet outPacket = new Packet(MapleServerOperationCode.ShowLog))
             {
                 outPacket.WriteByte();
                 outPacket.WriteByte(status);
@@ -507,6 +507,7 @@ namespace Loki.Maple.Characters
         {
             using (ByteBuffer buffer = new ByteBuffer())
             {
+                buffer.WriteInt(this.Parent.Meso);
                 buffer.WriteByte(this.MaxSlots[ItemType.Equipment]);
                 buffer.WriteByte(this.MaxSlots[ItemType.Usable]);
                 buffer.WriteByte(this.MaxSlots[ItemType.Setup]);
@@ -533,7 +534,9 @@ namespace Loki.Maple.Characters
                     buffer.WriteBytes(item.ToByteArray());
                 }
 
-                buffer.WriteInt();
+                buffer.WriteShort();
+                buffer.WriteShort();
+                buffer.WriteShort();
 
                 foreach (Item item in this[ItemType.Usable])
                 {
@@ -560,6 +563,9 @@ namespace Loki.Maple.Characters
                 {
                     buffer.WriteBytes(item.ToByteArray());
                 }
+
+                buffer.WriteByte();
+                buffer.WriteInt(-1);
 
                 buffer.Flip();
                 return buffer.GetContent();

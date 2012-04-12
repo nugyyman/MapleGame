@@ -180,6 +180,7 @@ namespace Loki.Net
                     outPacket.WriteBool(this.Account.IsMaster); // NOTE: Disables trade, enables admin commands.
                     outPacket.WriteByte();
                     outPacket.WriteByte();
+                    outPacket.WriteByte();
                     outPacket.WriteString(this.Account.Username);
                     outPacket.WriteByte();
                     outPacket.WriteBool(false); // OBSOLETE: Quiet ban.
@@ -191,6 +192,9 @@ namespace Loki.Net
                         outPacket.WriteByte((byte)(this.Account.Pic == null || this.Account.Pic.Length == 0 ? 0 : 1));
                     else
                         outPacket.WriteByte(2);
+                    outPacket.WriteLong();
+                    outPacket.WriteInt();
+                    outPacket.WriteByte();
                 }
                 else
                 {
@@ -204,8 +208,8 @@ namespace Loki.Net
 
         private void Login(Packet inPacket)
         {
-            string username = inPacket.ReadString();
             string password = inPacket.ReadString();
+            string username = inPacket.ReadString();
 
             if (!username.IsAlphaNumeric())
             {
@@ -399,6 +403,12 @@ namespace Loki.Net
                 this.Send(outPacket);
             }
 
+            using (Packet outPacket = new Packet(MapleServerOperationCode.EnableRecommended))
+            {
+                outPacket.WriteInt(3);
+                this.Send(outPacket);
+            }
+
             using (Packet outPacket = new Packet(MapleServerOperationCode.SendRecommended))
             {
                 byte count = 0;
@@ -467,7 +477,7 @@ namespace Loki.Net
                     outPacket.WriteByte((byte)(this.Account.Pic == null || this.Account.Pic.Length == 0 ? 0 : 1));
                 else
                     outPacket.WriteByte(2);
-                outPacket.WriteInt(LoginServer.MaxCharacters);
+                outPacket.WriteLong(LoginServer.MaxCharacters);
 
                 this.Send(outPacket);
             }
@@ -660,7 +670,8 @@ namespace Loki.Net
 
         private void ClientError(Packet inPacket)
         {
-            Log.Warn(inPacket.ReadString());
+            if (inPacket.Remaining > 2)
+                Log.Warn(inPacket.ReadString());
         }
     }
 }

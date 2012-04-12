@@ -82,7 +82,6 @@ namespace Loki.Maple.Characters
         {
             using (ByteBuffer buffer = new ByteBuffer())
             {
-                buffer.WriteByte();
                 buffer.WriteShort((short)this.Count);
 
                 List<Skill> cooldownSkills = new List<Skill>();
