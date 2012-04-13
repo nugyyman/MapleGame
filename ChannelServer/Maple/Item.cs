@@ -61,6 +61,12 @@ namespace Loki.Maple
         public short Speed { get; set; }
         public short Jump { get; set; }
         public short ViciousHammerApplied { get; set; }
+        public byte Potential { get; set; }
+        public byte Stars { get; set; }
+        public short Potential1 { get; set; }
+        public short Potential2 { get; set; }
+        public short Potential3 { get; set; }
+        public byte PotentialLines { get; set; }
 
         public byte AttackSpeed { get; private set; }
         public short RecoveryRate { get; private set; }
@@ -522,6 +528,12 @@ namespace Loki.Maple
                 this.Speed = this.CachedReference.Speed;
                 this.Jump = this.CachedReference.Jump;
                 this.ViciousHammerApplied = this.CachedReference.ViciousHammerApplied;
+                this.Potential = this.CachedReference.Potential;
+                this.Stars = this.CachedReference.Stars;
+                this.Potential1 = this.CachedReference.Potential1;
+                this.Potential2 = this.CachedReference.Potential2;
+                this.Potential3 = this.CachedReference.Potential3;
+                this.PotentialLines = this.CachedReference.PotentialLines;
             }
             else if (this.IsScroll)
             {
@@ -610,6 +622,12 @@ namespace Loki.Maple
             this.Jump = equipDatum.jump;
             this.Speed = equipDatum.speed;
             this.ViciousHammerApplied = 0;
+            this.Potential = 0;
+            this.Stars = 0;
+            this.Potential1 = 0;
+            this.Potential2 = 0;
+            this.Potential3 = 0;
+            this.PotentialLines = 0;
         }
 
         public void LoadScrollData(dynamic scrollDatum)
@@ -733,6 +751,12 @@ namespace Loki.Maple
                     this.Jump = itemDatum.Jump;
                     this.Speed = itemDatum.Speed;
                     this.ViciousHammerApplied = itemDatum.ViciousHammerApplied;
+                    this.Potential = itemDatum.Potential;
+                    this.Stars = itemDatum.Stars;
+                    this.Potential1 = itemDatum.Potential1;
+                    this.Potential2 = itemDatum.Potential2;
+                    this.Potential3 = itemDatum.Potential3;
+                    this.PotentialLines = itemDatum.PotentialLines;
                 }
                 else if (this.IsScroll)
                 {
@@ -818,6 +842,12 @@ namespace Loki.Maple
             datum.Jump = this.Jump;
             datum.Speed = this.Speed;
             datum.ViciousHammerApplied = this.ViciousHammerApplied;
+            datum.Potential = this.Potential;
+            datum.Stars = this.Stars;
+            datum.Potential1 = this.Potential1;
+            datum.Potential2 = this.Potential2;
+            datum.Potential3 = this.Potential3;
+            datum.PotentialLines = this.PotentialLines;
 
             if (this.Assigned)
             {
@@ -1172,13 +1202,13 @@ namespace Loki.Maple
                         buffer.WriteShort(); // TODO: Item EXP. Timeless has it.
                         buffer.WriteInt(-1);
                         buffer.WriteInt(this.ViciousHammerApplied);
-                        buffer.WriteByte(7); // pot zero // 1 = is potential
-                        buffer.WriteByte(2); // starz
-                        buffer.WriteShort(30044); // pot 1
-                        buffer.WriteShort(30044);// pot 2
-                        buffer.WriteShort(30044);// pot 3
-                        buffer.WriteShort(30044);//hp ratio
-                        buffer.WriteShort(30044);//mp ratio
+                        buffer.WriteByte(this.Potential); // 0/4 = No potential, 1/2/3 = Hidden potential, 5 = Rare, 6 = Epic, 7 = Unique
+                        buffer.WriteByte(this.Stars); // stars
+                        buffer.WriteShort(this.Potential1); // potential stat 1
+                        buffer.WriteShort(this.Potential2); // potential stat 2
+                        buffer.WriteShort(this.Potential3); // potential stat 3
+                        buffer.WriteShort(); // potential stat 4 ?
+                        buffer.WriteShort(); // potential stat 5 ?
                         buffer.WriteLong(-1);
                     }
                     else

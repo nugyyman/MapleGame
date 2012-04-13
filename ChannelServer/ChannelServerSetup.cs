@@ -125,6 +125,12 @@ namespace Loki
 							  `IsStored` tinyint(1) unsigned NOT NULL,
 							  `Quantity` smallint(6) NOT NULL,
                               `ViciousHammerApplied` tinyint(3) unsigned NOT NULL,
+                              `Potential` tinyint(3) unsigned NOT NULL,
+                              `Stars` tinyint(3) unsigned NOT NULL,
+                              `Potential1` smallint(6) NOT NULL,
+                              `Potential2` smallint(6) NOT NULL,
+                              `Potential3` smallint(6) NOT NULL,
+                              `PotentialLines` tinyint(3) unsigned NOT NULL,
 							  PRIMARY KEY (`ID`),
 							  KEY `character_id` (`CharacterID`) USING BTREE
 							) ENGINE=InnoDB DEFAULT CHARSET=latin1;
