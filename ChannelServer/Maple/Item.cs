@@ -61,7 +61,7 @@ namespace Loki.Maple
         public short Speed { get; set; }
         public short Jump { get; set; }
         public short ViciousHammerApplied { get; set; }
-        public byte Potential { get; set; }
+        public Potential Potential { get; set; }
         public byte Stars { get; set; }
         public short Potential1 { get; set; }
         public short Potential2 { get; set; }
@@ -528,7 +528,7 @@ namespace Loki.Maple
                 this.Speed = this.CachedReference.Speed;
                 this.Jump = this.CachedReference.Jump;
                 this.ViciousHammerApplied = this.CachedReference.ViciousHammerApplied;
-                this.Potential = this.CachedReference.Potential;
+                this.Potential = (Maple.Potential)this.CachedReference.Potential;
                 this.Stars = this.CachedReference.Stars;
                 this.Potential1 = this.CachedReference.Potential1;
                 this.Potential2 = this.CachedReference.Potential2;
@@ -622,7 +622,7 @@ namespace Loki.Maple
             this.Jump = equipDatum.jump;
             this.Speed = equipDatum.speed;
             this.ViciousHammerApplied = 0;
-            this.Potential = 0;
+            this.Potential = Maple.Potential.Regular;
             this.Stars = 0;
             this.Potential1 = 0;
             this.Potential2 = 0;
@@ -751,7 +751,7 @@ namespace Loki.Maple
                     this.Jump = itemDatum.Jump;
                     this.Speed = itemDatum.Speed;
                     this.ViciousHammerApplied = itemDatum.ViciousHammerApplied;
-                    this.Potential = itemDatum.Potential;
+                    this.Potential = (Maple.Potential)itemDatum.Potential;
                     this.Stars = itemDatum.Stars;
                     this.Potential1 = itemDatum.Potential1;
                     this.Potential2 = itemDatum.Potential2;
@@ -842,7 +842,7 @@ namespace Loki.Maple
             datum.Jump = this.Jump;
             datum.Speed = this.Speed;
             datum.ViciousHammerApplied = this.ViciousHammerApplied;
-            datum.Potential = this.Potential;
+            datum.Potential = (byte)this.Potential;
             datum.Stars = this.Stars;
             datum.Potential1 = this.Potential1;
             datum.Potential2 = this.Potential2;
@@ -1202,7 +1202,7 @@ namespace Loki.Maple
                         buffer.WriteShort(); // TODO: Item EXP. Timeless has it.
                         buffer.WriteInt(-1);
                         buffer.WriteInt(this.ViciousHammerApplied);
-                        buffer.WriteByte(this.Potential); // 0/4 = No potential, 1/2/3 = Hidden potential, 5 = Rare, 6 = Epic, 7 = Unique
+                        buffer.WriteByte((byte)this.Potential); // 0/4 = No potential, 1/2/3 = Hidden potential, 5 = Rare, 6 = Epic, 7 = Unique
                         buffer.WriteByte(this.Stars); // stars
                         buffer.WriteShort(this.Potential1); // potential stat 1
                         buffer.WriteShort(this.Potential2); // potential stat 2

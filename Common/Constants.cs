@@ -1242,4 +1242,15 @@ namespace Loki.Maple
         AlreadyOnList,
         Success
     }
+
+    public enum Potential : byte
+    {
+        Regular = 0,
+        HiddenPotential1,
+        HiddenPotential2,
+        HiddenPotential3,
+        Rare = 5,
+        Epic,
+        Unique,
+    }
 }
