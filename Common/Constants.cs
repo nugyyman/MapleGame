@@ -408,11 +408,11 @@ namespace Loki.Maple
     public enum NpcMessageType : byte
     {
         Standard,
-        YesNo,
+        YesNo = 2,
         RequestText,
         RequestNumber,
         Choice,
-        RequestStyle = 7,
+        RequestStyle = 8,
         AcceptDecline = 0x0C
     }
 

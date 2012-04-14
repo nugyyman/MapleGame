@@ -384,6 +384,7 @@ namespace Loki.Maple.Characters
         {
             inPacket.ReadByte();
             inPacket.ReadInt();
+            inPacket.ReadInt();
             short x = inPacket.ReadShort();
             short y = inPacket.ReadShort(); // TODO: Check for vac hack.
 

@@ -41,6 +41,10 @@ namespace Loki.Maple.Characters
                     {
                         inPacket.ReadInt();
                     }
+                    else
+                    {
+                        inPacket.ReadShort();
+                    }
 
                     this.Started.Add(quest.ID, new Dictionary<int, short>());
 

@@ -1023,6 +1023,8 @@ namespace Loki.Maple.Characters
                 writer.WriteInt(1);
                 writer.WriteLong();
                 writer.WriteLong();
+                writer.WriteInt();
+                writer.WriteShort();
                 writer.Flip();
 
                 return writer.GetContent();
@@ -1266,6 +1268,8 @@ namespace Loki.Maple.Characters
             {
                 outPacket.WriteInt(this.ID);
                 outPacket.WriteInt(expressionID);
+                outPacket.WriteInt(-1);
+                outPacket.WriteByte();
 
                 this.Map.Broadcast(this, outPacket);
             }
@@ -1276,7 +1280,7 @@ namespace Loki.Maple.Characters
             this.Express(reader.ReadInt());
         }
 
-        public void Talk(string text)
+        public void Talk(string text, bool show)
         {
             text = text.Replace("{", "{{").Replace("}", "}}");
 
@@ -1291,7 +1295,7 @@ namespace Loki.Maple.Characters
                     outPacket.WriteInt(this.ID);
                     outPacket.WriteBool(this.IsMaster);
                     outPacket.WriteString(text);
-                    outPacket.WriteBool(false); // Hide from log.
+                    outPacket.WriteBool(show); // Hide from log.
                     outPacket.Flip();
 
                     this.Map.Broadcast(outPacket);
@@ -1301,7 +1305,8 @@ namespace Loki.Maple.Characters
 
         public void Talk(ByteBuffer reader)
         {
-            this.Talk(reader.ReadString());
+            reader.ReadInt(); // TODO: ?
+            this.Talk(reader.ReadString(), reader.ReadBool());
         }
 
         public void Notify(string message, NoticeType type = NoticeType.Pink)

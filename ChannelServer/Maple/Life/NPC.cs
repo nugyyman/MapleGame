@@ -384,7 +384,6 @@ namespace Loki.Maple.Life
                 outPacket.WriteInt(defaultValue);
                 outPacket.WriteInt(minimum);
                 outPacket.WriteInt(maximum);
-                outPacket.WriteInt(0);
 
                 talker.Client.Send(outPacket);
             }
