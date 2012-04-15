@@ -1140,7 +1140,7 @@ namespace Loki.Maple
             {
                 if (zeroPosition && !leaveOut)
                 {
-                    buffer.WriteByte();
+                    //buffer.WriteByte();
                 }
                 else if (!zeroPosition && !leaveOut)
                 {
