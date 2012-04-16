@@ -1138,11 +1138,7 @@ namespace Loki.Maple
         {
             using (ByteBuffer buffer = new ByteBuffer())
             {
-                if (zeroPosition && !leaveOut)
-                {
-                    //buffer.WriteByte();
-                }
-                else if (!zeroPosition && !leaveOut)
+                if (!zeroPosition && !leaveOut)
                 {
                     byte pos = this.ComputedSlot;
                     if (pos < 0)
@@ -1159,10 +1155,9 @@ namespace Loki.Maple
                 buffer.WriteInt(this.MapleID);
                 buffer.WriteBool(this.IsCash);
 
-                if (this.IsEquippedCash)
+                if (this.IsCash)
                 {
-                    // TODO: Maybe this is purchase time: Figure out.
-                    buffer.WriteBytes(0x01, 0xBE, 0x50, 0x17, 0x00, 0x00, 0x00, 0x00, 0x00, 0xB0, 0xCE, 0xEB);
+                    buffer.WriteLong(1);
                 }
 
                 // TODO: This is expiration time: Implement it.

@@ -82,7 +82,7 @@ namespace Loki.Maple.Characters
                         outPacket.WriteBool(fromDrop);
                         outPacket.WriteBytes(1, 0);
                         outPacket.WriteByte((byte)item.Type);
-                        outPacket.WriteSByte(item.Slot);
+                        outPacket.WriteShort((short)item.Slot);
                         outPacket.WriteBytes(item.ToByteArray(true));
 
                         this.Parent.Client.Send(outPacket);
