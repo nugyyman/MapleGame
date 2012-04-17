@@ -1525,6 +1525,9 @@ namespace Loki.Maple.Characters
                     }
                 }
 
+                outPacket.WriteByte();
+                outPacket.WriteByte();
+
                 this.Client.Send(outPacket);
             }
         }
@@ -3048,7 +3051,6 @@ namespace Loki.Maple.Characters
                     outPacket.WriteByte((byte)ItemType.Equipment);
                     outPacket.WriteShort(equip.Slot);
                     outPacket.WriteBytes(equip.ToByteArray(true, true));
-                    outPacket.WriteByte(4);
 
                     this.Client.Send(outPacket);
                 }
@@ -3073,7 +3075,6 @@ namespace Loki.Maple.Characters
                     outPacket.WriteByte(3);
                     outPacket.WriteByte((byte)ItemType.Equipment);
                     outPacket.WriteShort(equip.Slot);
-                    outPacket.WriteByte(4);
 
                     this.Client.Send(outPacket);
                 }
