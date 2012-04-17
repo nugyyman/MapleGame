@@ -210,6 +210,10 @@ namespace Loki.Net
                 case MapleClientOperationCode.BuddyListModify:
                     this.Character.BuddyListModify(inPacket);
                     break;
+
+                case MapleClientOperationCode.UsePotentialScroll:
+                    this.Character.UsePotentialScroll(inPacket);
+                    break;
             }
         }
 
@@ -229,7 +233,7 @@ namespace Loki.Net
 
         private void ClientError(Packet inPacket)
         {
-            Log.Warn(inPacket.ReadString());
+            //Log.Warn(inPacket.ReadString());
         }
     }
 }

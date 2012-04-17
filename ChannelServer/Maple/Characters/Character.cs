@@ -1421,7 +1421,10 @@ namespace Loki.Maple.Characters
                 outPacket.WriteByte(1); // UNK.
                 outPacket.WriteBytes(this.AppearanceToByteArray());
                 outPacket.WriteByte(0); // TODO: Ring footer.
+                outPacket.WriteByte(0);
+                outPacket.WriteByte(0);
                 outPacket.WriteShort();
+                outPacket.WriteInt();
 
                 this.Map.Broadcast(outPacket);
             }
@@ -2413,12 +2416,15 @@ namespace Loki.Maple.Characters
             byte ws = (byte)inPacket.ReadShort();
             bool whiteScroll = false;
             bool legendarySpirit = false;
+
             if ((ws & 2) == 2)
             {
                 whiteScroll = true;
             }
+
             Item toScroll = null;
             Skill legendarySpiritSkill = new Skill(0001003);
+
             if (this.Skills.Contains(legendarySpiritSkill))
             {
                 if (this.Skills[0001003].CurrentLevel > 0 && dst >= 0)
@@ -2428,14 +2434,20 @@ namespace Loki.Maple.Characters
                 }
             }
             else
+            {
                 toScroll = this.Items[(EquipmentSlot)dst];
+            }
+
             byte oldLevel = toScroll.UpgradesApplied;
+
             if (toScroll.UpgradesAvailable < 1)
             {
                 this.Items.NotifyFull();
                 return;
             }
+
             Item scroll = this.Items[ItemType.Usable, slot];
+
             if (whiteScroll)
             {
                 if (!this.Items.Contains(2340000))
@@ -2443,6 +2455,7 @@ namespace Loki.Maple.Characters
                     whiteScroll = false;
                 }
             }
+
             if (scroll.Flag == "")
             {
                 if (!((scroll.MapleID / 100) % 100 == (toScroll.MapleID / 10000) % 100))
@@ -2450,14 +2463,17 @@ namespace Loki.Maple.Characters
                     return;
                 }
             }
+
             if (scroll.Quantity < 1)
             {
                 return;
             }
+
             ScrollResult scrollSuccess = ScrollResult.Success;
             Random r = new Random();
             int rand;
             rand = r.Next(1, 101);
+
             if (rand <= scroll.Success)
             {
                 switch (scroll.Flag)
@@ -2547,8 +2563,9 @@ namespace Loki.Maple.Characters
                     scrollSuccess = ScrollResult.Fail;
                 }
             }
+
             bool scrollsLeft = true;
-            short scrollSlot = scroll.Slot;
+
             if (scroll.Quantity > 1)
             {
                 this.Items.Remove(scroll.MapleID, 1);
@@ -2558,6 +2575,7 @@ namespace Loki.Maple.Characters
                 scrollsLeft = false;
                 this.Items.Remove(scroll, false);
             }
+
             if (whiteScroll)
             {
                 Item white = this.Items[ItemType.Usable, 2340000];
@@ -2566,6 +2584,7 @@ namespace Loki.Maple.Characters
                 else
                     this.Items.Remove(white, true);
             }
+
             if (scrollSuccess == ScrollResult.Curse)
             {
                 using (Packet outPacket = new Packet(MapleServerOperationCode.ModifyInventoryItem))
@@ -2574,17 +2593,21 @@ namespace Loki.Maple.Characters
                     outPacket.WriteByte(2);
                     outPacket.WriteByte(scrollsLeft ? (byte)1 : (byte)3);
                     outPacket.WriteByte((byte)ItemType.Usable);
-                    outPacket.WriteShort((short)scroll.Slot);
+                    outPacket.WriteShort(slot);
+
                     if (scrollsLeft)
                     {
                         outPacket.WriteShort(scroll.Quantity);
                     }
+
                     outPacket.WriteByte(3);
                     outPacket.WriteByte((byte)ItemType.Equipment);
                     outPacket.WriteShort(toScroll.Slot);
                     outPacket.WriteByte(1);
+
                     this.Client.Send(outPacket);
                 }
+
                 this.Items.Remove(toScroll, false);
             }
             else
@@ -2595,11 +2618,13 @@ namespace Loki.Maple.Characters
                     outPacket.WriteByte(3);
                     outPacket.WriteByte(scrollsLeft ? (byte)1 : (byte)3);
                     outPacket.WriteByte((byte)ItemType.Usable);
-                    outPacket.WriteShort(scrollSlot);
+                    outPacket.WriteShort(slot);
+
                     if (scrollsLeft)
                     {
                         outPacket.WriteShort(scroll.Quantity);
                     }
+
                     outPacket.WriteByte(3);
                     outPacket.WriteByte((byte)ItemType.Equipment);
                     outPacket.WriteShort(toScroll.Slot);
@@ -2608,12 +2633,14 @@ namespace Loki.Maple.Characters
                     outPacket.WriteShort(toScroll.Slot);
                     outPacket.WriteBytes(toScroll.ToByteArray(true, true));
                     outPacket.WriteByte(1);
+
                     this.Client.Send(outPacket);
                 }
             }
             using (Packet outPacket = new Packet(MapleServerOperationCode.ShowScrollEffect))
             {
                 outPacket.WriteInt(this.ID);
+
                 switch (scrollSuccess)
                 {
                     case ScrollResult.Success:
@@ -2630,8 +2657,13 @@ namespace Loki.Maple.Characters
                         outPacket.WriteShort(legendarySpirit ? (short)1 : (short)0);
                         break;
                 }
+
+                outPacket.WriteInt(1);
+                outPacket.WriteShort();
+
                 this.Map.Broadcast(outPacket);
             }
+
             this.UpdateLook();
         }
 
@@ -2957,6 +2989,122 @@ namespace Loki.Maple.Characters
                     this.BuddyList.Update();
                     break;
             }
+        }
+
+        public void UsePotentialScroll(Packet inPacket)
+        {
+            inPacket.ReadInt();
+            sbyte slot = (sbyte)inPacket.ReadShort();
+            sbyte dst = (sbyte)inPacket.ReadShort();
+            Item scroll = this.Items[(EquipmentSlot)slot];
+            Item equip = this.Items[(EquipmentSlot)dst];
+
+            if (scroll.MapleID != 2049400 && scroll.MapleID != 2049401)
+            {
+                return;
+            }
+
+            if (equip.Potential != Potential.Regular)
+            {
+                return;
+            }
+
+            int chance = scroll.MapleID == 2049400 ? 90 : 70;
+            ScrollResult scrollSuccess = ScrollResult.Success;
+            bool scrollsLeft = scroll.Quantity > 1;
+
+            if (scrollsLeft)
+            {
+                this.Items.Remove(scroll.MapleID, 1);
+            }
+            else
+            {
+                this.Items.Remove(scroll, false);
+            }
+
+            Random rand = new Random();
+
+            if (rand.Next(1, 101) <= chance) // Success
+            {
+                equip.Potential = Potential.HiddenPotential1;
+                
+                using (Packet outPacket = new Packet(MapleServerOperationCode.ModifyInventoryItem))
+                {
+                    outPacket.WriteByte(1);
+                    outPacket.WriteByte(3);
+                    outPacket.WriteByte(scrollsLeft ? (byte) 1 : (byte)3);
+                    outPacket.WriteByte((byte)ItemType.Usable);
+                    outPacket.WriteShort(slot);
+
+                    if (scrollsLeft)
+                    {
+                        outPacket.WriteShort(scroll.Quantity);
+                    }
+
+                    outPacket.WriteByte(3);
+                    outPacket.WriteByte((byte)ItemType.Equipment);
+                    outPacket.WriteShort(equip.Slot);
+                    outPacket.WriteByte(0);
+                    outPacket.WriteByte((byte)ItemType.Equipment);
+                    outPacket.WriteShort(equip.Slot);
+                    outPacket.WriteBytes(equip.ToByteArray(true, true));
+                    outPacket.WriteByte(4);
+
+                    this.Client.Send(outPacket);
+                }
+            }
+            else
+            {
+                scrollSuccess = ScrollResult.Curse;
+
+                using (Packet outPacket = new Packet(MapleServerOperationCode.ModifyInventoryItem))
+                {
+                    outPacket.WriteByte(1);
+                    outPacket.WriteByte(2);
+                    outPacket.WriteByte(scrollsLeft ? (byte)1 : (byte)3);
+                    outPacket.WriteByte((byte)ItemType.Usable);
+                    outPacket.WriteShort(slot);
+
+                    if (scrollsLeft)
+                    {
+                        outPacket.WriteShort(scroll.Quantity);
+                    }
+
+                    outPacket.WriteByte(3);
+                    outPacket.WriteByte((byte)ItemType.Equipment);
+                    outPacket.WriteShort(equip.Slot);
+                    outPacket.WriteByte(4);
+
+                    this.Client.Send(outPacket);
+                }
+            
+                this.Items.Remove(equip, false);
+            }
+
+            using (Packet outPacket = new Packet(MapleServerOperationCode.ShowScrollEffect))
+            {
+                outPacket.WriteInt(this.ID);
+
+                switch (scrollSuccess)
+                {
+                    case ScrollResult.Success:
+                        outPacket.WriteShort(1);
+                        outPacket.WriteShort();
+                        break;
+                    case ScrollResult.Curse:
+                        outPacket.WriteByte();
+                        outPacket.WriteByte(1);
+                        outPacket.WriteShort();
+                        break;
+                }
+
+                outPacket.WriteInt(1);
+                outPacket.WriteShort();
+
+                this.Map.Broadcast(outPacket);
+            }
+
+            this.UpdateLook();
         }
     }
 }
