@@ -1012,7 +1012,7 @@ namespace Loki.Maple.Characters
             {
                 writer.WriteInt(this.ID);
                 writer.WriteByte(this.Level);
-                writer.WriteShort(this.IsMaster ? (short)Job.GM : (short)this.Job);
+                writer.WriteShort((short)this.Job);
                 writer.WriteShort(this.Fame);
                 writer.WriteBool(false); // TODO: Married.
                 writer.WriteString("-"); // TODO: Guild name.
