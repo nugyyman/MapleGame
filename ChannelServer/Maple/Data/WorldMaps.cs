@@ -29,7 +29,7 @@ namespace Loki.Maple.Data
                 }
             }
 
-            /*using (Log.Load("Life"))
+            using (Log.Load("Life"))
             {
                 foreach (dynamic lifeDatum in new Datums("map_life").Populate())
                 {
@@ -73,7 +73,7 @@ namespace Loki.Maple.Data
                         }
                     }
                 }
-            }*/
+            }
         }
 
         protected override int GetKeyForItem(Map item)

@@ -16,8 +16,8 @@ namespace Loki.Maple.Life
         public LifeObject(dynamic datum)
             : base()
         {
-            this.ID = datum.id;
-            this.MapleID = datum.lifeid;
+            this.ID = (int)datum.id;
+            this.MapleID = (int)datum.lifeid;
 
             this.Position = new Point(datum.x_pos, datum.y_pos);
             this.Foothold = datum.foothold;

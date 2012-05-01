@@ -288,11 +288,11 @@ namespace Loki.Interoperability
 
             bool charOk = true;
 
-            /*if (Database.Exists("characters", "Name = '{0}'", name) || World.ForbiddenNames.Contains(name))
+            if (Database.Exists("characters", "Name = '{0}'", name) || World.ForbiddenNames.Contains(name))
                 charOk = false;
 
             if (!World.CharacterCreationData.checkData(job, gender, face, hair, hair_color, skin, topID, bottomID, shoesID, weaponID))
-                charOk = false;*/
+                charOk = false;
 
             if (charOk)
             {
