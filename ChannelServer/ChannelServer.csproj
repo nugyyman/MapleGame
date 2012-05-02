@@ -70,6 +70,7 @@
     <Compile Include="Maple\Characters\CharacterBuffs.cs" />
     <Compile Include="Maple\Characters\CharacterKeyMap.cs" />
     <Compile Include="Maple\Characters\CharacterQuests.cs" />
+    <Compile Include="Maple\Characters\CharacterSPTable.cs" />
     <Compile Include="Maple\Characters\ControlledMobs.cs" />
     <Compile Include="Maple\Characters\ControlledNpcs.cs" />
     <Compile Include="Maple\Commands\Implementation\BringCommand.cs" />

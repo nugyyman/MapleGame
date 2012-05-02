@@ -196,6 +196,15 @@ namespace Loki
 							  PRIMARY KEY (`ID`),
 							KEY `groupname` (`GroupName`) USING BTREE
 							) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+							DROP TABLE IF EXISTS `sptables`;
+							CREATE TABLE `sptables` (
+							  `ID` int(11) NOT NULL AUTO_INCREMENT,
+							  `CharacterID` int(11) NOT NULL,
+							  `Advancement` tinyint(3) unsigned NOT NULL,
+							  `AvailableSP` tinyint(3) unsigned NOT NULL DEFAULT '0',
+							  PRIMARY KEY (`ID`)
+							) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 						", databaseSchema);
 
                     Log.Inform("Database '{0}' created.", databaseSchema);

@@ -23,6 +23,7 @@ namespace Loki.Maple.Characters
         public CharacterBuddyList BuddyList { get; private set; }
         public ControlledMobs ControlledMobs { get; private set; }
         public ControlledNpcs ControlledNpcs { get; private set; }
+        public CharacterSPTable SPTable { get; private set; }
         public Trade Trade { get; set; }
         public Omok Omok { get; set; }
         public PlayerShop PlayerShop { get; set; }
@@ -232,9 +233,40 @@ namespace Loki.Maple.Characters
                                     }
                                 }
 
-                                if (this.Job != Job.Beginner && this.Job != Job.Noblesse)
+                                if (this.Job != Job.Beginner && this.Job != Job.Noblesse && this.Job != Maple.Job.Legend && this.Job != Maple.Job.Farmer && this.Job != Maple.Job.Citizen)
                                 {
-                                    this.AvailableSP += 3;
+                                    if (this.SPTable.GetSPType(this.Job) == ExtendedSPType.Evan)
+                                    {
+                                        byte adv = (byte)((short)this.Job % 100 == 0 ? 1 : ((short)this.Job % 10) + 2);
+                                        if (!this.SPTable.ContainsKey(adv))
+                                        {
+                                            this.SPTable.Add(adv, 3);
+                                            this.UpdateStatistics(StatisticType.AvailableSP);
+                                        }
+                                        else
+                                        {
+                                            this.SPTable[adv] += 3;
+                                            this.UpdateStatistics(StatisticType.AvailableSP);
+                                        }
+                                    }
+                                    else if (this.SPTable.GetSPType(this.Job) == ExtendedSPType.Resistance)
+                                    {
+                                        byte adv = (byte)((short)this.Job % 100 == 0 ? 1 : ((short)this.Job % 10) + 2);
+                                        if (!this.SPTable.ContainsKey(adv))
+                                        {
+                                            this.SPTable.Add(adv, 3);
+                                            this.UpdateStatistics(StatisticType.AvailableSP);
+                                        }
+                                        else
+                                        {
+                                            this.SPTable[adv] += 3;
+                                            this.UpdateStatistics(StatisticType.AvailableSP);
+                                        }
+                                    }
+                                    else
+                                    {
+                                        this.AvailableSP += 3;
+                                    }
                                 }
 
                                 this.UpdateStatistics(StatisticType.Level);
@@ -739,6 +771,7 @@ namespace Loki.Maple.Characters
             this.Buffs = new CharacterBuffs(this);
             this.KeyMap = new CharacterKeyMap(this);
             this.BuddyList = new CharacterBuddyList(this);
+            this.SPTable = new CharacterSPTable(this);
 
             this.Position = new Point(0, 0);
             this.ControlledMobs = new ControlledMobs(this);
@@ -790,6 +823,7 @@ namespace Loki.Maple.Characters
             this.Quests.Load();
             this.KeyMap.Load();
             this.BuddyList.Load();
+            this.SPTable.Load();
         }
 
         public void Save()
@@ -850,6 +884,7 @@ namespace Loki.Maple.Characters
             this.Quests.Save();
             this.KeyMap.Save();
             this.BuddyList.Save();
+            this.SPTable.Save();
 
             Log.Inform("Saved character '{0}' to database.", this.Name);
         }
@@ -862,6 +897,7 @@ namespace Loki.Maple.Characters
             this.Quests.Delete();
             this.KeyMap.Delete();
             this.BuddyList.Delete();
+            this.SPTable.Delete();
 
             Database.Delete("characters", "ID = '{0}'", this.ID);
 
@@ -920,7 +956,7 @@ namespace Loki.Maple.Characters
                 buffer.WriteInt(this.CurrentMP);
                 buffer.WriteInt(this.MaxMP);
                 buffer.WriteShort(this.AvailableAP);
-                buffer.WriteShort(this.AvailableSP);
+                buffer.WriteBytes(this.SPTable.ToByteArray());
                 buffer.WriteInt(this.Experience);
                 buffer.WriteShort(this.Fame);
                 buffer.WriteInt();
@@ -1508,7 +1544,11 @@ namespace Loki.Maple.Characters
                             break;
 
                         case StatisticType.AvailableSP:
-                            outPacket.WriteInt(this.AvailableSP);
+                            outPacket.WriteBytes(this.SPTable.ToByteArray());
+                            if (this.SPTable.GetSPType(this.Job) == ExtendedSPType.Regular)
+                            {
+                                outPacket.WriteShort();
+                            }
                             break;
 
                         case StatisticType.Experience:

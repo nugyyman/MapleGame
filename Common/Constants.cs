@@ -1253,4 +1253,11 @@ namespace Loki.Maple
         Epic,
         Unique,
     }
+
+    public enum ExtendedSPType
+    {
+        Regular,
+        Evan,
+        Resistance
+    }
 }
