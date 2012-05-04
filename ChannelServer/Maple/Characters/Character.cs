@@ -207,7 +207,7 @@ namespace Loki.Maple.Characters
 
                                 level++;
 
-                                if (this.job == Maple.Job.Beginner && Level < 11)
+                                if ((this.Job == Job.Beginner || this.Job == Job.Noblesse || this.Job == Maple.Job.Legend || this.Job == Maple.Job.Farmer || this.Job == Maple.Job.Citizen) && Level < 11)
                                 {
                                     if (this.Level < 6)
                                     {
@@ -219,7 +219,7 @@ namespace Loki.Maple.Characters
                                         this.Dexterity += 1;
                                     }
                                 }
-                                else if (this.job == Maple.Job.Beginner && Level == 11)
+                                else if ((this.Job == Job.Beginner || this.Job == Job.Noblesse || this.Job == Maple.Job.Legend || this.Job == Maple.Job.Farmer || this.Job == Maple.Job.Citizen) && Level == 11)
                                 {
                                     this.ResetStats();
                                 }
@@ -233,7 +233,7 @@ namespace Loki.Maple.Characters
                                     }
                                 }
 
-                                if (this.Job != Job.Beginner && this.Job != Job.Noblesse && this.Job != Maple.Job.Legend && this.Job != Maple.Job.Farmer && this.Job != Maple.Job.Citizen)
+                                if (this.Level < 11)
                                 {
                                     if (this.SPTable.GetSPType(this.Job) == ExtendedSPType.Evan)
                                     {
@@ -1616,46 +1616,86 @@ namespace Loki.Maple.Characters
             }
         }
 
-        public void DistributeAP(int stat)
+        public void AutoDistributeAP(Packet inPacket)
+        {
+            int stat, ap, total = 0;
+
+            inPacket.Skip(8);
+
+            for (int i = 0; i < 2; i++)
+            {
+                stat = inPacket.ReadInt();
+                ap = inPacket.ReadInt();
+
+                if (ap > this.AvailableAP || ap < 0)
+                {
+                    return;
+                }
+
+                total += ap;
+                this.DistributeAP(stat, (short)ap);
+            }
+
+            this.AvailableAP -= (short)total;
+        }
+
+        public void DistributeAP(int stat, short ap = 1)
         {
             lock (this)
             {
                 switch (stat)
                 {
                     case 64:
-                        if (this.Strength == 32767)
+                        if (this.Strength + ap > 32767)
+                        {
                             return;
-                        this.Strength++;
+                        }
+
+                        this.Strength += ap;
                         break;
 
                     case 128:
-                        if (this.Dexterity == 32767)
+                        if (this.Dexterity + ap > 32767)
+                        {
                             return;
-                        this.Dexterity++;
-                        this.Dexterity++;
+                        }
+
+                        this.Dexterity += ap;
                         break;
 
                     case 256:
-                        if (this.Intelligence == 32767)
+                        if (this.Intelligence + ap > 32767)
+                        {
                             return;
-                        this.Intelligence++;
+                        }
+
+                        this.Intelligence += ap;
                         break;
 
                     case 512:
-                        if (this.Luck == 32767)
+                        if (this.Luck + ap > 32767)
+                        {
                             return;
-                        this.Luck++;
+                        }
+
+                        this.Luck += ap;
                         break;
 
                     case 2048:
-                        if (this.MaxHP == 30000)
+                        if (this.MaxHP + ap > 99999)
+                        {
                             return;
+                        }
+
                         this.MaxHP += 10; // TODO: Correct HP addition.
                         break;
 
                     case 8192:
-                        if (this.MaxMP == 30000)
+                        if (this.MaxMP + ap > 99999)
+                        {
                             return;
+                        }
+
                         this.MaxMP += 10; // TODO: Correct MP addition.
                         break;
 
@@ -1715,6 +1755,7 @@ namespace Loki.Maple.Characters
 
         public void HealOverTime(Packet inPacket)
         {
+            inPacket.ReadInt();
             inPacket.ReadInt();
             short hpAmount = inPacket.ReadShort();
             short mpAmount = inPacket.ReadShort();

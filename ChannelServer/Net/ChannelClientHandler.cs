@@ -111,6 +111,10 @@ namespace Loki.Net
                     this.Character.DistributeAP(inPacket);
                     break;
 
+                case MapleClientOperationCode.AutoDistributeAP:
+                    this.Character.AutoDistributeAP(inPacket);
+                    break;
+
                 case MapleClientOperationCode.DistributeSP:
                     this.Character.DistributeSP(inPacket);
                     break;
