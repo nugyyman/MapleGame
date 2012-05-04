@@ -78,7 +78,7 @@ namespace Loki.Net
                 Log.Inform("Pin will{0}be requested upon login.", LoginServer.RequestPin ? " " : " not ");
 
                 LoginServer.RequestPic = Settings.GetBool("Server/RequestPic");
-                Log.Inform("Pic will{0}be requested upon login.", LoginServer.RequestPic ? " " : " not ");
+                Log.Inform("Pic will{0}be requested upon char selection.", LoginServer.RequestPic ? " " : " not ");
 
                 LoginServer.MaxCharacters = Settings.GetInt("Server/MaxCharacters");
                 Log.Inform("Maximum of {0} characters per account.", LoginServer.MaxCharacters);

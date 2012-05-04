@@ -70,7 +70,7 @@ namespace Loki.Maple
                             reader.Skip(7);
                             break;
 
-                        case 27: // ODO: Knockback
+                        case 27: //TODO: Knockback
                             reader.Skip(9);
                             break;
                     }

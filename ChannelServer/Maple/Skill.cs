@@ -279,10 +279,10 @@ namespace Loki.Maple
                 // TODO: This is expiration time: Implement it.
                 outPacket.WriteByte();
                 outPacket.WriteBytes(PacketConstants.Item);
-                outPacket.WriteInt(400967355);
+                outPacket.WriteBytes((byte)0xBB, 0x46, (byte)0xE6, 0x17);
                 outPacket.WriteByte(2); // 1 to show it, 2 to hide it.
 
-                outPacket.WriteByte(4);
+                outPacket.WriteByte(1);
 
                 this.Character.Client.Send(outPacket);
             }

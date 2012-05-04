@@ -17,6 +17,80 @@ namespace Loki.Maple.Characters
             this.Parent = parent;
         }
 
+        public short AvailableSP
+        {
+            get
+            {
+                short sp;
+
+                if (this.GetSPType(this.Parent.Job) == ExtendedSPType.Regular)
+                {
+                    sp = this.Parent.AvailableSP;
+                }
+                else
+                {
+                    byte adv = (byte)((short)this.Parent.Job % 100 == 0 ? 1 : ((short)this.Parent.Job % 10) + 2);
+                    sp = this[adv];
+                }
+
+                return sp;
+            }
+            set
+            {
+                if (this.GetSPType(this.Parent.Job) == ExtendedSPType.Regular)
+                {
+                    this.Parent.AvailableSP = value;
+                }
+                else
+                {
+                    byte adv = (byte)((short)this.Parent.Job % 100 == 0 ? 1 : ((short)this.Parent.Job % 10) + 2);
+
+                    this[adv] = (byte)value;
+
+                    if (this.Parent.IsInitialized)
+                    {
+                        this.Parent.UpdateStatistics(StatisticType.AvailableSP);
+                    }
+                }
+            }
+        }
+
+        public short GetAvailableSPByJob(Job job)
+        {
+            short sp;
+
+            if (this.GetSPType(job) == ExtendedSPType.Regular)
+            {
+                sp = this.Parent.AvailableSP;
+            }
+            else
+            {
+                byte adv = (byte)((short)job % 100 == 0 ? 1 : ((short)job % 10) + 2);
+                sp = this[adv];
+            }
+
+            return sp;
+        }
+
+        public void SetAvailableSPByJob(Job job, short sp)
+        {
+            if (this.GetSPType(this.Parent.Job) == ExtendedSPType.Regular)
+            {
+                this.Parent.AvailableSP = sp;
+            }
+            else
+            {
+                byte adv = (byte)((short)job % 100 == 0 ? 1 : ((short)job % 10) + 2);
+
+                this[adv] = (byte)sp;
+
+                if (this.Parent.IsInitialized)
+                {
+                    this.Parent.UpdateStatistics(StatisticType.AvailableSP);
+                }
+            }
+        }
+
         public void Load()
         {
             foreach (dynamic datum in new Datums("sptables").Populate("CharacterID = '{0}'", this.Parent.ID))

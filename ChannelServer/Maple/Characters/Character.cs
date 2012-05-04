@@ -238,30 +238,26 @@ namespace Loki.Maple.Characters
                                     if (this.SPTable.GetSPType(this.Job) == ExtendedSPType.Evan)
                                     {
                                         byte adv = (byte)((short)this.Job % 100 == 0 ? 1 : ((short)this.Job % 10) + 2);
+
                                         if (!this.SPTable.ContainsKey(adv))
                                         {
-                                            this.SPTable.Add(adv, 3);
-                                            this.UpdateStatistics(StatisticType.AvailableSP);
+                                            this.SPTable.Add(adv, 0);
                                         }
-                                        else
-                                        {
-                                            this.SPTable[adv] += 3;
-                                            this.UpdateStatistics(StatisticType.AvailableSP);
-                                        }
+
+                                        this.SPTable[adv] += 3;
+                                        this.UpdateStatistics(StatisticType.AvailableSP);
                                     }
                                     else if (this.SPTable.GetSPType(this.Job) == ExtendedSPType.Resistance)
                                     {
                                         byte adv = (byte)((short)this.Job % 100 == 0 ? 1 : ((short)this.Job % 10) + 2);
+
                                         if (!this.SPTable.ContainsKey(adv))
                                         {
                                             this.SPTable.Add(adv, 3);
-                                            this.UpdateStatistics(StatisticType.AvailableSP);
                                         }
-                                        else
-                                        {
-                                            this.SPTable[adv] += 3;
-                                            this.UpdateStatistics(StatisticType.AvailableSP);
-                                        }
+
+                                        this.SPTable[adv] += 3;
+                                        this.UpdateStatistics(StatisticType.AvailableSP);
                                     }
                                     else
                                     {
@@ -1545,10 +1541,6 @@ namespace Loki.Maple.Characters
 
                         case StatisticType.AvailableSP:
                             outPacket.WriteBytes(this.SPTable.ToByteArray());
-                            if (this.SPTable.GetSPType(this.Job) == ExtendedSPType.Regular)
-                            {
-                                outPacket.WriteShort();
-                            }
                             break;
 
                         case StatisticType.Experience:
@@ -1616,48 +1608,7 @@ namespace Loki.Maple.Characters
                 {
                     inPacket.ReadInt();
 
-                    switch (inPacket.ReadInt())
-                    {
-                        case 64:
-                            if (this.Strength == 32767)
-                                return;
-                            this.Strength++;
-                            break;
-
-                        case 128:
-                            if (this.Dexterity == 32767)
-                                return;
-                            this.Dexterity++;
-                            break;
-
-                        case 256:
-                            if (this.Intelligence == 32767)
-                                return;
-                            this.Intelligence++;
-                            break;
-
-                        case 512:
-                            if (this.Luck == 32767)
-                                return;
-                            this.Luck++;
-                            break;
-
-                        case 2048:
-                            if (this.MaxHP == 30000)
-                                return;
-                            this.MaxHP += 10; // TODO: Correct HP addition.
-                            break;
-
-                        case 8192:
-                            if (this.MaxMP == 30000)
-                                return;
-                            this.MaxMP += 10; // TODO: Correct MP addition.
-                            break;
-
-                        default:
-                            throw new NotImplementedException("Adding unknown statistic.");
-                    }
-
+                    this.DistributeAP(inPacket.ReadInt());
                     this.AvailableAP--;
 
                     this.Release();
@@ -1712,53 +1663,53 @@ namespace Loki.Maple.Characters
                         throw new NotImplementedException("Adding unknown statistic.");
                 }
 
-                this.AvailableAP--;
-
                 this.Release();
             }
         }
 
         public void DistributeSP(Packet inPacket)
         {
-            if (this.AvailableSP < 1)
+            inPacket.ReadInt();
+
+            int skillID = inPacket.ReadInt();
+
+            if (this.SPTable.GetAvailableSPByJob((Job)(skillID / 10000)) < 1)
             {
+                this.Release();
+
                 return;
+            }
+
+            if (!this.Skills.Contains(skillID))
+            {
+                this.Skills.Add(new Skill(skillID));
+            }
+
+            Skill skill = this.Skills[skillID];
+
+            // TODO: Check for skill requirements.
+
+            if (skill.IsFromBeginner)
+            {
+                //TODO: Handle begginner skills
+            }
+
+            if (skill.CurrentLevel + 1 <= skill.MaxLevel)
+            {
+                if (!skill.IsFromBeginner)
+                {
+                    this.SPTable.SetAvailableSPByJob((Job)(skillID / 10000), (short)(this.SPTable.GetAvailableSPByJob((Job)(skillID / 10000)) - 1));
+                }
+
+                this.Release();
+
+                skill.CurrentLevel++;
             }
             else
             {
-                inPacket.ReadInt();
+                this.Release();
 
-                int skillID = inPacket.ReadInt();
-
-                if (!this.Skills.Contains(skillID))
-                {
-                    this.Skills.Add(new Skill(skillID));
-                }
-
-                Skill skill = this.Skills[skillID];
-
-                // TODO: Check for skill requirements.
-
-                if (skill.IsFromBeginner)
-                {
-                    //TODO: Handle begginner skills
-                }
-
-                if (skill.CurrentLevel + 1 <= skill.MaxLevel)
-                {
-                    if (!skill.IsFromBeginner)
-                    {
-                        this.AvailableSP--;
-                    }
-
-                    this.Release();
-
-                    skill.CurrentLevel++;
-                }
-                else
-                {
-                    return;
-                }
+                return;
             }
         }
 
