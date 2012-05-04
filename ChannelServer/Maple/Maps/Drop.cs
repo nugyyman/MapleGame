@@ -85,11 +85,12 @@ namespace Loki.Maple.Maps
             {
                 spawn.WriteByte();
                 spawn.WriteBytes(PacketConstants.Item);
-                spawn.WriteInt(400967355);
+                spawn.WriteBytes((byte)0xBB, 0x46, (byte)0xE6, 0x17);
                 spawn.WriteByte(2); // 1 to show it, 2 to hide it.
             }
 
             spawn.WriteByte(1); // Pet equip pickup.
+            spawn.WriteByte(1); // Also pet thingy
 
             return spawn;
         }

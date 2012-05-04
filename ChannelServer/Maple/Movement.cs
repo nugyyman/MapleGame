@@ -25,49 +25,52 @@ namespace Loki.Maple
                     {
                         case 0:
                         case 5:
+                        case 14:
                         case 17:
-                            this.Add(new AbsoluteMovement(type, reader.ReadBytes(13)));
+                            this.Add(new AbsoluteMovement(type, reader.ReadBytes(17)));
                             break;
 
                         case 1:
                         case 2:
-                        case 6:
                         //case 12:
-                        case 13:
-                            //case 16:
+                        //case 13:
+                            case 16:
                             this.Add(new RelativeMovement(type, reader.ReadBytes(7)));
                             break;
 
                         case 3:
                         case 4:
-                        case 7:
+                        case 6:
                         case 8:
-                        case 9:
-                            //case 14:
+                        case 11:
+                        case 15:
                             this.Add(new InstantMovement(type, reader.ReadBytes(9)));
                             break;
 
-                        case 10:
+                        case 9:
                             this.Add(new EquipmentMovement(type, reader.ReadBytes(1)));
                             break;/*
 
-					case 11:
+					case 10:
 						this.Add(new ChairMovement(type, reader.ReadBytes(9)));
 						break;*/
 
-                        case 15:
+                        case 12:
+                        case 24:
                             this.Add(new JumpDownMovement(type, reader.ReadBytes(15)));
                             break;
 
-                        case 16:
+                        case 20: //TODO: FJ
+                            break;
+
+                        case 19:
+                        case 21:
+                        case 22:
+                        case 26: //TODO: Aran
                             reader.Skip(7);
                             break;
 
-                        case 12:
-                            reader.Skip(7);
-                            break;
-
-                        case 14:
+                        case 27: // ODO: Knockback
                             reader.Skip(9);
                             break;
                     }
@@ -110,7 +113,8 @@ namespace Loki.Maple
     {
         public Point Position { get; set; }
         public Point Wobble { get; set; }
-        public short Unknown { get; set; }
+        public short FootHold { get; set; }
+        public int Unknown { get; set; }
         public short Duration { get; set; }
 
         public AbsoluteMovement(byte type, byte[] data)
@@ -120,7 +124,8 @@ namespace Loki.Maple
             {
                 this.Position = new Point(reader.ReadShort(), reader.ReadShort());
                 this.Wobble = new Point(reader.ReadShort(), reader.ReadShort());
-                this.Unknown = reader.ReadShort();
+                this.FootHold = reader.ReadShort();
+                this.Unknown = reader.ReadInt();
                 this.NewStance = reader.ReadByte();
                 this.Duration = reader.ReadShort();
             }
@@ -135,7 +140,8 @@ namespace Loki.Maple
                 writer.WriteShort(this.Position.Y);
                 writer.WriteShort(this.Wobble.X);
                 writer.WriteShort(this.Wobble.Y);
-                writer.WriteShort(this.Unknown);
+                writer.WriteShort(this.FootHold);
+                writer.WriteInt(this.Unknown);
                 writer.WriteByte(this.NewStance);
                 writer.WriteShort(this.Duration);
 
@@ -149,9 +155,9 @@ namespace Loki.Maple
     {
         public Point Position { get; set; }
         public Point Wobble { get; set; }
-        public short Unknown { get; set; }
+        public int Unknown { get; set; }
         public short Duration { get; set; }
-        public short FootHold { get; set; }
+        public int FootHold { get; set; }
 
         public JumpDownMovement(byte type, byte[] data)
             : base(type)
@@ -160,8 +166,8 @@ namespace Loki.Maple
             {
                 this.Position = new Point(reader.ReadShort(), reader.ReadShort());
                 this.Wobble = new Point(reader.ReadShort(), reader.ReadShort());
-                this.Unknown = reader.ReadShort();
-                this.FootHold = reader.ReadShort();
+                this.Unknown = reader.ReadInt();
+                this.FootHold = reader.ReadInt();
                 this.NewStance = reader.ReadByte();
                 this.Duration = reader.ReadShort();
             }
@@ -176,8 +182,8 @@ namespace Loki.Maple
                 writer.WriteShort(this.Position.Y);
                 writer.WriteShort(this.Wobble.X);
                 writer.WriteShort(this.Wobble.Y);
-                writer.WriteShort(this.Unknown);
-                writer.WriteShort(this.FootHold);
+                writer.WriteInt(this.Unknown);
+                writer.WriteInt(this.FootHold);
                 writer.WriteByte(this.NewStance);
                 writer.WriteShort(this.Duration);
 
