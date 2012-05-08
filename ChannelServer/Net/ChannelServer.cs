@@ -62,8 +62,9 @@ namespace Loki.Net
             {
                 channelID = value;
 
-                Console.Title = string.Format("Channel Server v.{0} ({1}-{2})",
+                Console.Title = string.Format("Channel Server v.{0}.{1} ({2}-{3})",
                     Application.MapleVersion,
+                    Application.PatchVersion,
                     WorldNameResolver.GetName(ChannelServer.WorldID),
                     ChannelServer.ChannelID);
             }
@@ -91,7 +92,7 @@ namespace Loki.Net
             ChannelServer.LoggedIn = new List<int>();
             ChannelServer.Clients = new List<ChannelClientHandler>();
 
-            Log.Entitle("Channel Server v.{0}", Application.MapleVersion);
+            Log.Entitle("Channel Server v.{0}.{1}", Application.MapleVersion, Application.PatchVersion);
 
             try
             {

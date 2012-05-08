@@ -228,6 +228,7 @@ namespace Loki
 				Packets={0}
 				StackTrace=False
 				LoadTime=False
+				PacketRecord=[recive/send, ExactPacketName]
 				
 				[Server]
 				Port=8484

@@ -67,6 +67,7 @@
     <Compile Include="Data\Meta.cs" />
     <Compile Include="Data\Datum.cs" />
     <Compile Include="Data\RowNotUniqueException.cs" />
+    <Compile Include="IO\PacketRecorder.cs" />
     <Compile Include="Net\NetworkConnector.cs" />
     <Compile Include="Net\NetworkException.cs" />
     <Compile Include="Security\BlankCryptograph.cs" />

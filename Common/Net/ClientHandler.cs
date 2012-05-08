@@ -15,6 +15,8 @@ namespace Loki.Net
         protected virtual void Register() { }
         protected virtual void Unregister() { }
 
+        PacketRecorder packetRecorder;
+
         public ClientHandler(Socket socket, string title = "Client", params object[] args)
         {
             this.Title = title;
@@ -33,6 +35,8 @@ namespace Loki.Net
             this.Initialize();
 
             this.Register();
+
+            packetRecorder = new PacketRecorder();
 
             while (this.IsAlive && this.IsServerAlive)
             {
@@ -56,9 +60,9 @@ namespace Loki.Net
 
         private ByteBuffer ReceivalBuffer { get; set; }
 
-        private void Handle(byte[] rawPacket)
+        private void Handle(byte[] rawPacket, bool fromCommand = false, Packet packet = null)
         {
-            using (Packet inPacket = new Packet(this.Cryptograph.Decrypt(rawPacket)))
+            using (Packet inPacket = fromCommand ? packet : new Packet(this.Cryptograph.Decrypt(rawPacket)))
             {
                 if (Enum.IsDefined(typeof(TReceiveOP), inPacket.OperationCode))
                 {
@@ -72,10 +76,18 @@ namespace Loki.Net
                             Log.Hex("Received {0} packet from {1}: ", inPacket.Array, Enum.GetName(typeof(TReceiveOP), inPacket.OperationCode), this.Title);
                             break;
                     }
+
+                    packetRecorder.Record(inPacket, this.Title, true);
                 }
                 else
                 {
                     Log.Hex("Received unknown (0x{0:X2}) packet from {1}: ", inPacket.Array, inPacket.OperationCode, this.Title);
+                }
+
+                if (fromCommand)
+                {
+                    inPacket.Position = 0;
+                    inPacket.ReadShort();
                 }
 
                 this.Dispatch(inPacket);
@@ -182,6 +194,8 @@ namespace Loki.Net
                                 Log.Hex("Sent {0} packet to {1}: ", outPacket.GetContent(), Enum.GetName(typeof(TSendOP), outPacket.OperationCode), this.Title);
                                 break;
                         }
+
+                        packetRecorder.Record(outPacket, this.Title, false);
                     }
                     else
                     {
@@ -216,6 +230,11 @@ namespace Loki.Net
             this.Unregister();
 
             Log.Inform("{0} disposed.", this.Title);
+        }
+
+        public void HandlePacket(Packet inPacket)
+        {
+            this.Handle(null, true, inPacket);
         }
     }
 }

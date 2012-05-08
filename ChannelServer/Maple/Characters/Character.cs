@@ -2248,6 +2248,7 @@ namespace Loki.Maple.Characters
             int damageFrom = inPacket.ReadByte();
             inPacket.ReadByte();
             int damage = inPacket.ReadInt();
+            Log.Warn(damage);
             int objectId = 0;
             int monsterIdFrom = 0;
             int pgmr = 0;

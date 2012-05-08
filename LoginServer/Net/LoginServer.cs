@@ -56,7 +56,7 @@ namespace Loki.Net
             LoginServer.LoggedIn = new List<int>();
             LoginServer.Clients = new List<LoginClientHandler>();
 
-            Log.Entitle("Login Server v.{0}", Application.MapleVersion);
+            Log.Entitle("Login Server v.{0}.{1}", Application.MapleVersion, Application.PatchVersion);
 
             try
             {

@@ -51,7 +51,7 @@ namespace Loki.Maple.Life
         public int WeaponDefense { get; private set; }
         public int MagicAttack { get; private set; }
         public int MagicDefense { get; private set; }
-        public short Accuracy { get; private set; }
+        public int Accuracy { get; private set; }
         public short Avoidability { get; private set; }
         public short Speed { get; private set; }
         public short ChaseSpeed { get; private set; }
@@ -85,29 +85,29 @@ namespace Loki.Maple.Life
             this.CurrentMP = this.MaxMP;
             this.HpRecovery = datum.hp_recovery;
             this.MpRecovery = datum.mp_recovery;
-            this.ExplodeHP = (int)datum.explode_hp;
+            this.ExplodeHP = datum.explode_hp;
             this.Experience = datum.experience;
-            this.Link = (int)datum.link;
-            this.SummonType = (short)datum.summon_type;
-            this.KnockBack = (int)datum.knockback;
-            this.FixedDamage = (int)datum.fixed_damage;
-            this.DeathBuff = (int)datum.death_buff;
-            this.DeathAfter = (int)datum.death_after;
+            this.Link = datum.link;
+            this.SummonType = datum.summon_type;
+            this.KnockBack = datum.knockback;
+            this.FixedDamage = datum.fixed_damage;
+            this.DeathBuff = datum.death_buff;
+            this.DeathAfter = datum.death_after;
             this.Traction = datum.traction;
-            this.DamagedBySkillOnly = (int)datum.damaged_by_skill_only;
-            this.DamagedByMobOnly = (int)datum.damaged_by_mob_only;
+            this.DamagedBySkillOnly = datum.damaged_by_skill_only;
+            this.DamagedByMobOnly = datum.damaged_by_mob_only;
             //this.DropItemPeriod = datum.drop_item_period;
             this.HpBarForeColor = datum.hp_bar_color;
             this.HpBarBackColor = datum.hp_bar_bg_color;
             this.CarnivalPoints = datum.carnival_points;
-            this.WeaponAttack = (int)datum.physical_attack;
-            this.WeaponDefense = (int)datum.physical_defense;
-            this.MagicAttack = (int)datum.magical_attack;
-            this.MagicDefense = (int)datum.magical_defense;
-            this.Accuracy = (short)datum.accuracy;
-            this.Avoidability = (short)datum.avoidability;
-            this.Speed = (short)datum.speed;
-            this.ChaseSpeed = (short)datum.chase_speed;
+            this.WeaponAttack = datum.physical_attack;
+            this.WeaponDefense = datum.physical_defense;
+            this.MagicAttack = datum.magical_attack;
+            this.MagicDefense = datum.magical_defense;
+            this.Accuracy = datum.accuracy;
+            this.Avoidability = datum.avoidability;
+            this.Speed = datum.speed;
+            this.ChaseSpeed = datum.chase_speed;
 
             this.Loots = new List<Loot>();
             this.Skills = new MobSkills(this);
@@ -238,14 +238,11 @@ namespace Loki.Maple.Life
             short movementId = inPacket.ReadShort();
 
             byte randomSkill = inPacket.ReadByte(); // TODO: Might be a byte!
-            byte skillUnknown1 = inPacket.ReadByte();
+            int skillUnknown1 = inPacket.ReadByte() & 0xFF;
             byte skillId = inPacket.ReadByte();
             byte skillLevel = inPacket.ReadByte();
             byte skillUnknown2 = inPacket.ReadByte();
-            inPacket.ReadByte();
-            inPacket.Skip(8);
-            inPacket.ReadByte();
-            inPacket.Skip(16);
+            inPacket.Skip(26);
             Point startPosition = new Point(inPacket.ReadShort(), inPacket.ReadShort());
             inPacket.ReadInt();
             Movements movements = Movements.Parse(inPacket.ReadBytes());
@@ -293,7 +290,7 @@ namespace Loki.Maple.Life
                 outPacket.WriteInt(this.ObjectID);
                 outPacket.WriteShort();
                 outPacket.WriteByte(randomSkill);
-                outPacket.WriteByte(skillUnknown1);
+                outPacket.WriteByte((byte)skillUnknown1);
                 outPacket.WriteByte(skillId);
                 outPacket.WriteByte(skillLevel);
                 outPacket.WriteByte(skillUnknown2);

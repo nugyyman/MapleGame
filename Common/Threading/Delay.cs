@@ -26,7 +26,6 @@ namespace Loki.Threading
             t.Start();
         }
 
-        private ThreadStart action;
         private Timer t;
 
         public Delay(int delay, ThreadStart action)

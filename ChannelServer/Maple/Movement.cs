@@ -57,7 +57,7 @@ namespace Loki.Maple
 
                         case 12:
                         case 24:
-                            this.Add(new JumpDownMovement(type, reader.ReadBytes(15)));
+                            this.Add(new JumpDownMovement(type, reader.ReadBytes(19)));
                             break;
 
                         case 20: //TODO: FJ
@@ -166,8 +166,8 @@ namespace Loki.Maple
             {
                 this.Position = new Point(reader.ReadShort(), reader.ReadShort());
                 this.Wobble = new Point(reader.ReadShort(), reader.ReadShort());
-                this.Unknown = reader.ReadInt();
                 this.FootHold = reader.ReadInt();
+                this.Unknown = reader.ReadInt();
                 this.NewStance = reader.ReadByte();
                 this.Duration = reader.ReadShort();
             }
