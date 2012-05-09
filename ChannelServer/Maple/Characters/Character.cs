@@ -938,9 +938,9 @@ namespace Loki.Maple.Characters
                 buffer.WriteByte(this.Skin);
                 buffer.WriteInt(this.Face);
                 buffer.WriteInt(this.Hair);
-                buffer.WriteLong(); // UNK: One of these creation date?
-                buffer.WriteLong();
-                buffer.WriteLong();
+                buffer.WriteLong(); // Pet #1
+                buffer.WriteLong(); // Pet #2
+                buffer.WriteLong(); // Pet #3
                 buffer.WriteByte(this.Level);
                 buffer.WriteShort((short)this.Job);
                 buffer.WriteShort(this.Strength);
@@ -955,7 +955,7 @@ namespace Loki.Maple.Characters
                 buffer.WriteBytes(this.SPTable.ToByteArray());
                 buffer.WriteInt(this.Experience);
                 buffer.WriteShort(this.Fame);
-                buffer.WriteInt();
+                buffer.WriteInt(); // Gacha exp
                 buffer.WriteInt(this.Map.MapleID);
                 buffer.WriteByte(this.SpawnPoint);
                 buffer.WriteInt();
@@ -1031,7 +1031,9 @@ namespace Loki.Maple.Characters
                     buffer.WriteInt();
                 }
 
-                buffer.Skip(12);
+                buffer.WriteInt(); // Pet #1
+                buffer.WriteInt(); // Pet #2
+                buffer.WriteInt(); // Pet #3
 
                 buffer.Flip();
                 return buffer.GetContent();
@@ -1050,13 +1052,16 @@ namespace Loki.Maple.Characters
                 writer.WriteString("-"); // TODO: Guild name.
                 writer.WriteString(string.Empty); // TODO: Alliance name.
                 writer.WriteByte();
-                writer.WriteShort(0); // Pets footer.
+                writer.WriteByte(0); // Pets footer.
+                writer.WriteByte(0); // Mount
                 writer.WriteByte(0); // TODO: Wishlist (this is the number of items in it.)
-                writer.WriteInt(1);
-                writer.WriteLong();
-                writer.WriteLong();
-                writer.WriteInt();
-                writer.WriteShort();
+                writer.WriteInt(1); // MonsterBook level
+                writer.WriteInt(); // Normal card
+                writer.WriteInt(); // Spacial card
+                writer.WriteInt(); // Total cards
+                writer.WriteInt(); // MonsterBook cover
+                writer.WriteInt(); // Medal
+                writer.WriteShort(0); // Medal quests (this is the number of items in it.)
                 writer.Flip();
 
                 return writer.GetContent();
@@ -1103,9 +1108,7 @@ namespace Loki.Maple.Characters
                 }
 
                 // TODO: Monster book.
-                //outPacket.WriteInt(); // Cover.
-                //outPacket.WriteByte();
-                outPacket.WriteShort(0); // Cards length.
+                outPacket.WriteShort(0);
 
                 outPacket.WriteShort(); // UNK: PQ Information?
                 outPacket.WriteShort();
@@ -1128,8 +1131,8 @@ namespace Loki.Maple.Characters
             this.IsInitialized = true;
 
             this.KeyMap.Send();
-            //this.UpdateBuddies(true);
-            //this.BuddyList.Update();
+            this.UpdateBuddies(true);
+            this.BuddyList.Update();
 
             // NOTE: Until we find out more about buffs in the SpawnPlayer packet
 
@@ -1138,7 +1141,7 @@ namespace Loki.Maple.Characters
                 loopBuff.Apply();
             }
 
-            /*this.BuddyList.LoadPendingBuddies();
+            this.BuddyList.LoadPendingBuddies();
 
             foreach (Buddy loopBuddy in this.BuddyList.pendingBuddies)
             {
@@ -1160,7 +1163,7 @@ namespace Loki.Maple.Characters
                 }
             }
 
-            this.BuddyList.pendingBuddies.Clear();*/
+            this.BuddyList.pendingBuddies.Clear();
         }
 
         public Packet GetCreatePacket()
@@ -1175,6 +1178,7 @@ namespace Loki.Maple.Characters
             spawn.WriteInt(this.ID);
             spawn.WriteByte(this.Level);
             spawn.WriteString(this.Name);
+            spawn.WriteShort();
 
             // If not in guild:
             spawn.WriteString(string.Empty);

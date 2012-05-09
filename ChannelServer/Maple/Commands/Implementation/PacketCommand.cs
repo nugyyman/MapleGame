@@ -12,7 +12,7 @@ namespace Loki.Maple.Commands.Implementation
     {
         public override bool IsRestricted { get { return true; } }
         public override string Name { get { return "packet"; } }
-        public override string Parameters { get { return "{ client | server } [ packet ]"; } }
+        public override string Parameters { get { return "{ client | server } packet"; } }
 
         public override void Execute(Character caller, string[] args)
         {

@@ -21,9 +21,13 @@ namespace Loki.Maple.Commands.Implementation
 
                 foreach (Command command in CommandFactory.Commands)
                 {
-                    if ((command.IsRestricted && caller.IsMaster) || !command.IsRestricted && !(command is HelpCommand))
+                    if (command.IsRestricted && caller.IsMaster)
                     {
                         caller.Notify(string.Format("    !{0} {1}", command.Name, command.Parameters.ClearFormatters()));
+                    }
+                    else if (!command.IsRestricted && !(command is HelpCommand))
+                    {
+                        caller.Notify(string.Format("    @{0} {1}", command.Name, command.Parameters.ClearFormatters()));
                     }
                 }
             }
