@@ -1078,10 +1078,7 @@ namespace Loki.Maple.Characters
                 outPacket.WriteByte(1);
                 outPacket.WriteShort();
 
-                for (int i = 0; i < 3; i++)
-                {
-                    outPacket.WriteInt(Application.Random.Next());
-                }
+                outPacket.WriteBytes(new CharacterRandom().ToByteArray());
 
                 outPacket.WriteLong(-1);
                 outPacket.WriteByte();
