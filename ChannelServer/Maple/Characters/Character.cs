@@ -536,6 +536,9 @@ namespace Loki.Maple.Characters
                         outPacket.WriteInt(); //equip bonus
                         outPacket.WriteInt(); //Internet Cafe Bonus
                         outPacket.WriteInt(); //Rainbow Week Bonus
+                        outPacket.WriteInt(); // Party Ring Bonus
+                        outPacket.WriteInt(); // Cake vs Pie Bonus
+                        outPacket.WriteByte();
 
                         this.Client.Send(outPacket);
                     }
@@ -1826,9 +1829,11 @@ namespace Loki.Maple.Characters
             }
 
             inPacket.ReadByte();
+            inPacket.Skip(8);
             byte amountAttackedDamaged = inPacket.ReadByte();
             byte amountAttacked = (byte)((amountAttackedDamaged >> 4) & 0xF);
             byte amountDamaged = (byte)(amountAttackedDamaged & 0xF);
+            inPacket.Skip(8);
             int skillID = inPacket.ReadInt();
 
             Skill skill = null;
@@ -1843,6 +1848,16 @@ namespace Loki.Maple.Characters
                 }
             }
 
+            inPacket.Skip(17);
+            if (type == AttackType.Magic)
+            {
+                inPacket.Skip(24);
+            }
+            else if (type == AttackType.Ranged)
+            {
+                inPacket.Skip(1);
+            }
+
             int charge;
 
             if (skillID == 2121001 || skillID == 2221001 || skillID == 2321001 || skillID == 5201002 || skillID == 5101004)
@@ -1851,34 +1866,30 @@ namespace Loki.Maple.Characters
             }
             else
             {
-                charge = 0;
+                charge = -1;
             }
 
-            inPacket.Skip(10);
+            byte display = inPacket.ReadByte();
+            byte direction = inPacket.ReadByte();
             byte stance = inPacket.ReadByte();
-
-            if (skillID == 4211006)
-            {
-                // TODO: Meso Explosion.
-            }
-
-            inPacket.ReadByte();
+            inPacket.Skip(4);
+            inPacket.ReadByte(); // Weapon
             byte speed = inPacket.ReadByte();
+            inPacket.Skip(8);
 
             if (type == AttackType.Ranged)
             {
-                inPacket.ReadByte();
-                byte direction = inPacket.ReadByte();
-                inPacket.Skip(7);
+                inPacket.Skip(5);
 
                 if (skillID == 3121004 || skillID == 3221001 || skillID == 5221004)
                 {
                     inPacket.Skip(4);
                 }
             }
-            else
+
+            if (skillID == 4211006)
             {
-                inPacket.Skip(4);
+                // TODO: Meso Explosion.
             }
 
             List<Mob> dead = new List<Mob>();
@@ -1895,7 +1906,7 @@ namespace Loki.Maple.Characters
                     {
                         outPacket.WriteInt(this.ID);
                         outPacket.WriteByte(amountAttackedDamaged);
-                        outPacket.WriteByte(0x5B);
+                        outPacket.WriteByte(10);
 
                         if (this.Skills.Contains(skillID))
                         {
@@ -1909,11 +1920,11 @@ namespace Loki.Maple.Characters
                             outPacket.WriteByte();
                         }
 
-                        outPacket.WriteByte();
-                        outPacket.WriteByte();
+                        outPacket.WriteByte(display);
+                        outPacket.WriteByte(direction);
                         outPacket.WriteByte(stance);
                         outPacket.WriteByte(speed);
-                        outPacket.WriteByte(0x0A);
+                        outPacket.WriteByte(0x32);
                         outPacket.WriteInt();
 
                         for (int i = 0; i < amountAttacked; i++)
@@ -1932,15 +1943,27 @@ namespace Loki.Maple.Characters
                                     outPacket.WriteInt(target.ObjectID);
                                     outPacket.WriteByte(0xFF);
 
+                                    if (skillID == 4211006)
+                                    {
+                                        // TODO: Meso Explosion
+                                    }
+
                                     uint totalDamage = 0;
 
                                     for (int j = 0; j < amountDamaged; j++)
                                     {
                                         uint value = inPacket.ReadUInt();
                                         totalDamage += value;
+
+                                        if (skillID != 4211006)
+                                        {
+                                            outPacket.WriteByte();
+                                        }
+
                                         outPacket.WriteUInt(value);
                                     }
 
+                                    inPacket.Skip(4);
 
                                     if (target.Damage(this, totalDamage))
                                     {
@@ -1951,8 +1974,6 @@ namespace Loki.Maple.Characters
                                     }
                                 }
                             }
-
-                            if (skillID != 5221004) inPacket.Skip(4);
                         }
                     }
 
@@ -1973,7 +1994,7 @@ namespace Loki.Maple.Characters
                 {
                     outPacket.WriteInt(this.ID);
                     outPacket.WriteByte(amountAttackedDamaged);
-                    outPacket.WriteByte(0x5B);
+                    outPacket.WriteByte(10);
 
                     if (this.Skills.Contains(skillID))
                     {
@@ -1987,11 +2008,11 @@ namespace Loki.Maple.Characters
                         outPacket.WriteByte();
                     }
 
-                    outPacket.WriteByte();
-                    outPacket.WriteByte();
+                    outPacket.WriteByte(display);
+                    outPacket.WriteByte(direction);
                     outPacket.WriteByte(stance);
                     outPacket.WriteByte(speed);
-                    outPacket.WriteByte(0x0A);
+                    outPacket.WriteByte(0x32);
                     outPacket.WriteInt(projectile);
 
                     for (int i = 0; i < amountAttacked; i++)
@@ -2018,6 +2039,8 @@ namespace Loki.Maple.Characters
                                     totalDamage += value;
                                     outPacket.WriteUInt(value);
                                 }
+                                
+                                inPacket.Skip(4);
 
                                 if (target.Damage(this, totalDamage))
                                 {
@@ -2025,8 +2048,6 @@ namespace Loki.Maple.Characters
                                 }
                             }
                         }
-
-                        if (skillID != 5221004) inPacket.Skip(4);
                     }
                     outPacket.WriteInt();
                     this.Map.Broadcast(this, outPacket);
@@ -2034,11 +2055,11 @@ namespace Loki.Maple.Characters
             }
             else if (type == AttackType.Magic)
             {
-                using (Packet outPacket = new Packet(MapleServerOperationCode.CloseRangeAttack))
+                using (Packet outPacket = new Packet(MapleServerOperationCode.MagicAttack))
                 {
                     outPacket.WriteInt(this.ID);
                     outPacket.WriteByte(amountAttackedDamaged);
-                    outPacket.WriteByte(0x5B);
+                    outPacket.WriteByte(10);
 
                     if (this.Skills.Contains(skillID))
                     {
@@ -2052,11 +2073,11 @@ namespace Loki.Maple.Characters
                         outPacket.WriteByte();
                     }
 
-                    outPacket.WriteByte();
-                    outPacket.WriteByte();
+                    outPacket.WriteByte(display);
+                    outPacket.WriteByte(direction);
                     outPacket.WriteByte(stance);
                     outPacket.WriteByte(speed);
-                    outPacket.WriteByte(0x0A);
+                    outPacket.WriteByte(0x32);
                     outPacket.WriteInt();
 
                     for (int i = 0; i < amountAttacked; i++)
@@ -2084,6 +2105,7 @@ namespace Loki.Maple.Characters
                                     outPacket.WriteUInt(value);
                                 }
 
+                                inPacket.Skip(4);
 
                                 if (target.Damage(this, totalDamage))
                                 {
@@ -2091,11 +2113,9 @@ namespace Loki.Maple.Characters
                                 }
                             }
                         }
-
-                        if (skillID != 5221004) inPacket.Skip(4);
                     }
 
-                    if (skillID == 2121001 || skillID == 2221001 || skillID == 2321001)
+                    if (charge != -1)
                     {
                         outPacket.WriteInt(charge);
                     }

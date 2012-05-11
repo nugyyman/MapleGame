@@ -80,6 +80,7 @@
     <Compile Include="Maple\Commands\Implementation\ClearCommand.cs" />
     <Compile Include="Maple\Commands\Implementation\DexCommand.cs" />
     <Compile Include="Maple\Commands\Implementation\IntCommand.cs" />
+    <Compile Include="Maple\Commands\Implementation\ItemVacCommand.cs" />
     <Compile Include="Maple\Commands\Implementation\LukCommand.cs" />
     <Compile Include="Maple\Commands\Implementation\MasterMaxSkills.cs" />
     <Compile Include="Maple\Commands\Implementation\PacketCommand.cs" />

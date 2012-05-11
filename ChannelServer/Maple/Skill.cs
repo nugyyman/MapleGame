@@ -319,7 +319,7 @@ namespace Loki.Maple
                     using (Packet outPacket = new Packet(MapleServerOperationCode.Cooldown))
                     {
                         outPacket.WriteInt(this.MapleID);
-                        outPacket.WriteShort((short)this.RemainingCooldownSeconds);
+                        outPacket.WriteInt((short)this.RemainingCooldownSeconds);
 
                         this.Character.Client.Send(outPacket);
                     }
@@ -329,7 +329,7 @@ namespace Loki.Maple
                         using (Packet outPacket = new Packet(MapleServerOperationCode.Cooldown))
                         {
                             outPacket.WriteInt(this.MapleID);
-                            outPacket.WriteShort(0);
+                            outPacket.WriteInt(0);
 
                             this.Character.Client.Send(outPacket);
                         }
