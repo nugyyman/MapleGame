@@ -68,7 +68,7 @@
         SkillMacro = 0x8E,
         WarpToMap = 0x8F,
         MTSOpen = 0x90,
-        CSOpen = 0x91,
+        CashShopOpen = 0x91,
         ForcedMapEquip = 0x97,
         Whisper = 0x99,
         SpouseChat = 0x9B,
@@ -156,7 +156,9 @@
         FredrickMessage = 0x185,
         FredrickOperation = 0x186,
         Messanger = 0x188,
-        PlayerInteraction = 0x129,
+        PlayerInteraction = 0x189,
+        CashShopUpdate = 0x193,
+        CashShopOperation = 0x194,
         KeyMap = 0x1A2,
         ViciousHammer = 0x1BF
     }

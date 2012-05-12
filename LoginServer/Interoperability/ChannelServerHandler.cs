@@ -147,6 +147,14 @@ namespace Loki.Interoperability
                 case InteroperabilityOperationCode.IsMasterCheck:
                     this.CheckIsMaster(inPacket);
                     break;
+
+                case InteroperabilityOperationCode.GetCashRequest:
+                    this.SendCash(inPacket);
+                    break;
+
+                case InteroperabilityOperationCode.SetCashRequest:
+                    this.SetCash(inPacket);
+                    break;
             }
         }
 
@@ -285,6 +293,56 @@ namespace Loki.Interoperability
 
                 this.Send(outPacket);
             }
+        }
+
+        public void SendCash(Packet inPacket)
+        {
+            int accountID = inPacket.ReadInt();
+
+            using (Packet outPacket = new Packet(InteroperabilityOperationCode.GetCashResponse))
+            {
+                outPacket.WriteInt(accountID);
+
+                switch (inPacket.ReadByte())
+                {
+                    case 1:
+                        outPacket.WriteInt(Database.Fetch("accounts", "CardNX", "ID = '{0}'", accountID));
+                        break;
+
+                    case 2:
+                        outPacket.WriteInt(Database.Fetch("accounts", "MaplePoints", "ID = '{0}'", accountID));
+                        break;
+
+                    case 3:
+                        outPacket.WriteInt(Database.Fetch("accounts", "PaypalNX", "ID = '{0}'", accountID));
+                        break;
+                }
+
+                this.Send(outPacket);
+            }
+        }
+
+        public void SetCash(Packet inPacket)
+        {
+            int accountID = inPacket.ReadInt();
+            dynamic datum = new Datum("accounts");
+
+            switch (inPacket.ReadByte())
+            {
+                case 1:
+                    datum.CardNX = inPacket.ReadInt();
+                    break;
+
+                case 2:
+                    datum.MaplePoints = inPacket.ReadInt();
+                    break;
+
+                case 3:
+                    datum.PaypalNX = inPacket.ReadInt();
+                    break;
+            }
+
+            datum.Update("ID = '{0}'", accountID);
         }
     }
 }

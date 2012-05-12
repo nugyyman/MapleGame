@@ -218,6 +218,10 @@ namespace Loki.Net
                 case MapleClientOperationCode.UsePotentialScroll:
                     this.Character.UsePotentialScroll(inPacket);
                     break;
+
+                case MapleClientOperationCode.EnterCashShop:
+                    this.Character.CashShop.Send();
+                    break;
             }
         }
 

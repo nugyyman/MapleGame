@@ -17,6 +17,9 @@
         ChannelPortResponse,
         LoadInformationRequest,
         LoadInformationResponse,
-        IsMasterCheck
+        IsMasterCheck,
+        GetCashRequest,
+        GetCashResponse,
+        SetCashRequest
     }
 }

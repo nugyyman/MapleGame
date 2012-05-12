@@ -146,6 +146,10 @@ namespace Loki.Interoperability
                 case InteroperabilityOperationCode.IsMasterCheck:
                     this.IsMasterPool.Enqueue(inPacket.ReadInt(), inPacket.ReadBool());
                     break;
+
+                case InteroperabilityOperationCode.GetCashResponse:
+                    this.CashPool.Enqueue(inPacket.ReadInt(), inPacket.ReadInt());
+                    break;
             }
         }
 
@@ -355,6 +359,31 @@ namespace Loki.Interoperability
             }
 
             return this.IsMasterPool.Dequeue(accountID);
+        }
+
+        private PendingKeyedQueue<int, int> CashPool = new PendingKeyedQueue<int, int>();
+
+        public int GetCash(int accountID, byte type)
+        {
+            using (Packet outPacket = new Packet(InteroperabilityOperationCode.GetCashRequest))
+            {
+                outPacket.WriteInt(accountID);
+                outPacket.WriteByte(type);
+                this.Send(outPacket);
+            }
+
+            return this.CashPool.Dequeue(accountID);
+        }
+
+        public void SetCash(int accountID, byte type, int cash)
+        {
+            using (Packet outPacket = new Packet(InteroperabilityOperationCode.SetCashRequest))
+            {
+                outPacket.WriteInt(accountID);
+                outPacket.WriteByte(type);
+                outPacket.WriteInt(cash);
+                this.Send(outPacket);
+            }
         }
     }
 }

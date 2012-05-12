@@ -8,6 +8,7 @@ using Loki.Maple.Interaction;
 using Loki.Maple.Life;
 using Loki.Maple.Maps;
 using Loki.Net;
+using Loki.Maple.CashShop;
 
 namespace Loki.Maple.Characters
 {
@@ -21,9 +22,10 @@ namespace Loki.Maple.Characters
         public CharacterBuffs Buffs { get; private set; }
         public CharacterKeyMap KeyMap { get; set; }
         public CharacterBuddyList BuddyList { get; private set; }
+        public CharacterSPTable SPTable { get; private set; }
+        public CharacterCashShop CashShop { get; set; }
         public ControlledMobs ControlledMobs { get; private set; }
         public ControlledNpcs ControlledNpcs { get; private set; }
-        public CharacterSPTable SPTable { get; private set; }
         public Trade Trade { get; set; }
         public Omok Omok { get; set; }
         public PlayerShop PlayerShop { get; set; }
@@ -757,6 +759,42 @@ namespace Loki.Maple.Characters
             }
         }
 
+        public int CardNX
+        {
+            get
+            {
+                return ChannelServer.LoginServerConnection.GetCash(this.AccountID, 1);
+            }
+            set
+            {
+                ChannelServer.LoginServerConnection.SetCash(this.AccountID, 1, value);
+            }
+        }
+
+        public int MaplePoints
+        {
+            get
+            {
+                return ChannelServer.LoginServerConnection.GetCash(this.AccountID, 2);
+            }
+            set
+            {
+                ChannelServer.LoginServerConnection.SetCash(this.AccountID, 2, value);
+            }
+        }
+
+        public int PaypalNX
+        {
+            get
+            {
+                return ChannelServer.LoginServerConnection.GetCash(this.AccountID, 3);
+            }
+            set
+            {
+                ChannelServer.LoginServerConnection.SetCash(this.AccountID, 3, value);
+            }
+        }
+
         private bool Assigned { get; set; }
 
         public Character(int id = 0, ChannelClientHandler client = null)
@@ -771,6 +809,7 @@ namespace Loki.Maple.Characters
             this.KeyMap = new CharacterKeyMap(this);
             this.BuddyList = new CharacterBuddyList(this);
             this.SPTable = new CharacterSPTable(this);
+            this.CashShop = new CharacterCashShop(this);
 
             this.Position = new Point(0, 0);
             this.ControlledMobs = new ControlledMobs(this);
@@ -823,6 +862,7 @@ namespace Loki.Maple.Characters
             this.KeyMap.Load();
             this.BuddyList.Load();
             this.SPTable.Load();
+            this.CashShop.Load();
         }
 
         public void Save()
@@ -884,6 +924,7 @@ namespace Loki.Maple.Characters
             this.KeyMap.Save();
             this.BuddyList.Save();
             this.SPTable.Save();
+            this.CashShop.Save();
 
             Log.Inform("Saved character '{0}' to database.", this.Name);
         }
@@ -897,6 +938,7 @@ namespace Loki.Maple.Characters
             this.KeyMap.Delete();
             this.BuddyList.Delete();
             this.SPTable.Delete();
+            this.CashShop.Delete();
 
             Database.Delete("characters", "ID = '{0}'", this.ID);
 
@@ -1071,6 +1113,44 @@ namespace Loki.Maple.Characters
             }
         }
 
+        public byte[] DataToByteArray()
+        {
+            using (ByteBuffer buffer = new ByteBuffer())
+            {
+                buffer.WriteLong(-1);
+                buffer.WriteByte();
+                buffer.WriteByte();
+                buffer.WriteBytes(this.StatisticsToByteArray());
+                buffer.WriteByte(this.MaxBuddies);
+                buffer.WriteByte();
+                buffer.WriteShort();
+                buffer.WriteBytes(this.Items.ToByteArray());
+                buffer.WriteBytes(this.Skills.ToByteArray());
+                buffer.WriteBytes(this.Quests.ToByteArray());
+
+                // TODO: Rings.
+                buffer.WriteShort();
+                buffer.WriteShort();
+                buffer.WriteShort();
+                buffer.WriteShort(); // Somehow ring footer.
+
+                for (int i = 0; i < 28; i++)
+                {
+                    buffer.WriteBytes(PacketConstants.Character);
+                }
+
+                // TODO: Monster book.
+                buffer.WriteShort(0);
+
+                buffer.WriteShort(); // UNK: PQ Information?
+                buffer.WriteShort();
+                buffer.WriteShort();
+
+                buffer.Flip();
+                return buffer.GetContent();
+            }
+        }
+
         public void Initialize()
         {
             using (Packet outPacket = new Packet(MapleServerOperationCode.WarpToMap))
@@ -1088,35 +1168,7 @@ namespace Loki.Maple.Characters
 
                 outPacket.WriteBytes(new CharacterRandom().ToByteArray());
 
-                outPacket.WriteLong(-1);
-                outPacket.WriteByte();
-                outPacket.WriteByte();
-                outPacket.WriteBytes(this.StatisticsToByteArray());
-                outPacket.WriteByte(this.MaxBuddies);
-                outPacket.WriteByte();
-                outPacket.WriteShort();
-                outPacket.WriteBytes(this.Items.ToByteArray());
-                outPacket.WriteBytes(this.Skills.ToByteArray());
-                outPacket.WriteBytes(this.Quests.ToByteArray());
-
-                // TODO: Rings.
-                outPacket.WriteShort();
-                outPacket.WriteShort();
-                outPacket.WriteShort();
-                outPacket.WriteShort(); // Somehow ring footer.
-
-                for (int i = 0; i < 28; i++)
-                {
-                    outPacket.WriteBytes(PacketConstants.Character);
-                }
-
-                // TODO: Monster book.
-                outPacket.WriteShort(0);
-
-                outPacket.WriteShort(); // UNK: PQ Information?
-                outPacket.WriteShort();
-                outPacket.WriteShort();
-
+                outPacket.WriteBytes(this.DataToByteArray());
                 outPacket.WriteInt(0);
                 outPacket.WriteInt(0); // Lucky reward after long unactivity; Received/do not show = 1; not received/show = 0
                 outPacket.WriteInt(30100003); // SN of cash item #1
