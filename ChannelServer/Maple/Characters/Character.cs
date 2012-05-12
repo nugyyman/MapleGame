@@ -1099,7 +1099,7 @@ namespace Loki.Maple.Characters
                 writer.WriteByte();
                 writer.WriteByte(0); // Pets footer.
                 writer.WriteByte(0); // Mount
-                writer.WriteByte(0); // TODO: Wishlist (this is the number of items in it.)
+                writer.WriteBytes(this.CashShop.WishList.ToByteArray());
                 writer.WriteInt(1); // MonsterBook level
                 writer.WriteInt(); // Normal card
                 writer.WriteInt(); // Spacial card

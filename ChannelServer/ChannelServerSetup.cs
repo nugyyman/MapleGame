@@ -205,6 +205,14 @@ namespace Loki
 							  `AvailableSP` tinyint(3) unsigned NOT NULL DEFAULT '0',
 							  PRIMARY KEY (`ID`)
 							) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+							DROP TABLE IF EXISTS `wishlists`;
+							CREATE TABLE  `wishlists` (
+							  `ID` int(11) NOT NULL AUTO_INCREMENT,
+							  `CharacterID` int(11) NOT NULL,
+							  `SerialNumber` int(11) NOT NULL,
+							  PRIMARY KEY (`ID`)
+							) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 						", databaseSchema);
 
                     Log.Inform("Database '{0}' created.", databaseSchema);

@@ -220,7 +220,15 @@ namespace Loki.Net
                     break;
 
                 case MapleClientOperationCode.EnterCashShop:
-                    this.Character.CashShop.Send();
+                    this.Character.CashShop.Enter();
+                    break;
+
+                case MapleClientOperationCode.CheckCash:
+                    this.Character.CashShop.ShowCash();
+                    break;
+
+                case MapleClientOperationCode.CashShopOperation:
+                    CashShopOperation.Handle(this.Character, inPacket);
                     break;
             }
         }

@@ -4,10 +4,11 @@ using System.Linq;
 using System.Text;
 using Loki.Maple.Characters;
 using Loki.Net;
+using Loki.Data;
 
 namespace Loki.Maple.CashShop
 {
-    public class CashInventory : List<Item>
+    public class CashInventory : List<CashItem>
     {
         public Character Parent { get; private set; }
 
@@ -35,16 +36,18 @@ namespace Loki.Maple.CashShop
         {
             using (Packet outPacket = new Packet(MapleServerOperationCode.CashShopOperation))
             {
-                outPacket.WriteByte(0x4B);
+                outPacket.WriteByte(0x58);
                 outPacket.WriteShort((short)this.Count);
 
-                foreach(Item cashItem in this)
+                foreach(CashItem cashItem in this)
                 {
-                    outPacket.WriteBytes(cashItem.ToByteArray());
+                    //outPacket.WriteBytes(cashItem.ToByteArray(this.Parent.AccountID));
                 }
 
                 outPacket.WriteShort(); // Storage slots
                 outPacket.WriteShort(); // Character slots
+                outPacket.WriteShort();
+                outPacket.WriteShort();
 
                 this.Parent.Client.Send(outPacket);
             }

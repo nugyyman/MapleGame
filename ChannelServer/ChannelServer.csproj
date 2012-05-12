@@ -66,6 +66,8 @@
     <Compile Include="Maple\Buddy.cs" />
     <Compile Include="Maple\Buff.cs" />
     <Compile Include="Maple\CashShop\CashInventory.cs" />
+    <Compile Include="Maple\CashShop\CashItem.cs" />
+    <Compile Include="Maple\CashShop\CashShopOperation.cs" />
     <Compile Include="Maple\CashShop\CharacterCashShop.cs" />
     <Compile Include="Maple\CashShop\UseCashItems.cs" />
     <Compile Include="Maple\CashShop\WishList.cs" />
@@ -101,6 +103,7 @@
     <Compile Include="Maple\Commands\Implementation\MasterCommand.cs" />
     <Compile Include="Maple\Commands\Implementation\MesoCommand.cs" />
     <Compile Include="Maple\Commands\Implementation\SearchCommand.cs" />
+    <Compile Include="Maple\Data\CachedCashItems.cs" />
     <Compile Include="Maple\Data\CharacterCreationData.cs" />
     <Compile Include="Maple\Data\ForbiddenNames.cs" />
     <Compile Include="Maple\Shortcut.cs" />

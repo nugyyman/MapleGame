@@ -38,7 +38,7 @@ namespace Loki.Maple.CashShop
             this.WishList.Save();
         }
 
-        public void Send()
+        public void Enter()
         {
             using (Packet outPacket = new Packet(MapleServerOperationCode.CashShopOpen))
             {
@@ -58,7 +58,7 @@ namespace Loki.Maple.CashShop
             #region // TODO: Gifts
             using (Packet outPacket = new Packet(MapleServerOperationCode.CashShopOperation))
             {
-                outPacket.WriteByte(0x4D);
+                outPacket.WriteByte(0x5A);
                 outPacket.WriteShort(0);
 
                 this.Parent.Client.Send(outPacket);

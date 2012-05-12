@@ -17,6 +17,7 @@ namespace Loki.Maple.Data
         public static CachedItems CachedItems { get; private set; }
         public static CachedSkills CachedSkills { get; private set; }
         public static CachedMobs CachedMobs { get; private set; }
+        public static CachedCashItems CachedCashItems { get; private set; }
         public static AvailableStyles AvailableStyles { get; private set; }
         public static WorldCharactersHelper Characters { get; private set; }
         public static WorldNpcsHelper Npcs { get; private set; }
@@ -52,6 +53,11 @@ namespace Loki.Maple.Data
                 if (World.CachedMobs != null)
                 {
                     World.CachedMobs.Clear();
+                }
+
+                if (World.CachedCashItems != null)
+                {
+                    World.CachedCashItems.Clear();
                 }
 
                 if (World.Maps != null)
@@ -99,6 +105,7 @@ namespace Loki.Maple.Data
                 World.CachedMobs = new CachedMobs();
                 World.CachedItems = new CachedItems();
                 World.CachedSkills = new CachedSkills();
+                World.CachedCashItems = new CachedCashItems();
                 World.Maps = new WorldMaps();
                 World.Quests = new QuestData();
                 World.CharacterCreationData = new CharacterCreationData();
