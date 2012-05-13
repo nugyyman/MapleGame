@@ -736,25 +736,6 @@ namespace Loki.Maple.Characters
 
             return 0;
         }
-
-        public int CountCashItems()
-        {
-            int count = 0;
-
-            foreach (Item item in this)
-            {
-                if (item.UniqueID > 0)
-                {
-                    count++;
-                }
-            }
-
-            foreach (CashItem item in this.Parent.CashShop.CashInventory)
-            {
-                count++;
-            }
-            return count;
-        }
     }
 
     public enum EquippedQueryMode // TODO: Move elsewhere. Maybe constants.

@@ -12,18 +12,23 @@ namespace Loki.Maple.CashShop
     {
         public static void Handle(Character player, Packet inPacket)
         {
+            if (!player.CashShop.Open)
+            {
+                return;
+            }
+
             CharacterCashShop cs = player.CashShop;
             byte action = inPacket.ReadByte();
             CashItem cashItem = null;
             Item item = null;
-            int uniqueID;
+            int uniqueID, cash;
 
             switch (action)
             {
                 case 0x03: // Buy item
                 case 0x20: // Buy packege
                     inPacket.Skip(1);
-                    int cash = inPacket.ReadInt();
+                    cash = inPacket.ReadInt();
                     try
                     {
                         cashItem = new CashItem(inPacket.ReadInt());
@@ -108,6 +113,33 @@ namespace Loki.Maple.CashShop
                     break;
 
                 case 0x06: // Buy inventory slots
+                    inPacket.Skip(1);
+                    cash = inPacket.ReadInt();
+
+                    if (inPacket.ReadByte() == 0)
+                    {
+                        if (player.GetCash((byte)cash) < 4000)
+                        {
+                            return;
+                        }
+
+                        byte type = inPacket.ReadByte();
+
+                        if (player.GainInventorySlots((ItemType)type, 4, false))
+                        {
+                            using (Packet outPacket = new Packet(MapleServerOperationCode.CashShopOperation))
+                            {
+                                outPacket.WriteByte(0x6D);
+                                outPacket.WriteByte(type);
+                                outPacket.WriteShort(player.Items.MaxSlots[(ItemType)type]);
+
+                                player.Client.Send(outPacket);
+                            }
+
+                            player.GainCash((byte)cash, -4000);
+                            player.CashShop.ShowCash();
+                        }
+                    }
                     break;
 
                 case 0x07: // Buy storage slots
@@ -172,27 +204,7 @@ namespace Loki.Maple.CashShop
 
         static bool CanBuy(CashItem cashItem, Character player, int cash)
         {
-            bool itemOk = cashItem != null, price = false;
-
-            if (itemOk)
-            {
-                switch (cash)
-                {
-                    case 1:
-                        price = player.CardNX >= cashItem.Price;
-                        break;
-
-                    case 2:
-                        price = player.MaplePoints >= cashItem.Price;
-                        break;
-
-                    case 4:
-                        price = player.PaypalNX >= cashItem.Price;
-                        break;
-                }
-            }
-
-            return itemOk && price;
+            return cashItem != null && player.GetCash((byte)cash) >= cashItem.Price;
         }
     }
 }

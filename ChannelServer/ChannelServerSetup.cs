@@ -228,9 +228,9 @@ namespace Loki
 
 							DROP TABLE IF EXISTS `uniqueids`;
 							CREATE TABLE `uniqueids` (
-							  `ID` int(11) NOT NULL AUTO_INCREMENT,
-							  PRIMARY KEY (`ID`)
+							  `ID` int(11) NOT NULL DEFAULT '0'
 							) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+							INSERT INTO `uniqueids` VALUES (0);
 						", databaseSchema);
 
                     Log.Inform("Database '{0}' created.", databaseSchema);

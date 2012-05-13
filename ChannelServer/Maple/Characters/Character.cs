@@ -795,6 +795,22 @@ namespace Loki.Maple.Characters
             }
         }
 
+        public int GetCash(byte cash)
+        {
+            switch (cash)
+            {
+                case 1:
+                    return this.CardNX;
+
+                case 2:
+                    return this.MaplePoints;
+
+                case 4:
+                    return this.PaypalNX;
+            }
+            return 0;
+        }
+
         public void GainCash(byte type, int cash)
         {
             switch (type)
@@ -813,6 +829,27 @@ namespace Loki.Maple.Characters
             }
         }
 
+        public bool GainInventorySlots(ItemType type, byte slots, bool update)
+        {
+            if (this.Items.MaxSlots[type] + slots <= 96)
+            {
+                this.Items.MaxSlots[type] += slots;
+
+                if (update)
+                {
+                    using (Packet outPacket = new Packet(MapleServerOperationCode.UpdateInventorySlots))
+                    {
+                        outPacket.WriteByte((byte)type);
+                        outPacket.WriteByte(this.Items.MaxSlots[type]);
+
+                        this.Client.Send(outPacket);
+                    }
+                }
+                return true;
+            }
+            return false;
+        }
+
         private bool Assigned { get; set; }
 
         public Character(int id = 0, ChannelClientHandler client = null)
@@ -820,7 +857,7 @@ namespace Loki.Maple.Characters
             this.ID = id;
             this.Client = client;
 
-            this.Items = new CharacterItems(this, 24, 48, 24, 24); // TODO: Find the actual max slots defaults.
+            this.Items = new CharacterItems(this, 24, 24, 24, 24); // TODO: Find the actual max slots defaults.
             this.Skills = new CharacterSkills(this);
             this.Quests = new CharacterQuests(this);
             this.Buffs = new CharacterBuffs(this);

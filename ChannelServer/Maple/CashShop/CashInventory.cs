@@ -108,16 +108,18 @@ namespace Loki.Maple.CashShop
 
         public int GenerateUniqueID()
         {
-            dynamic datum = new Datum("uniqueids");
-            datum.Insert();
+            int uniqueID = 0;
 
-            int count = 0;
-
-            foreach (dynamic uniqueID in new Datums("uniqueids").Populate())
+            foreach (dynamic id in new Datums("uniqueids").Populate())
             {
-                count++;
+                uniqueID = id.ID + 1;
             }
-            return count;
+
+            dynamic datum = new Datum("uniqueids");
+            datum.ID = uniqueID;
+            datum.Update("ID = '{0}'", uniqueID - 1);
+
+            return uniqueID;
         }
     }
 }
