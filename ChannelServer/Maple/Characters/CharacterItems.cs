@@ -5,6 +5,7 @@ using Loki.Data;
 using Loki.IO;
 using Loki.Maple.Maps;
 using Loki.Net;
+using Loki.Maple.CashShop;
 
 namespace Loki.Maple.Characters
 {
@@ -459,6 +460,32 @@ namespace Loki.Maple.Characters
             }
         }
 
+        public Item this[int uniqueId, ItemType type]
+        {
+            get
+            {
+                foreach (Item item in this)
+                {
+                    if (item.Type == type && item.UniqueID == uniqueId)
+                        return item;
+                }
+                return null;
+            }
+        }
+
+        public Item this[int uniqueId]
+        {
+            get
+            {
+                foreach (Item item in this)
+                {
+                    if (item.UniqueID == uniqueId)
+                        return item;
+                }
+                return null;
+            }
+        }
+
         public IEnumerable<Item> this[ItemType type]
         {
             get
@@ -513,7 +540,7 @@ namespace Loki.Maple.Characters
                 buffer.WriteByte(this.MaxSlots[ItemType.Setup]);
                 buffer.WriteByte(this.MaxSlots[ItemType.Etcetera]);
                 buffer.WriteByte(this.MaxSlots[ItemType.Cash]);
-                buffer.WriteBytes(new byte[] { 0, (byte)0x40, (byte)0xE0, (byte)0xFD, (byte)0x3B, (byte)0x37, (byte)0x4F, 1 });
+                buffer.WriteBytes(0, (byte)0x40, (byte)0xE0, (byte)0xFD, (byte)0x3B, (byte)0x37, (byte)0x4F, 1);
 
                 foreach (Item item in this.GetEquipped(EquippedQueryMode.Normal))
                 {
@@ -708,6 +735,25 @@ namespace Loki.Maple.Characters
             }
 
             return 0;
+        }
+
+        public int CountCashItems()
+        {
+            int count = 0;
+
+            foreach (Item item in this)
+            {
+                if (item.UniqueID > 0)
+                {
+                    count++;
+                }
+            }
+
+            foreach (CashItem item in this.Parent.CashShop.CashInventory)
+            {
+                count++;
+            }
+            return count;
         }
     }
 

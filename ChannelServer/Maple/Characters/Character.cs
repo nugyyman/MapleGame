@@ -795,6 +795,24 @@ namespace Loki.Maple.Characters
             }
         }
 
+        public void GainCash(byte type, int cash)
+        {
+            switch (type)
+            {
+                case 1:
+                    this.CardNX += cash;
+                    break;
+
+                case 2:
+                    this.MaplePoints += cash;
+                    break;
+
+                case 4:
+                    this.PaypalNX += cash;
+                    break;
+            }
+        }
+
         private bool Assigned { get; set; }
 
         public Character(int id = 0, ChannelClientHandler client = null)
@@ -1438,11 +1456,21 @@ namespace Loki.Maple.Characters
 
         public void ChangeMap(Packet inPacket)
         {
+            if (this.CashShop.Open)
+            {
+                this.CashShop.Open = false;
+                this.Save();
+                this.Client.ChangeChannel(this.Channel);
+                return;
+            }
+
             ChangeMapMode mode = (ChangeMapMode)inPacket.ReadByte();
             int destinationMapId = inPacket.ReadInt();
             string portalLabel = inPacket.ReadString();
             inPacket.ReadByte();
             bool wheel = inPacket.ReadShort() > 0;
+            destinationMapId = this.Map.MapleID;
+            portalLabel = null;
 
             if (!this.IsAlive && this.IsMaster)
             {
@@ -3212,6 +3240,21 @@ namespace Loki.Maple.Characters
             }
 
             this.UpdateLook();
+        }
+
+        public void EnterCashShop()
+        {
+            if (this.CashShop.Open)
+            {
+                return;
+            }
+
+            this.CashShop.Open = true;
+            this.Save();
+            int mapId = this.Map.MapleID;
+            this.Map.Characters.Remove(this);
+            this.Map = World.Maps[mapId];
+            this.CashShop.Enter();
         }
     }
 }

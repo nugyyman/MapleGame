@@ -128,6 +128,10 @@ namespace Loki.Maple
         public short CMorph { get; private set; }
         public string CDropUp { get; private set; }
 
+        // Cash items data
+        public int SerialNumber { get; set; }
+        public int UniqueID { get; set; }
+
         public Character Character
         {
             get
@@ -493,6 +497,9 @@ namespace Loki.Maple
             this.SalePrice = this.CachedReference.SalePrice;
             this.RequiredLevel = this.CachedReference.RequiredLevel;
 
+            this.SerialNumber = this.CachedReference.SerialNumber;
+            this.UniqueID = this.CachedReference.UniqueID;
+
             if (this.Type == ItemType.Equipment)
             {
                 this.PreventsSlipping = this.CachedReference.PreventsSlipping;
@@ -696,6 +703,8 @@ namespace Loki.Maple
                 this.IsScisored = false;
                 this.SalePrice = itemDatum.price;
                 this.RequiredLevel = itemDatum.min_level;
+                this.SerialNumber = 0;
+                this.UniqueID = 0;
             }
             else
             {
@@ -715,6 +724,9 @@ namespace Loki.Maple
                 this.IsScisored = itemDatum.IsScisored;
                 this.SalePrice = this.CachedReference.SalePrice;
                 this.RequiredLevel = this.CachedReference.RequiredLevel;
+
+                this.SerialNumber = itemDatum.SerialNumber;
+                this.UniqueID = itemDatum.UniqueID;
 
                 if (this.Type == ItemType.Equipment)
                 {
@@ -848,6 +860,8 @@ namespace Loki.Maple
             datum.Potential2 = this.Potential2;
             datum.Potential3 = this.Potential3;
             datum.PotentialLines = this.PotentialLines;
+            datum.SerialNumber = this.SerialNumber;
+            datum.UniqueID = this.UniqueID;
 
             if (this.Assigned)
             {
@@ -1157,7 +1171,7 @@ namespace Loki.Maple
 
                 if (this.IsCash)
                 {
-                    buffer.WriteLong(1);
+                    buffer.WriteLong(this.UniqueID);
                 }
 
                 // TODO: This is expiration time: Implement it.
@@ -1189,28 +1203,23 @@ namespace Loki.Maple
                     buffer.WriteString(this.Creator);
                     buffer.WriteShort(this.Flags);
                     buffer.WriteByte();
+                    buffer.WriteByte(); // TODO: Item level. Timeless has it.
+                    buffer.WriteInt(); // TODO: Item EXP. Timeless has it.
+                    buffer.WriteInt(-1);
+                    buffer.WriteInt(this.ViciousHammerApplied);
+                    buffer.WriteByte((byte)this.Potential); // 0/4 = No potential, 1/2/3 = Hidden potential, 5 = Rare, 6 = Epic, 7 = Unique
+                    buffer.WriteByte(this.Stars); // stars
+                    buffer.WriteShort(this.Potential1); // potential stat 1
+                    buffer.WriteShort(this.Potential2); // potential stat 2
+                    buffer.WriteShort(this.Potential3); // potential stat 3
+                    buffer.WriteShort(); // potential stat 4 ?
+                    buffer.WriteShort(); // potential stat 5 ?
 
-                    if (!this.IsEquippedCash)
+                    if (!this.IsEquippedCash && !this.IsCash)
                     {
-                        buffer.WriteByte(); // TODO: Item level. Timeless has it.
-                        buffer.WriteShort(); // UNK.
-                        buffer.WriteShort(); // TODO: Item EXP. Timeless has it.
-                        buffer.WriteInt(-1);
-                        buffer.WriteInt(this.ViciousHammerApplied);
-                        buffer.WriteByte((byte)this.Potential); // 0/4 = No potential, 1/2/3 = Hidden potential, 5 = Rare, 6 = Epic, 7 = Unique
-                        buffer.WriteByte(this.Stars); // stars
-                        buffer.WriteShort(this.Potential1); // potential stat 1
-                        buffer.WriteShort(this.Potential2); // potential stat 2
-                        buffer.WriteShort(this.Potential3); // potential stat 3
-                        buffer.WriteShort(); // potential stat 4 ?
-                        buffer.WriteShort(); // potential stat 5 ?
                         buffer.WriteLong(-1);
                     }
-                    else
-                    {
-                        buffer.WriteBytes(0x65, 0x0A, 0x28, 0x27, 0xF4, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x40, 0xE0, 0xFD, 0x3B, 0x37, 0x4F, 0x01);
-                    }
-                    
+
                     buffer.WriteBytes(0x00, 0x40, 0xE0, 0xFD, 0x3B, 0x37, 0x4F, 0x01);
                     buffer.WriteInt(-1);
                 }
@@ -1222,7 +1231,7 @@ namespace Loki.Maple
 
                     if (this.IsRechargeable)
                     {
-                        buffer.WriteBytes(new byte[] { 0x02, 0x00, 0x00, 0x00, 0x54, 0x00, 0x00, 0x34 });
+                        buffer.WriteBytes(0x02, 0x00, 0x00, 0x00, 0x54, 0x00, 0x00, 0x34);
                     }
                 }
 

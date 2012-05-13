@@ -325,6 +325,7 @@ namespace Loki.Interoperability
         public void SetCash(Packet inPacket)
         {
             int accountID = inPacket.ReadInt();
+
             dynamic datum = new Datum("accounts");
 
             switch (inPacket.ReadByte())

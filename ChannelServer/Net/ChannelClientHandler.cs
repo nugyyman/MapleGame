@@ -220,7 +220,7 @@ namespace Loki.Net
                     break;
 
                 case MapleClientOperationCode.EnterCashShop:
-                    this.Character.CashShop.Enter();
+                    this.Character.EnterCashShop();
                     break;
 
                 case MapleClientOperationCode.CheckCash:
@@ -242,6 +242,19 @@ namespace Loki.Net
                 outPacket.WriteBool(true); // UNK: What does false do?
                 outPacket.WriteBytes(ChannelServer.RemoteEndPoint.Address.GetAddressBytes());
                 outPacket.WriteShort(ChannelServer.LoginServerConnection.GetChannelPort(channelID));
+
+                this.Send(outPacket);
+            }
+        }
+
+        public void ChangeChannel(byte channelID)
+        {
+
+            using (Packet outPacket = new Packet(MapleServerOperationCode.ChangeChannel))
+            {
+                outPacket.WriteBool(true); // UNK: What does false do?
+                outPacket.WriteBytes(ChannelServer.RemoteEndPoint.Address.GetAddressBytes());
+                outPacket.WriteShort(ChannelServer.LoginServerConnection.GetChannelPort((byte)(channelID - 1)));
 
                 this.Send(outPacket);
             }

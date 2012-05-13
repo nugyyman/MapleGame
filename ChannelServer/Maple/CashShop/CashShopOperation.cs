@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using Loki.Net;
 using Loki.Maple.Characters;
+using Loki.Maple.Data;
 
 namespace Loki.Maple.CashShop
 {
@@ -13,13 +14,77 @@ namespace Loki.Maple.CashShop
         {
             CharacterCashShop cs = player.CashShop;
             byte action = inPacket.ReadByte();
+            CashItem cashItem = null;
+            Item item = null;
+            int uniqueID;
 
             switch (action)
             {
                 case 0x03: // Buy item
-                    break;
-
                 case 0x20: // Buy packege
+                    inPacket.Skip(1);
+                    int cash = inPacket.ReadInt();
+                    try
+                    {
+                        cashItem = new CashItem(inPacket.ReadInt());
+                    }
+                    catch (KeyNotFoundException)
+                    {
+                        cashItem = null;
+                    }
+
+                    if (!CanBuy(cashItem, player, cash)) return;
+
+                    if (action == 0x03) // Item
+                    {
+                        cashItem.UniqueID = cs.CashInventory.GenerateUniqueID();
+                        player.CashShop.CashInventory.Add(cashItem);
+
+                        using (Packet outPacket = new Packet(MapleServerOperationCode.CashShopOperation))
+                        {
+                            outPacket.WriteByte(0x64);
+                            outPacket.WriteBytes(cashItem.ToByteArray(player.AccountID));
+
+                            player.Client.Send(outPacket);
+                        }
+                    }
+                    else // Package
+                    {
+                        List<CashItem> package;
+
+                        try
+                        {
+                            package = World.CachedCashItems.Packages[cashItem.MapleID];
+                        }
+                        catch (KeyNotFoundException)
+                        {
+                            return;
+                        }
+
+                        foreach (CashItem cItem in package)
+                        {
+                            cItem.UniqueID = cs.CashInventory.GenerateUniqueID();
+                            player.CashShop.CashInventory.Add(cItem);
+                        }
+
+                        using (Packet outPacket = new Packet(MapleServerOperationCode.CashShopOperation))
+                        {
+                            outPacket.WriteByte(0x9A);
+                            outPacket.WriteByte((byte)package.Count);
+
+                            foreach (CashItem cItem in package)
+                            {
+                                outPacket.WriteBytes(cItem.ToByteArray(player.AccountID));
+                            }
+
+                            outPacket.WriteShort();
+
+                            player.Client.Send(outPacket);
+                        }  
+                    }
+
+                    player.GainCash((byte)cash, -cashItem.Price);
+                    player.CashShop.ShowCash();
                     break;
 
                 case 0x04: // Gift
@@ -31,7 +96,7 @@ namespace Loki.Maple.CashShop
                     for (byte i = 0; i < 10; i++)
                     {
                         int sn = inPacket.ReadInt();
-                        CashItem cashItem = CashItem.GetCashItem(sn);
+                        cashItem = CashItem.GetCashItem(sn);
 
                         if (cashItem != null)
                         {
@@ -52,9 +117,38 @@ namespace Loki.Maple.CashShop
                     break;
 
                 case 0x0E: // Take from cash inventory
+                    uniqueID = inPacket.ReadInt();
+                    try
+                    {
+                        cashItem = cs.CashInventory[uniqueID];
+                        cs.CashInventory.Remove(cashItem);
+                    }
+                    catch (KeyNotFoundException)
+                    {
+                        return;
+                    }
                     break;
 
                 case 0x0F: // Put into cash inventory
+                    uniqueID = inPacket.ReadInt();
+                    inPacket.Skip(4);
+                    item = player.Items[uniqueID, (ItemType)inPacket.ReadByte()];
+
+                    if (item != null)
+                    {
+                        player.Items.Remove(item, false);
+                        cashItem = new CashItem(item.SerialNumber);
+                        cashItem.UniqueID = item.UniqueID;
+                        cs.CashInventory.Add(cashItem);
+
+                        using (Packet outPacket = new Packet(MapleServerOperationCode.CashShopOperation))
+                        {
+                            outPacket.WriteByte(0x79);
+                            outPacket.WriteBytes(cashItem.ToByteArray(player.AccountID));
+
+                            player.Client.Send(outPacket);
+                        }
+                    }
                     break;
 
                 case 0x1F: // Buy crush ring
@@ -74,6 +168,31 @@ namespace Loki.Maple.CashShop
                     cs.ShowCash();
                     break;
             }
+        }
+
+        static bool CanBuy(CashItem cashItem, Character player, int cash)
+        {
+            bool itemOk = cashItem != null, price = false;
+
+            if (itemOk)
+            {
+                switch (cash)
+                {
+                    case 1:
+                        price = player.CardNX >= cashItem.Price;
+                        break;
+
+                    case 2:
+                        price = player.MaplePoints >= cashItem.Price;
+                        break;
+
+                    case 4:
+                        price = player.PaypalNX >= cashItem.Price;
+                        break;
+                }
+            }
+
+            return itemOk && price;
         }
     }
 }

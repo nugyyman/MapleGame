@@ -131,6 +131,8 @@ namespace Loki
                               `Potential2` smallint(6) NOT NULL,
                               `Potential3` smallint(6) NOT NULL,
                               `PotentialLines` tinyint(3) unsigned NOT NULL,
+                              `SerialNumber` int(11) NOT NULL,
+                              `UniqueID` int(11) NOT NULL,
 							  PRIMARY KEY (`ID`),
 							  KEY `character_id` (`CharacterID`) USING BTREE
 							) ENGINE=InnoDB DEFAULT CHARSET=latin1;
@@ -211,6 +213,22 @@ namespace Loki
 							  `ID` int(11) NOT NULL AUTO_INCREMENT,
 							  `CharacterID` int(11) NOT NULL,
 							  `SerialNumber` int(11) NOT NULL,
+							  PRIMARY KEY (`ID`)
+							) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+							DROP TABLE IF EXISTS `cash_inventory`;
+							CREATE TABLE  `cash_inventory` (
+							  `ID` int(11) NOT NULL AUTO_INCREMENT,
+							  `AccountID` int(11) NOT NULL,
+							  `SerialNumber` int(11) NOT NULL,
+							  `UniqueID` int(11) NOT NULL,
+							  `Quantity` smallint(6) NOT NULL,
+							  PRIMARY KEY (`ID`)
+							) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+							DROP TABLE IF EXISTS `uniqueids`;
+							CREATE TABLE `uniqueids` (
+							  `ID` int(11) NOT NULL AUTO_INCREMENT,
 							  PRIMARY KEY (`ID`)
 							) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 						", databaseSchema);

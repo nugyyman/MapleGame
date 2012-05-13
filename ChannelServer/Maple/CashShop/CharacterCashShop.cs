@@ -12,12 +12,14 @@ namespace Loki.Maple.CashShop
         public Character Parent { get; private set; }
         public CashInventory CashInventory { get; private set; }
         public WishList WishList { get; private set; }
+        public bool Open { get; set; }
 
         public CharacterCashShop(Character parent)
         {
             this.Parent = parent;
             this.CashInventory = new CashInventory(this.Parent);
             this.WishList = new WishList(this.Parent);
+            this.Open = false;
         }
 
         public void Load()
