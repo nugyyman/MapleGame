@@ -124,15 +124,15 @@ namespace Loki
 							  `PreventsColdness` tinyint(1) unsigned NOT NULL,
 							  `IsStored` tinyint(1) unsigned NOT NULL,
 							  `Quantity` smallint(6) NOT NULL,
-                              `ViciousHammerApplied` tinyint(3) unsigned NOT NULL,
-                              `Potential` tinyint(3) unsigned NOT NULL,
-                              `Stars` tinyint(3) unsigned NOT NULL,
-                              `Potential1` smallint(6) NOT NULL,
-                              `Potential2` smallint(6) NOT NULL,
-                              `Potential3` smallint(6) NOT NULL,
-                              `PotentialLines` tinyint(3) unsigned NOT NULL,
-                              `SerialNumber` int(11) NOT NULL,
-                              `UniqueID` int(11) NOT NULL,
+							  `ViciousHammerApplied` tinyint(3) unsigned NOT NULL,
+							  `Potential` tinyint(3) unsigned NOT NULL,
+							  `Stars` tinyint(3) unsigned NOT NULL,
+							  `Potential1` smallint(6) NOT NULL,
+							  `Potential2` smallint(6) NOT NULL,
+							  `Potential3` smallint(6) NOT NULL,
+							  `PotentialLines` tinyint(3) unsigned NOT NULL,
+							  `SerialNumber` int(11) NOT NULL,
+							  `UniqueID` int(11) NOT NULL,
 							  PRIMARY KEY (`ID`),
 							  KEY `character_id` (`CharacterID`) USING BTREE
 							) ENGINE=InnoDB DEFAULT CHARSET=latin1;
@@ -178,7 +178,7 @@ namespace Loki
 							  PRIMARY KEY (`id`)
 							) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
-                            DROP TABLE IF EXISTS `keymaps`;
+							DROP TABLE IF EXISTS `keymaps`;
 							CREATE TABLE  `keymaps` (
 							  `ID` int(11) NOT NULL AUTO_INCREMENT,
 							  `CharacterID` int(11) NOT NULL,
@@ -231,6 +231,56 @@ namespace Loki
 							  `ID` int(11) NOT NULL DEFAULT '0'
 							) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 							INSERT INTO `uniqueids` VALUES (0);
+
+							DROP TABLE IF EXISTS `storages`;
+							CREATE TABLE  `storages` (
+							  `ID` int(11) NOT NULL AUTO_INCREMENT,
+							  `AccountID` int(11) NOT NULL,
+ 							 `Slots` tinyint(3) unsigned NOT NULL DEFAULT '4',
+ 							 `Meso` int(11) NOT NULL DEFAULT '0',
+ 							 PRIMARY KEY (`ID`)
+							) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+							DROP TABLE IF EXISTS `storage_items`;
+							CREATE TABLE  `storage_items` (
+							  `ID` int(11) NOT NULL AUTO_INCREMENT,
+							  `AccountID` int(11) NOT NULL,
+							  `MapleID` int(11) NOT NULL,
+							  `Slot` tinyint(4) NOT NULL,
+							  `Creator` varchar(13) NOT NULL,
+							  `UpgradesAvailable` tinyint(3) unsigned NOT NULL,
+							  `UpgradesApplied` tinyint(3) unsigned NOT NULL,
+							  `Strength` smallint(6) NOT NULL,
+							  `Dexterity` smallint(6) NOT NULL,
+							  `Intelligence` smallint(6) NOT NULL,
+							  `Luck` smallint(6) NOT NULL,
+							  `HP` smallint(6) NOT NULL,
+							  `MP` smallint(6) NOT NULL,
+							  `WeaponAttack` smallint(6) NOT NULL,
+							  `MagicAttack` smallint(6) NOT NULL,
+							  `WeaponDefense` smallint(6) NOT NULL,
+							  `MagicDefense` smallint(6) NOT NULL,
+							  `Accuracy` smallint(6) NOT NULL,
+							  `Avoidability` smallint(6) NOT NULL,
+							  `Agility` smallint(6) NOT NULL,
+							  `Speed` smallint(6) NOT NULL,
+							  `Jump` smallint(6) NOT NULL,
+							  `IsScisored` tinyint(1) unsigned NOT NULL,
+							  `PreventsSlipping` tinyint(1) unsigned NOT NULL,
+							  `PreventsColdness` tinyint(1) unsigned NOT NULL,
+							  `IsStored` tinyint(1) unsigned NOT NULL,
+							  `Quantity` smallint(6) NOT NULL,
+							  `ViciousHammerApplied` tinyint(3) unsigned NOT NULL,
+							  `Potential` tinyint(3) unsigned NOT NULL,
+							  `Stars` tinyint(3) unsigned NOT NULL,
+							  `Potential1` smallint(6) NOT NULL,
+							  `Potential2` smallint(6) NOT NULL,
+							  `Potential3` smallint(6) NOT NULL,
+							  `PotentialLines` tinyint(3) unsigned NOT NULL,
+							  `SerialNumber` int(11) NOT NULL,
+							  `UniqueID` int(11) NOT NULL,
+							  PRIMARY KEY (`ID`)
+							) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 						", databaseSchema);
 
                     Log.Inform("Database '{0}' created.", databaseSchema);

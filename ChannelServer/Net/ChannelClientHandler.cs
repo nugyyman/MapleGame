@@ -230,6 +230,10 @@ namespace Loki.Net
                 case MapleClientOperationCode.CashShopOperation:
                     CashShopOperation.Handle(this.Character, inPacket);
                     break;
+
+                case MapleClientOperationCode.Storage:
+                    this.Character.Storage.Handle(inPacket);
+                    break;
             }
         }
 
@@ -249,7 +253,6 @@ namespace Loki.Net
 
         public void ChangeChannel(byte channelID)
         {
-
             using (Packet outPacket = new Packet(MapleServerOperationCode.ChangeChannel))
             {
                 outPacket.WriteBool(true); // UNK: What does false do?

@@ -77,6 +77,7 @@
     <Compile Include="Maple\Characters\CharacterQuests.cs" />
     <Compile Include="Maple\Characters\CharacterRandom.cs" />
     <Compile Include="Maple\Characters\CharacterSPTable.cs" />
+    <Compile Include="Maple\Characters\CharacterStorage.cs" />
     <Compile Include="Maple\Characters\ControlledMobs.cs" />
     <Compile Include="Maple\Characters\ControlledNpcs.cs" />
     <Compile Include="Maple\Commands\Implementation\BringCommand.cs" />
@@ -106,6 +107,7 @@
     <Compile Include="Maple\Data\CachedCashItems.cs" />
     <Compile Include="Maple\Data\CharacterCreationData.cs" />
     <Compile Include="Maple\Data\ForbiddenNames.cs" />
+    <Compile Include="Maple\Life\Implementation\Npc9030100.cs" />
     <Compile Include="Maple\Shortcut.cs" />
     <Compile Include="Maple\Interaction\Fredrick.cs" />
     <Compile Include="Maple\Interaction\HiredMerchant.cs" />

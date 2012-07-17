@@ -152,7 +152,7 @@
         NpcTalk = 0x17F,
         OpenNpcShop = 0x180,
         ConfirmShopTransaction = 0x181,
-        OpenStorage = 0x184,
+        Storage = 0x184,
         FredrickMessage = 0x185,
         FredrickOperation = 0x186,
         Messanger = 0x188,

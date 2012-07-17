@@ -24,6 +24,7 @@ namespace Loki.Maple.Characters
         public CharacterBuddyList BuddyList { get; private set; }
         public CharacterSPTable SPTable { get; private set; }
         public CharacterCashShop CashShop { get; set; }
+        public CharacterStorage Storage { get; private set; }
         public ControlledMobs ControlledMobs { get; private set; }
         public ControlledNpcs ControlledNpcs { get; private set; }
         public Trade Trade { get; set; }
@@ -573,7 +574,7 @@ namespace Loki.Maple.Characters
             }
             set
             {
-                if (meso > 0 && value > 0 && meso + value < 0) // Overflow
+                if (meso > 0 && value < 0) // Overflow
                 {
                     meso = int.MaxValue;
                 }
@@ -865,6 +866,7 @@ namespace Loki.Maple.Characters
             this.BuddyList = new CharacterBuddyList(this);
             this.SPTable = new CharacterSPTable(this);
             this.CashShop = new CharacterCashShop(this);
+            this.Storage = new CharacterStorage(this);
 
             this.Position = new Point(0, 0);
             this.ControlledMobs = new ControlledMobs(this);
@@ -918,6 +920,7 @@ namespace Loki.Maple.Characters
             this.BuddyList.Load();
             this.SPTable.Load();
             this.CashShop.Load();
+            this.Storage.Load();
         }
 
         public void Save()
@@ -980,6 +983,7 @@ namespace Loki.Maple.Characters
             this.BuddyList.Save();
             this.SPTable.Save();
             this.CashShop.Save();
+            this.Storage.Save();
 
             Log.Inform("Saved character '{0}' to database.", this.Name);
         }

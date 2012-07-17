@@ -877,9 +877,57 @@ namespace Loki.Maple
             }
         }
 
+        public void SaveToStorage(Character parent)
+        {
+            dynamic datum = new Datum("storage_items");
+
+            datum.AccountID = parent.AccountID;
+            datum.MapleID = this.MapleID;
+            datum.Quantity = this.Quantity;
+            datum.Slot = this.Slot;
+            datum.IsStored = this.IsStored;
+            datum.Creator = this.Creator;
+            datum.IsScisored = this.IsScisored;
+            datum.PreventsSlipping = this.PreventsSlipping;
+            datum.PreventsColdness = this.PreventsColdness;
+            datum.UpgradesAvailable = this.UpgradesAvailable;
+            datum.UpgradesApplied = this.UpgradesApplied;
+            datum.HP = this.HP;
+            datum.MP = this.MP;
+            datum.Strength = this.Strength;
+            datum.Dexterity = this.Dexterity;
+            datum.Intelligence = this.Intelligence;
+            datum.Luck = this.Luck;
+            datum.Agility = this.Agility;
+            datum.WeaponAttack = this.WeaponAttack;
+            datum.WeaponDefense = this.WeaponDefense;
+            datum.MagicAttack = this.MagicAttack;
+            datum.MagicDefense = this.MagicDefense;
+            datum.Accuracy = this.Accuracy;
+            datum.Avoidability = this.Avoidability;
+            datum.Jump = this.Jump;
+            datum.Speed = this.Speed;
+            datum.ViciousHammerApplied = this.ViciousHammerApplied;
+            datum.Potential = (byte)this.Potential;
+            datum.Stars = this.Stars;
+            datum.Potential1 = this.Potential1;
+            datum.Potential2 = this.Potential2;
+            datum.Potential3 = this.Potential3;
+            datum.PotentialLines = this.PotentialLines;
+            datum.SerialNumber = this.SerialNumber;
+            datum.UniqueID = this.UniqueID;
+            datum.Insert();
+        }
+
         public void Delete()
         {
             Database.Delete("items", "ID = '{0}'", this.ID);
+            this.Assigned = false;
+        }
+
+        public void DeleteFromStorage()
+        {
+            Database.Delete("storage_items", "ID = '{0}'", this.ID);
             this.Assigned = false;
         }
 
