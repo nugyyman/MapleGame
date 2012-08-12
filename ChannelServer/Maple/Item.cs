@@ -1255,6 +1255,7 @@ namespace Loki.Maple
                     buffer.WriteInt(); // TODO: Item EXP. Timeless has it.
                     buffer.WriteInt(-1);
                     buffer.WriteInt(this.ViciousHammerApplied);
+                    buffer.WriteShort(); // PVP stuff
                     buffer.WriteByte((byte)this.Potential); // 0/4 = No potential, 1/2/3 = Hidden potential, 5 = Rare, 6 = Epic, 7 = Unique
                     buffer.WriteByte(this.Stars); // stars
                     buffer.WriteShort(this.Potential1); // potential stat 1
@@ -1262,6 +1263,10 @@ namespace Loki.Maple
                     buffer.WriteShort(this.Potential3); // potential stat 3
                     buffer.WriteShort(); // potential stat 4 ?
                     buffer.WriteShort(); // potential stat 5 ?
+                    buffer.WriteShort();
+                    buffer.WriteShort();
+                    buffer.WriteShort();
+                    buffer.WriteShort();
 
                     if (!this.IsEquippedCash && !this.IsCash)
                     {

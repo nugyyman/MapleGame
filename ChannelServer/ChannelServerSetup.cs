@@ -10,7 +10,7 @@ namespace Loki
 {
     public static class ChannelServerSetup
     {
-        private const string McdbFileName = "mcdb-4.3-83.sql";
+        private const string McdbFileName = "mcdb-4.3-111.sql";
 
         public static void Run()
         {
@@ -86,6 +86,8 @@ namespace Loki
 							  `MapID` int(11) NOT NULL DEFAULT '0',
 							  `SpawnPoint` tinyint(3) unsigned NOT NULL DEFAULT '0',
 							  `MaxBuddies` tinyint(3) unsigned NOT NULL DEFAULT '20',
+							  `SpecialJob` enum('0', '1', '2') NOT NULL,
+							  `DemonMark` int(11) NOT NULL DEFAULT '0',
 							  `EquipmentSlots` tinyint(3) unsigned NOT NULL DEFAULT '24',
 							  `UsableSlots` tinyint(3) unsigned NOT NULL DEFAULT '48',
 							  `SetupSlots` tinyint(3) unsigned NOT NULL DEFAULT '24',
@@ -304,7 +306,7 @@ namespace Loki
 
             try
             {
-                using (Database.TemporaryConnection(databaseHost, "mcdb97", databaseUsername, databasePassword))
+                using (Database.TemporaryConnection(databaseHost, "mcdb", databaseUsername, databasePassword))
                 {
                     Database.Test();
                 }
@@ -323,11 +325,11 @@ namespace Loki
 
                         Database.ExecuteFile(databaseHost, databaseUsername, databasePassword, Application.ExecutablePath + ChannelServerSetup.McdbFileName);
 
-                        Log.Inform("Database 'mcdb97' created.", databaseSchema);
+                        Log.Inform("Database 'mcdb' created.", databaseSchema);
                     }
                     catch (Exception mcdbE)
                     {
-                        Log.Error("Error while creating 'mcdb97': ", mcdbE);
+                        Log.Error("Error while creating 'mcdb': ", mcdbE);
                         goto mcdbConfiguration;
                     }
                 }

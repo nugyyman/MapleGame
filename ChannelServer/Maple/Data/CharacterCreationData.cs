@@ -17,9 +17,9 @@ namespace Loki.Maple.Data
             }
         }
 
-        public bool checkData(int job, byte gender, int face, int hair, int haircolor, int skin, int top, int bottom, int shoes, int weapon)
+        public bool checkData(int job, byte gender, int face, int hair, int haircolor, byte skin, int top, int bottom, int shoes, int weapon)
         {
-            if (!(this.Contains(face) && this.Contains(hair) && this.Contains(haircolor) && this.Contains(skin) && this.Contains(top) && this.Contains(bottom) && this.Contains(shoes) && this.Contains(weapon)))
+            if (!(this.Contains(face) && this.Contains(hair) && this.Contains(haircolor) && this.Contains((int)skin) && this.Contains(top) && (bottom == 0 || this.Contains(bottom)) && this.Contains(shoes) && this.Contains(weapon)))
                 return false;
             return true;
         }

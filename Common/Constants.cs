@@ -233,6 +233,9 @@ namespace Loki.Maple
         Gunslinger = 520,
         Outlaw,
         Corsair,
+        Cannoneer = 530,
+        CannonBlaster,
+        CannonMaster,
 
         GM = 900,
         SuperGM = 910,
@@ -261,6 +264,8 @@ namespace Loki.Maple
 
         Legend = 2000,
         Farmer,
+        Mercedes,
+        Phantom,
 
         Aran1 = 2100,
         Aran2 = 2110,
@@ -278,16 +283,34 @@ namespace Loki.Maple
         Evan9,
         Evan10,
 
+        Mercedes1 = 2300,
+        Mercedes2 = 2310,
+        Mercedes3,
+        Mercedes4,
+
+        Phantom1 = 2400,
+        Phantom2 = 2410,
+        Phantom3,
+        Phantom4,
+
         Citizen = 3000,
+        DemonSlayer,
+
+        DemonSlayer1 = 3100,
+        DemonSlayer2 = 3110,
+        DemonSlayer3,
+        DemonSlayer4,
 
         BattleMage1 = 3200,
         BattleMage2 = 3210,
         BattleMage3,
         BattleMage4,
+
         WildHunter1 = 3300,
         WildHunter2 = 3310,
         WildHunter3,
         WildHunter4,
+
         Mechanic1 = 3500,
         Mechanic2 = 3510,
         Mechanic3,
@@ -1258,6 +1281,15 @@ namespace Loki.Maple
     {
         Regular,
         Evan,
-        Resistance
+        Resistance,
+        Mercedes,
+        Phantom
+    }
+
+    public enum SpecialJob
+    {
+        Regular,
+        DualBlade,
+        Cannoneer
     }
 }

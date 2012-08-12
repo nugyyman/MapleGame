@@ -46,7 +46,7 @@ namespace Loki.Maple.Life
         public int DropItemPeriod { get; private set; }
         public byte HpBarForeColor { get; private set; }
         public byte HpBarBackColor { get; private set; }
-        public byte CarnivalPoints { get; private set; }
+        public ushort CarnivalPoints { get; private set; }
         public int WeaponAttack { get; private set; }
         public int WeaponDefense { get; private set; }
         public int MagicAttack { get; private set; }

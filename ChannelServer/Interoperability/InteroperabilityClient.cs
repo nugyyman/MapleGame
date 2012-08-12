@@ -211,40 +211,86 @@ namespace Loki.Interoperability
         public void CreateCharacter(Packet inPacket)
         {
             int accountID = inPacket.ReadInt();
+            bool isMaster = inPacket.ReadBool();
 
             string name = inPacket.ReadString();
             int job = inPacket.ReadInt();
-            short DB = inPacket.ReadShort();
+            short specialJob = inPacket.ReadShort();
+            byte gender = inPacket.ReadByte();
+            inPacket.ReadShort();
             int face = inPacket.ReadInt();
             int hair = inPacket.ReadInt();
-            int hair_color = inPacket.ReadInt();
-            int skin = inPacket.ReadInt();
+            int hair_color = 0;
+            byte skin = 0;
+
+            if (job < 5)
+            {
+                hair_color = inPacket.ReadInt();
+            }
+
+            if (job == 6)
+            {
+                skin = 13;
+            }
+            else if (job == 5)
+            {
+                skin = 12;
+            }
+            else
+            {
+                skin = (byte)inPacket.ReadInt();
+            }
+
+            int demonMark = job == 6 ? inPacket.ReadInt() : 0;
             int topID = inPacket.ReadInt();
-            int bottomID = inPacket.ReadInt();
+
+            int bottomID = 0;
+            if (job < 5)
+            {
+                bottomID = inPacket.ReadInt();
+            }
+
             int shoesID = inPacket.ReadInt();
             int weaponID = inPacket.ReadInt();
-            byte gender = inPacket.ReadByte();
+            int shieldID = job == 6 ? inPacket.ReadInt() : 0;
 
             Character character = new Character();
 
             character.AccountID = accountID;
 
             character.Level = 1;
-            if (job == 0)
-                character.Job = Job.Citizen;
-            else if (job == 1)
+            if (job == -1) // UA
             {
-                if (DB == 1)
-                    character.Job = Job.BladeAcolyte;
-                else
-                    character.Job = Job.Beginner;
+                // TODO: Handle UA
             }
-            else if (job == 2)
+            else if (job == 0) // Resistance
+            {
+                character.Job = Job.Citizen;
+            }
+            else if (job == 1) // Adventurer
+            {
+                character.Job = Job.Beginner;
+            }
+            else if (job == 2) // Cygnus
+            {
                 character.Job = Job.Noblesse;
-            else if (job == 3)
+            }
+            else if (job == 3) // Aran
+            {
                 character.Job = Job.Legend;
-            else if (job == 4)
+            }
+            else if (job == 4) // Evan
+            {
                 character.Job = Job.Farmer;
+            }
+            else if (job == 5) // Mercedes
+            {
+                character.Job = Job.Mercedes;
+            }
+            else if (job == 6) // DemonSlayer
+            {
+                character.Job = Job.DemonSlayer;
+            }
 
             character.MaxHP = 50;
             character.MaxMP = 5;
@@ -260,14 +306,16 @@ namespace Loki.Interoperability
             character.AvailableSP = 0;
             character.SpawnPoint = 0;
             character.MaxBuddies = 20;
+            character.SpecialJob = (SpecialJob)specialJob;
 
             character.Name = name;
             character.Face = face;
             character.Hair = hair + hair_color;
-            character.Skin = (byte)skin;
+            character.Skin = skin;
             character.Gender = (Gender)gender;
+            character.DemonMark = demonMark;
 
-            if (character.Job != Job.Citizen)
+            if (job < 5 && job != 0)
             {
                 character.Items.Add(new Item(topID, equipped: true));
                 character.Items.Add(new Item(bottomID, equipped: true));
@@ -279,6 +327,11 @@ namespace Loki.Interoperability
                 character.Items.Add(new Item(topID, equipped: true));
                 character.Items.Add(new Item(shoesID, equipped: true));
                 character.Items.Add(new Item(weaponID, equipped: true));
+
+                if (job == 6)
+                {
+                    character.Items.Add(new Item(shieldID, equipped: true));
+                }
             }
 
             int[] key = { 18, 65, 2, 23, 3, 4, 5, 6, 16, 17, 19, 25, 26, 27, 31, 34, 35, 37, 38, 40, 43, 44, 45, 46, 50, 56, 59, 60, 61, 62, 63, 64, 57, 48, 29, 7, 24, 33, 41 };
@@ -292,11 +345,11 @@ namespace Loki.Interoperability
 
             bool charOk = true;
 
-            if (Database.Exists("characters", "Name = '{0}'", name) || World.ForbiddenNames.Contains(name))
+            if (Database.Exists("characters", "Name = '{0}'", name) || (World.ForbiddenNames.Contains(name) && !isMaster))
                 charOk = false;
 
-            if (!World.CharacterCreationData.checkData(job, gender, face, hair, hair_color, skin, topID, bottomID, shoesID, weaponID))
-                charOk = false;
+            //if (!World.CharacterCreationData.checkData(job, gender, face, hair, hair_color, skin, topID, bottomID, shoesID, weaponID))
+              //  charOk = false;
 
             if (charOk)
             {

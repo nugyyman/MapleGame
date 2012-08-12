@@ -12,7 +12,7 @@ namespace Loki.Maple.Life
         public byte Level { get; private set; }
         public short EffectDelay { get; private set; }
 
-        public short Duration { get; private set; }
+        public int Duration { get; private set; }
         public short MpCost { get; private set; }
         public int ParameterA { get; private set; }
         public int ParameterB { get; private set; }
@@ -35,7 +35,7 @@ namespace Loki.Maple.Life
 
         public void Load(dynamic mobSkillDatum)
         {
-            this.Duration = (short)mobSkillDatum.buff_time;
+            this.Duration = mobSkillDatum.buff_time;
             this.MpCost = (short)mobSkillDatum.mp_cost;
             this.ParameterA = (int)mobSkillDatum.x_property;
             this.ParameterB = (int)mobSkillDatum.y_property;

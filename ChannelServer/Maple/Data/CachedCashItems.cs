@@ -31,8 +31,10 @@ namespace Loki.Maple.Data
                     {
                         this.Packages.Add(itemDatum.packageid, new List<CashItem>());
                     }
-
-                    this.Packages[itemDatum.packageid].Add(this[itemDatum.serial_number]);
+                    if (itemDatum.serial_number != 30000089 && itemDatum.serial_number != 43591812 && itemDatum.serial_number != 43591780)
+                    {
+                        this.Packages[itemDatum.packageid].Add(this[itemDatum.serial_number]);
+                    }
                 }
             }
         }

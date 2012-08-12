@@ -46,6 +46,8 @@ namespace Loki.Maple.Characters
         public byte MaxBuddies { get; set; }
         public bool IsMaster { get; set; }
         public byte Stance { get; set; }
+        public int DemonMark { get; set; }
+        public SpecialJob SpecialJob { get; set; }
 
         private byte skin;
         private int face;
@@ -238,7 +240,11 @@ namespace Loki.Maple.Characters
 
                                 if (this.Level < 11)
                                 {
-                                    if (this.SPTable.GetSPType(this.Job) == ExtendedSPType.Evan)
+                                    if (this.SPTable.GetSPType(this) == ExtendedSPType.Regular)
+                                    {
+                                        this.AvailableSP += 3;
+                                    }
+                                    else
                                     {
                                         byte adv = (byte)((short)this.Job % 100 == 0 ? 1 : ((short)this.Job % 10) + 2);
 
@@ -249,22 +255,6 @@ namespace Loki.Maple.Characters
 
                                         this.SPTable[adv] += 3;
                                         this.UpdateStatistics(StatisticType.AvailableSP);
-                                    }
-                                    else if (this.SPTable.GetSPType(this.Job) == ExtendedSPType.Resistance)
-                                    {
-                                        byte adv = (byte)((short)this.Job % 100 == 0 ? 1 : ((short)this.Job % 10) + 2);
-
-                                        if (!this.SPTable.ContainsKey(adv))
-                                        {
-                                            this.SPTable.Add(adv, 3);
-                                        }
-
-                                        this.SPTable[adv] += 3;
-                                        this.UpdateStatistics(StatisticType.AvailableSP);
-                                    }
-                                    else
-                                    {
-                                        this.AvailableSP += 3;
                                     }
                                 }
 
@@ -621,19 +611,83 @@ namespace Loki.Maple.Characters
             }
         }
 
+        public bool IsAdventurer
+        {
+            get
+            {
+                return (short)this.Job >= 900 && (short)this.Job <= 910;
+            }
+        }
+
+        public bool IsDualBlade
+        {
+            get
+            {
+                return (short)this.Job >= 430 && (short)this.Job <= 434;
+            }
+        }
+
+        public bool IsCannoneer
+        {
+            get
+            {
+                return (short)this.Job >= 530 && (short)this.Job <= 533;
+            }
+        }
+
         public bool IsCygnus
         {
             get
             {
-                return (short)this.Job >= 1000;
+                return (short)this.Job >= 1000 && (short)this.Job <= 1512;
             }
         }
 
-        public bool IsExplorer
+        public bool IsAran
         {
             get
             {
-                return (short)this.Job < 900;
+                return (short)this.Job == 2000 || ((short)this.Job >= 2100 && (short)this.Job <= 2112);
+            }
+        }
+
+        public bool IsEvan
+        {
+            get
+            {
+                return (short)this.Job == 2001 || ((short)this.Job >= 2200 && (short)this.Job <= 2218);
+            }
+        }
+
+        public bool IsMercedes
+        {
+            get
+            {
+                return (short)this.Job == 2002 || ((short)this.Job >= 2300 && (short)this.Job <= 2312);
+            }
+        }
+
+        public bool IsPhantom
+        {
+            get
+            {
+                return (short)this.Job == 2003 || ((short)this.Job >= 2400 && (short)this.Job <= 2412);
+            }
+        }
+
+        public bool IsResistance
+        {
+            get
+            {
+                return (short)this.Job >= 3000 && (short)this.Job <= 3512;
+            }
+        }
+
+        public bool IsDemonSlayer
+        {
+            get
+            {
+                return (short)this.Job == 3001 || ((short)this.Job >= 3100 && (short)this.Job <= 3112);
             }
         }
 
@@ -906,6 +960,8 @@ namespace Loki.Maple.Characters
             this.SpawnPoint = datum.SpawnPoint;
             this.MaxBuddies = datum.MaxBuddies;
             this.Map = World.Maps[datum.MapID];
+            this.SpecialJob = (SpecialJob)(byte.Parse(datum.SpecialJob));
+            this.DemonMark = datum.DemonMark;
 
             this.Items.MaxSlots[ItemType.Equipment] = datum.EquipmentSlots;
             this.Items.MaxSlots[ItemType.Usable] = datum.UsableSlots;
@@ -956,6 +1012,8 @@ namespace Loki.Maple.Characters
             datum.SpawnPoint = this.SpawnPoint;
             datum.MaxBuddies = this.MaxBuddies;
             datum.MapID = this.Map.MapleID;
+            datum.SpecialJob = (byte)this.SpecialJob;
+            datum.DemonMark = this.DemonMark;
 
             datum.EquipmentSlots = this.Items.MaxSlots[ItemType.Equipment];
             datum.UsableSlots = this.Items.MaxSlots[ItemType.Usable];
@@ -1012,12 +1070,6 @@ namespace Loki.Maple.Characters
                 buffer.WriteBytes(this.AppearanceToByteArray(false));
                 if (!fromViewAll)
                     buffer.WriteByte();
-                if (this.IsMaster)
-                {
-                    buffer.WriteByte();
-                    buffer.Flip();
-                    return buffer.GetContent();
-                }
 
                 buffer.WriteBool(true); // World rank enabled (next 4 ints are not sent if disabled)
 
@@ -1058,12 +1110,38 @@ namespace Loki.Maple.Characters
                 buffer.WriteShort(this.AvailableAP);
                 buffer.WriteBytes(this.SPTable.ToByteArray());
                 buffer.WriteInt(this.Experience);
-                buffer.WriteShort(this.Fame);
+                buffer.WriteInt(this.Fame);
                 buffer.WriteInt(); // Gacha exp
                 buffer.WriteInt(this.Map.MapleID);
                 buffer.WriteByte(this.SpawnPoint);
                 buffer.WriteInt();
-                buffer.WriteShort(0); // DualBlade
+                buffer.WriteShort((byte)this.SpecialJob); // 1 = DualBlade. 2 = Cannoner
+
+                if (this.IsDemonSlayer) // Demonslayer stuff
+                {
+                    buffer.WriteInt(this.DemonMark);
+                }
+
+                buffer.WriteByte();
+                buffer.WriteInt();
+
+                // trait stuff
+                for (int i = 0; i < 6; i++)
+                {
+                    buffer.WriteInt();
+                }
+                for (int i = 0; i < 6; i++)
+                {
+                    buffer.WriteShort();
+                }
+
+                buffer.WriteInt(); // PVP exp
+                buffer.WriteByte(); // PVP rank
+                buffer.WriteInt(); // PVP points
+                buffer.WriteByte(5);
+                buffer.WriteInt();
+                buffer.WriteInt();
+                buffer.WriteInt();
 
                 buffer.Flip();
                 return buffer.GetContent();
@@ -1077,6 +1155,7 @@ namespace Loki.Maple.Characters
                 buffer.WriteByte((byte)this.Gender);
                 buffer.WriteByte(this.Skin);
                 buffer.WriteInt(this.Face);
+                buffer.WriteInt((int)this.Job);
                 buffer.WriteBool(forMegaphone);
                 buffer.WriteInt(this.Hair);
 
@@ -1126,46 +1205,49 @@ namespace Loki.Maple.Characters
 
                 Item cashWeapon = this.Items[EquipmentSlot.CashWeapon];
 
-                if (cashWeapon != null)
-                {
-                    buffer.WriteInt(cashWeapon.MapleID);
-                }
-                else
-                {
-                    buffer.WriteInt();
-                }
-
+                buffer.WriteInt(cashWeapon != null ? cashWeapon.MapleID : 0);
+                buffer.WriteBool(this.IsMercedes);
                 buffer.WriteInt(); // Pet #1
                 buffer.WriteInt(); // Pet #2
                 buffer.WriteInt(); // Pet #3
+
+                if (this.IsDemonSlayer)
+                {
+                    buffer.WriteInt(this.DemonMark);
+                }
 
                 buffer.Flip();
                 return buffer.GetContent();
             }
         }
 
-        public byte[] InformationToByteArray()
+        public byte[] InformationToByteArray(bool isSelf = false)
         {
             using (ByteBuffer writer = new ByteBuffer())
             {
                 writer.WriteInt(this.ID);
                 writer.WriteByte(this.Level);
                 writer.WriteShort((short)this.Job);
-                writer.WriteShort(this.Fame);
+                writer.WriteByte(0); // PVP rank
+                writer.WriteInt(this.Fame);
                 writer.WriteBool(false); // TODO: Married.
+                writer.WriteByte(0); // TODO: Professions.
                 writer.WriteString("-"); // TODO: Guild name.
                 writer.WriteString(string.Empty); // TODO: Alliance name.
+                writer.WriteByte((byte)(isSelf ? 1 : 0));
                 writer.WriteByte();
                 writer.WriteByte(0); // Pets footer.
                 writer.WriteByte(0); // Mount
                 writer.WriteBytes(this.CashShop.WishList.ToByteArray());
-                writer.WriteInt(1); // MonsterBook level
-                writer.WriteInt(); // Normal card
-                writer.WriteInt(); // Spacial card
-                writer.WriteInt(); // Total cards
-                writer.WriteInt(); // MonsterBook cover
                 writer.WriteInt(); // Medal
                 writer.WriteShort(0); // Medal quests (this is the number of items in it.)
+
+                for (int i = 0; i < 6; i++) // trait stuff
+                {
+                    writer.WriteByte();
+                }
+
+                writer.WriteInt(0); // Chairs (this is the number of items in it.)
                 writer.Flip();
 
                 return writer.GetContent();
@@ -1176,32 +1258,59 @@ namespace Loki.Maple.Characters
         {
             using (ByteBuffer buffer = new ByteBuffer())
             {
-                buffer.WriteLong(-1);
+                buffer.WriteInt(-1);
+                buffer.WriteInt(-3);
                 buffer.WriteByte();
+                buffer.WriteByte();
+                buffer.WriteInt();
                 buffer.WriteByte();
                 buffer.WriteBytes(this.StatisticsToByteArray());
                 buffer.WriteByte(this.MaxBuddies);
-                buffer.WriteByte();
-                buffer.WriteShort();
+                buffer.WriteByte(); // TODO: BlessOfFairyOrigin.
+                buffer.WriteByte(); // TODO: BlessOfEmpressOrigin.
+                buffer.WriteByte(); // TODO: Ultimate Explorer data.
+                buffer.WriteInt(this.Meso);
+                buffer.WriteInt();
                 buffer.WriteBytes(this.Items.ToByteArray());
                 buffer.WriteBytes(this.Skills.ToByteArray());
                 buffer.WriteBytes(this.Quests.ToByteArray());
+                buffer.WriteShort(0); // Mini games
 
                 // TODO: Rings.
-                buffer.WriteShort();
-                buffer.WriteShort();
-                buffer.WriteShort();
-                buffer.WriteShort(); // Somehow ring footer.
+                buffer.WriteShort(); // Crush rings
+                buffer.WriteShort(); // Friendship rings
+                buffer.WriteShort(); // Marriage ring
 
-                for (int i = 0; i < 28; i++)
+                // TODO: Teleport rocks.
+                for (int i = 0; i < 41; i++)
                 {
-                    buffer.WriteBytes(PacketConstants.Character);
+                    buffer.WriteInt();
                 }
 
                 // TODO: Monster book.
+                buffer.WriteInt(0);
+                buffer.WriteByte(0);
+                buffer.WriteShort(0);
+                buffer.WriteInt(0);
                 buffer.WriteShort(0);
 
-                buffer.WriteShort(); // UNK: PQ Information?
+                buffer.WriteShort(); // New year gift card
+                buffer.WriteShort(); // QuestEx 
+
+                if (false) // Wild Hunter stuff
+                {
+                    // Jaguar info
+                }
+
+                buffer.WriteShort();
+                buffer.WriteShort();
+
+                for (int i = 0; i < 18; i++)
+                {
+                    buffer.WriteInt(0);
+                }
+
+                buffer.WriteByte(1);
                 buffer.WriteShort();
                 buffer.WriteShort();
 
@@ -1218,8 +1327,9 @@ namespace Loki.Maple.Characters
                 outPacket.WriteLong(1);
                 outPacket.WriteLong(2);
                 outPacket.WriteInt(ChannelServer.InternalChannelID);
-                outPacket.WriteInt();
 
+                outPacket.WriteInt();
+                outPacket.WriteByte();
                 outPacket.WriteByte(1);
                 outPacket.WriteInt();
                 outPacket.WriteByte(1);
@@ -1228,14 +1338,14 @@ namespace Loki.Maple.Characters
                 outPacket.WriteBytes(new CharacterRandom().ToByteArray());
 
                 outPacket.WriteBytes(this.DataToByteArray());
-                outPacket.WriteInt(0);
                 outPacket.WriteInt(0); // Lucky reward after long unactivity; Received/do not show = 1; not received/show = 0
                 outPacket.WriteInt(30100003); // SN of cash item #1
                 outPacket.WriteInt(30100003); // SN #2
                 outPacket.WriteInt(30100003); // SN #3
-                outPacket.WriteByte(0);
                 outPacket.WriteDateTime(DateTime.UtcNow);
                 outPacket.WriteInt(100);
+                outPacket.WriteByte(0);
+                outPacket.WriteByte(1);
 
                 this.Client.Send(outPacket);
             }
@@ -1245,7 +1355,7 @@ namespace Loki.Maple.Characters
             this.IsInitialized = true;
 
             this.KeyMap.Send();
-            this.UpdateBuddies(true);
+            /*this.UpdateBuddies(true);
             this.BuddyList.Update();
 
             // NOTE: Until we find out more about buffs in the SpawnPlayer packet
@@ -1277,7 +1387,7 @@ namespace Loki.Maple.Characters
                 }
             }
 
-            this.BuddyList.pendingBuddies.Clear();
+            this.BuddyList.pendingBuddies.Clear();*/
         }
 
         public Packet GetCreatePacket()
@@ -1838,7 +1948,7 @@ namespace Loki.Maple.Characters
 
             int skillID = inPacket.ReadInt();
 
-            if (this.SPTable.GetAvailableSPByJob((Job)(skillID / 10000)) < 1)
+            if (this.SPTable.GetAvailableSPByJob(this) < 1)
             {
                 this.Release();
 
@@ -1863,7 +1973,7 @@ namespace Loki.Maple.Characters
             {
                 if (!skill.IsFromBeginner)
                 {
-                    this.SPTable.SetAvailableSPByJob((Job)(skillID / 10000), (short)(this.SPTable.GetAvailableSPByJob((Job)(skillID / 10000)) - 1));
+                    this.SPTable.SetAvailableSPByJob((short)(this.SPTable.GetAvailableSPByJob(this) - 1));
                 }
 
                 this.Release();

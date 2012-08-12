@@ -17,6 +17,7 @@ namespace Loki.Maple.Characters
         public CharacterStorage(Character parent)
         {
             this.Parent = parent;
+            this.Items = new StorageItem[0];
         }
 
         public void ClearItems()

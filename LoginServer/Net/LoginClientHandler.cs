@@ -116,6 +116,7 @@ namespace Loki.Net
                     break;
 
                 case MapleClientOperationCode.CreateCharacter:
+                case MapleClientOperationCode.CreateSpecialChar:
                     this.CreateCharacter(inPacket);
                     break;
 
@@ -143,8 +144,8 @@ namespace Loki.Net
                     this.SelectCharacter(inPacket, true, false, true);
                     break;
 
-                case MapleClientOperationCode.Relog:
-                    this.Relog();
+                case MapleClientOperationCode.EnableSpecialCreation:
+                    this.SendSpecialCharCreation();
                     break;
 
                 case MapleClientOperationCode.ClientStartError:
@@ -185,16 +186,12 @@ namespace Loki.Net
                     outPacket.WriteByte();
                     outPacket.WriteBool(false); // OBSOLETE: Quiet ban.
                     outPacket.WriteLong();
+                    outPacket.WriteByte(1);
                     outPacket.WriteDateTime(this.Account.Creation);
                     outPacket.WriteInt();
                     outPacket.WriteByte(0); // pin 0 = Enable, 1 = Disable
-                    if (LoginServer.RequestPic) // pic 0 = Register, 1 = Request, 2 = Disable
-                        outPacket.WriteByte((byte)(this.Account.Pic == null || this.Account.Pic.Length == 0 ? 0 : 1));
-                    else
-                        outPacket.WriteByte(2);
+                    outPacket.WriteByte((byte)(LoginServer.RequestPic ? (this.Account.Pic == null || this.Account.Pic.Length == 0 ? 0 : 1) : 2)); // pic 0 = Register, 1 = Request, 2 = Disable
                     outPacket.WriteLong();
-                    outPacket.WriteInt();
-                    outPacket.WriteByte();
                 }
                 else
                 {
@@ -208,8 +205,8 @@ namespace Loki.Net
 
         private void Login(Packet inPacket)
         {
-            string password = inPacket.ReadString();
             string username = inPacket.ReadString();
+            string password = inPacket.ReadString();
 
             if (!username.IsAlphaNumeric())
             {
@@ -392,6 +389,7 @@ namespace Loki.Net
                     }
 
                     outPacket.WriteShort();
+                    outPacket.WriteInt();
 
                     this.Send(outPacket);
                 }
@@ -405,7 +403,7 @@ namespace Loki.Net
 
             using (Packet outPacket = new Packet(MapleServerOperationCode.EnableRecommended))
             {
-                outPacket.WriteInt(3);
+                outPacket.WriteInt(0);
                 this.Send(outPacket);
             }
 
@@ -463,6 +461,27 @@ namespace Loki.Net
 
             List<byte[]> WorldCharacters = this.World.GetCharacters(this.Account.ID, false);
 
+            using (Packet outPacket = new Packet(MapleServerOperationCode.LoginInformation))
+            {
+                outPacket.WriteByte();
+                outPacket.WriteInt(this.Account.ID);
+                outPacket.WriteByte(/*0x0A*/); // OBSOLETE: If 0x0A, request gender.
+                outPacket.WriteBool(this.Account.IsMaster); // NOTE: Disables trade, enables admin commands.
+                outPacket.WriteByte();
+                outPacket.WriteByte();
+                outPacket.WriteByte();
+                outPacket.WriteString(this.Account.Username);
+                outPacket.WriteByte(3);
+                outPacket.WriteBool(false); // OBSOLETE: Quiet ban.
+                outPacket.WriteLong();
+                outPacket.WriteDateTime(this.Account.Creation);
+                outPacket.WriteInt(10);
+                outPacket.WriteByte();
+                outPacket.WriteDateTime(DateTime.UtcNow);
+
+                this.Send(outPacket);
+            }
+
             using (Packet outPacket = new Packet(MapleServerOperationCode.CharacterList))
             {
                 outPacket.WriteBool(false); // Not all characters.
@@ -473,10 +492,8 @@ namespace Loki.Net
                     outPacket.WriteBytes(characterBytes);
                 }
 
-                if (LoginServer.RequestPic)
-                    outPacket.WriteByte((byte)(this.Account.Pic == null || this.Account.Pic.Length == 0 ? 0 : 1));
-                else
-                    outPacket.WriteByte(2);
+                outPacket.WriteByte((byte)(LoginServer.RequestPic ? (this.Account.Pic == null || this.Account.Pic.Length == 0 ? 0 : 1) : 2)); // pic 0 = Register, 1 = Request, 2 = Disable
+                outPacket.WriteByte();
                 outPacket.WriteLong(LoginServer.MaxCharacters);
 
                 this.Send(outPacket);
@@ -563,7 +580,7 @@ namespace Loki.Net
         private void CreateCharacter(Packet inPacket)
         {
             byte[] characterData = inPacket.ReadBytes();
-            byte[] characterInfo = this.World.CreateCharacter(this.Account.ID, characterData);
+            byte[] characterInfo = this.World.CreateCharacter(this.Account.ID, characterData, this.Account.IsMaster);
 
             if (characterInfo.Length > 1)
             {
@@ -585,9 +602,14 @@ namespace Loki.Net
         {
             string pic = "";
             if (requestPic)
+            {
                 pic = inPacket.ReadString();
-            else if (registerPic)
+            }
+            else
+            {
                 inPacket.ReadByte();
+                inPacket.ReadByte();
+            }
 
             int characterID = inPacket.ReadInt();
 
@@ -641,8 +663,8 @@ namespace Loki.Net
                         outPacket.WriteIPAddress(this.Channel.RemoteEndPoint.Address);
                         outPacket.WriteShort((short)this.Channel.RemoteEndPoint.Port);
                         outPacket.WriteInt(characterID);
-                        outPacket.WriteInt();
-                        outPacket.WriteByte();
+                        outPacket.WriteLong();
+                        outPacket.WriteShort();
 
                         this.Send(outPacket);
                     }
@@ -659,11 +681,14 @@ namespace Loki.Net
             }
         }
 
-        private void Relog()
+        public void SendSpecialCharCreation()
         {
-            using (Packet outPacket = new Packet(MapleServerOperationCode.RelogResponse))
+            using (Packet outPacket = new Packet(MapleServerOperationCode.SpecialCreation))
             {
-                outPacket.WriteBool(true);
+                outPacket.WriteInt(this.Account.ID);
+                outPacket.WriteBool(!LoginServer.EnableSpecialCharCreation);
+                outPacket.WriteByte();
+
                 this.Send(outPacket);
             }
         }

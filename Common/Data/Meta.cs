@@ -12,7 +12,7 @@ namespace Loki.Data
         {
             Meta.Tables.Clear();
 
-            foreach (dynamic datum in new Datums("COLUMNS").Populate("TABLE_SCHEMA = '{0}'{1}", Database.DefaultSchema, mcdb ? " OR TABLE_SCHEMA = 'mcdb97'" : string.Empty))
+            foreach (dynamic datum in new Datums("COLUMNS").Populate("TABLE_SCHEMA = '{0}'{1}", Database.DefaultSchema, mcdb ? " OR TABLE_SCHEMA = 'mcdb'" : string.Empty))
             {
                 Meta.Add(datum);
             }

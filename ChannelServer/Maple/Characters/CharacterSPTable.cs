@@ -23,7 +23,7 @@ namespace Loki.Maple.Characters
             {
                 short sp;
 
-                if (this.GetSPType(this.Parent.Job) == ExtendedSPType.Regular)
+                if (this.GetSPType(this.Parent) == ExtendedSPType.Regular)
                 {
                     sp = this.Parent.AvailableSP;
                 }
@@ -37,7 +37,7 @@ namespace Loki.Maple.Characters
             }
             set
             {
-                if (this.GetSPType(this.Parent.Job) == ExtendedSPType.Regular)
+                if (this.GetSPType(this.Parent) == ExtendedSPType.Regular)
                 {
                     this.Parent.AvailableSP = value;
                 }
@@ -55,32 +55,32 @@ namespace Loki.Maple.Characters
             }
         }
 
-        public short GetAvailableSPByJob(Job job)
+        public short GetAvailableSPByJob(Character character)
         {
             short sp;
 
-            if (this.GetSPType(job) == ExtendedSPType.Regular)
+            if (this.GetSPType(character) == ExtendedSPType.Regular)
             {
                 sp = this.Parent.AvailableSP;
             }
             else
             {
-                byte adv = (byte)((short)job % 100 == 0 ? 1 : ((short)job % 10) + 2);
+                byte adv = (byte)((short)character.Job % 100 == 0 ? 1 : ((short)character.Job % 10) + 2);
                 sp = this[adv];
             }
 
             return sp;
         }
 
-        public void SetAvailableSPByJob(Job job, short sp)
+        public void SetAvailableSPByJob( short sp)
         {
-            if (this.GetSPType(this.Parent.Job) == ExtendedSPType.Regular)
+            if (this.GetSPType(this.Parent) == ExtendedSPType.Regular)
             {
                 this.Parent.AvailableSP = sp;
             }
             else
             {
-                byte adv = (byte)((short)job % 100 == 0 ? 1 : ((short)job % 10) + 2);
+                byte adv = (byte)((short)this.Parent.Job % 100 == 0 ? 1 : ((short)this.Parent.Job % 10) + 2);
 
                 this[adv] = (byte)sp;
 
@@ -125,15 +125,23 @@ namespace Loki.Maple.Characters
             }
         }
 
-        public ExtendedSPType GetSPType(Job job)
+        public ExtendedSPType GetSPType(Character character)
         {
-            if (job == Job.Farmer || (short)job / 100 == 22)
+            if (character.IsEvan)
             {
                 return ExtendedSPType.Evan;
             }
-            else if ((short)job / 1000 == 3)
+            else if (character.IsResistance)
             {
                 return ExtendedSPType.Resistance;
+            }
+            else if (character.IsMercedes)
+            {
+                return ExtendedSPType.Mercedes;
+            }
+            else if (character.IsPhantom)
+            {
+                return ExtendedSPType.Phantom;
             }
             else
             {
@@ -145,7 +153,7 @@ namespace Loki.Maple.Characters
         {
             using (ByteBuffer buffer = new ByteBuffer())
             {
-                if (this.GetSPType(this.Parent.Job) == ExtendedSPType.Regular)
+                if (this.GetSPType(this.Parent) == ExtendedSPType.Regular)
                 {
                     buffer.WriteShort(this.Parent.AvailableSP);
                 }

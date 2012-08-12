@@ -26,6 +26,7 @@ namespace Loki.Net
         public static bool RequestPin { get; private set; }
         public static bool RequestPic { get; private set; }
         public static int MaxCharacters { get; private set; }
+        public static bool EnableSpecialCharCreation { get; private set; }
 
         public static bool IsAlive
         {
@@ -82,6 +83,9 @@ namespace Loki.Net
 
                 LoginServer.MaxCharacters = Settings.GetInt("Server/MaxCharacters");
                 Log.Inform("Maximum of {0} characters per account.", LoginServer.MaxCharacters);
+
+                LoginServer.EnableSpecialCharCreation = true;
+                Log.Inform("Special char creation is{0}.", LoginServer.EnableSpecialCharCreation ? " enabled" : " disabled");
 
                 LoginServer.Listener = new TcpListener(IPAddress.Any, Settings.GetInt("Server/Port"));
                 LoginServer.Listener.Start();

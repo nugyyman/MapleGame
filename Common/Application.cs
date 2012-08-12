@@ -9,8 +9,8 @@ namespace Loki
     {
         public static readonly Random Random = new Random();
         public const int DefaultBufferSize = 8192;
-        public const int MapleVersion = 97;
-        public const string PatchVersion = "3";
+        public const short MapleVersion = 111;
+        public const string PatchVersion = "1";
         public const string CommandIndicator = "!";
         public const string PlayerCommandIndicator = "@";
 

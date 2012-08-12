@@ -259,6 +259,7 @@ namespace Loki.Maple.Characters
         {
             using (ByteBuffer buffer = new ByteBuffer())
             {
+                buffer.WriteByte(1);
                 buffer.WriteShort((short)this.Started.Count);
 
                 foreach (KeyValuePair<ushort, Dictionary<int, short>> questStatus in this.Started)
@@ -275,6 +276,8 @@ namespace Loki.Maple.Characters
                     buffer.WriteString(kills);
                 }
 
+                buffer.WriteShort();
+                buffer.WriteByte(1);
                 buffer.WriteShort((short)this.Completed.Count);
 
                 foreach (KeyValuePair<ushort, DateTime> questStatus in this.Completed)

@@ -153,11 +153,12 @@ namespace Loki.Interoperability
             return this.NameCheckPool.Dequeue(characterName);
         }
 
-        public byte[] CreateCharacter(int accountID, byte[] characterData)
+        public byte[] CreateCharacter(int accountID, byte[] characterData, bool isMaster)
         {
             using (Packet outPacket = new Packet(InteroperabilityOperationCode.CharacterCreationRequest))
             {
                 outPacket.WriteInt(accountID);
+                outPacket.WriteBool(isMaster);
                 outPacket.WriteBytes(characterData);
 
                 this.RandomChannel.Send(outPacket);

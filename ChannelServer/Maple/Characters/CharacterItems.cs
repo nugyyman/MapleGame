@@ -534,7 +534,6 @@ namespace Loki.Maple.Characters
         {
             using (ByteBuffer buffer = new ByteBuffer())
             {
-                buffer.WriteInt(this.Parent.Meso);
                 buffer.WriteByte(this.MaxSlots[ItemType.Equipment]);
                 buffer.WriteByte(this.MaxSlots[ItemType.Usable]);
                 buffer.WriteByte(this.MaxSlots[ItemType.Setup]);
@@ -561,9 +560,10 @@ namespace Loki.Maple.Characters
                     buffer.WriteBytes(item.ToByteArray());
                 }
 
-                buffer.WriteShort();
-                buffer.WriteShort();
-                buffer.WriteShort();
+                buffer.WriteShort(); 
+                buffer.WriteShort(); // Dragon inventory
+                buffer.WriteShort(); // Mechanic inventory
+                buffer.WriteShort(); // Android inventory
 
                 foreach (Item item in this[ItemType.Usable])
                 {
@@ -592,7 +592,10 @@ namespace Loki.Maple.Characters
                 }
 
                 buffer.WriteByte();
+
                 buffer.WriteInt(-1);
+                buffer.WriteInt();
+                buffer.WriteInt();
 
                 buffer.Flip();
                 return buffer.GetContent();
