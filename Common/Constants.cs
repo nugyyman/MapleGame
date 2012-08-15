@@ -435,8 +435,8 @@ namespace Loki.Maple
         RequestText,
         RequestNumber,
         Choice,
-        RequestStyle = 8,
-        AcceptDecline = 0x0C
+        RequestStyle = 9,
+        AcceptDecline = 0x0F
     }
 
     public enum ForeignEffect : byte

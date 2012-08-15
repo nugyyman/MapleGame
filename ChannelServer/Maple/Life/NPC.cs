@@ -23,11 +23,11 @@ namespace Loki.Maple.Life
             {
                 outPacket.WriteInt(this.ID);
 
-                if (length == 2)
+                if (length == 6)
                 {
-                    outPacket.WriteBytes(inPacket.ReadBytes(2));
+                    outPacket.WriteBytes(inPacket.ReadBytes(length));
                 }
-                else if (length >= 5)
+                else if (length > 6)
                 {
                     outPacket.WriteBytes(inPacket.ReadBytes(length - 5));
                 }

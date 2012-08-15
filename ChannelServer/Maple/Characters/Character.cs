@@ -1491,7 +1491,7 @@ namespace Loki.Maple.Characters
 
         public void Move(ByteBuffer reader)
         {
-            reader.Skip(37);
+            reader.Skip(17);
 
             Movements movements = Movements.Parse(reader.ReadBytes());
 

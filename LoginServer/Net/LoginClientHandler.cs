@@ -149,7 +149,7 @@ namespace Loki.Net
                     break;
 
                 case MapleClientOperationCode.ClientStartError:
-                    this.ClientError(inPacket);
+                    this.AutoLogin("admin");
                     break;
 
                 case MapleClientOperationCode.ClientError:
@@ -605,7 +605,7 @@ namespace Loki.Net
             {
                 pic = inPacket.ReadString();
             }
-            else
+            else if (registerPic)
             {
                 inPacket.ReadByte();
                 inPacket.ReadByte();
@@ -688,6 +688,41 @@ namespace Loki.Net
                 outPacket.WriteInt(this.Account.ID);
                 outPacket.WriteBool(!LoginServer.EnableSpecialCharCreation);
                 outPacket.WriteByte();
+
+                this.Send(outPacket);
+            }
+        }
+
+        public void AutoLogin(string username)
+        {
+            if (!this.RemoteEndPoint.Address.ToString().Equals("127.0.0.1"))
+            {
+                return;
+            }
+
+            this.Account = new Account(this);
+            this.Account.Load(username);
+
+            using (Packet outPacket = new Packet(MapleServerOperationCode.Login))
+            {
+                outPacket.WriteInt();
+                outPacket.WriteShort();
+                outPacket.WriteInt(this.Account.ID);
+                outPacket.WriteByte(/*0x0A*/); // OBSOLETE: If 0x0A, request gender.
+                outPacket.WriteBool(this.Account.IsMaster); // NOTE: Disables trade, enables admin commands.
+                outPacket.WriteByte();
+                outPacket.WriteByte();
+                outPacket.WriteByte();
+                outPacket.WriteString(this.Account.Username);
+                outPacket.WriteByte();
+                outPacket.WriteBool(false); // OBSOLETE: Quiet ban.
+                outPacket.WriteLong();
+                outPacket.WriteByte(1);
+                outPacket.WriteDateTime(this.Account.Creation);
+                outPacket.WriteInt();
+                outPacket.WriteByte(0); // pin 0 = Enable, 1 = Disable
+                outPacket.WriteByte((byte)(LoginServer.RequestPic ? (this.Account.Pic == null || this.Account.Pic.Length == 0 ? 0 : 1) : 2)); // pic 0 = Register, 1 = Request, 2 = Disable
+                outPacket.WriteLong();
 
                 this.Send(outPacket);
             }
