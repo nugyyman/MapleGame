@@ -1367,11 +1367,9 @@ namespace Loki.Maple
         {
             Packet showGain = new Packet(MapleServerOperationCode.ShowLog);
 
-            showGain.WriteBytes(0, 0);
+            showGain.WriteBytes(5, 1);
             showGain.WriteInt(((Item)this).MapleID);
             showGain.WriteInt(((Item)this).Quantity);
-            showGain.WriteInt();
-            showGain.WriteInt();
 
             return showGain;
         }

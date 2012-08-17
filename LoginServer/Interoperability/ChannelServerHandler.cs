@@ -140,6 +140,10 @@ namespace Loki.Interoperability
                     this.LoggedInPool.Enqueue(inPacket.ReadInt(), inPacket.ReadBool());
                     break;
 
+                case InteroperabilityOperationCode.LoggedInUpdate:
+                    this.LoggedInUpdate(inPacket);
+                    break;
+
                 case InteroperabilityOperationCode.ChannelPortRequest:
                     this.SendChannelPort(inPacket);
                     break;
@@ -266,6 +270,17 @@ namespace Loki.Interoperability
             }
 
             return this.LoggedInPool.Dequeue(accountID);
+        }
+
+        public void LoggedInUpdate(Packet inPacket)
+        {
+            int accountID = inPacket.ReadInt();
+
+            dynamic datum = new Datum("accounts");
+
+            datum.IsLoggedIn = inPacket.ReadBool();
+
+            datum.Update("ID = '{0}'", this.ID);
         }
 
         public float LoadProportion

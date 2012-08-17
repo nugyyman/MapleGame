@@ -388,6 +388,17 @@ namespace Loki.Interoperability
             }
         }
 
+        public void LoggedInUpdate(int accountID, bool LoggedIn)
+        {
+            using (Packet outPacket = new Packet(InteroperabilityOperationCode.LoggedInUpdate))
+            {
+                outPacket.WriteInt(accountID);
+                outPacket.WriteBool(LoggedIn);
+
+                this.Send(outPacket);
+            }
+        }
+
         private PendingKeyedQueue<byte, short> ChannelPortPool = new PendingKeyedQueue<byte, short>();
 
         public short GetChannelPort(byte channelID)

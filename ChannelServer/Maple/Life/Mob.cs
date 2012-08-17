@@ -237,18 +237,23 @@ namespace Loki.Maple.Life
         {
             short movementId = inPacket.ReadShort();
 
-            byte randomSkill = inPacket.ReadByte(); // TODO: Might be a byte!
+            bool useSkill = (inPacket.ReadByte() & 0xF) != 0;
             int skillUnknown1 = inPacket.ReadByte() & 0xFF;
             byte skillId = inPacket.ReadByte();
             byte skillLevel = inPacket.ReadByte();
-            byte skillUnknown2 = inPacket.ReadByte();
-            inPacket.Skip(26);
-            Point startPosition = new Point(inPacket.ReadShort(), inPacket.ReadShort());
-            inPacket.ReadInt();
+            short delay = inPacket.ReadShort();
+            Point startPosition = null;
+
+            if (inPacket.ReadBool())
+            {
+                startPosition = new Point(inPacket.ReadShort(), inPacket.ReadShort());
+            }
+
+            inPacket.Skip(27);
             Movements movements = Movements.Parse(inPacket.ReadBytes());
             MobSkill skill = null;
 
-            if (randomSkill == 1 && this.Skills.Count > 0)
+            if (useSkill && this.Skills.Count > 0)
             {
                 skill = this.Skills.Random;
             }
@@ -276,7 +281,7 @@ namespace Loki.Maple.Life
             {
                 outPacket.WriteInt(this.ObjectID);
                 outPacket.WriteShort(movementId);
-                outPacket.WriteByte(randomSkill);
+                outPacket.WriteBool(useSkill);
                 outPacket.WriteShort((short)this.CurrentMP);
                 outPacket.WriteByte((byte)(skill == null ? 0 : skill.MapleID));
                 outPacket.WriteByte((byte)(skill == null ? 0 : skill.Level));
@@ -289,15 +294,21 @@ namespace Loki.Maple.Life
             {
                 outPacket.WriteInt(this.ObjectID);
                 outPacket.WriteShort();
-                outPacket.WriteByte(randomSkill);
+                outPacket.WriteBool(useSkill);
                 outPacket.WriteByte((byte)skillUnknown1);
                 outPacket.WriteByte(skillId);
                 outPacket.WriteByte(skillLevel);
-                outPacket.WriteByte(skillUnknown2);
-                outPacket.WriteByte();
-                outPacket.WriteLong();
-                outPacket.WriteShort(startPosition.X);
-                outPacket.WriteShort(startPosition.Y);
+                outPacket.WriteShort(delay);
+                outPacket.WriteShort();
+
+                if (startPosition != null)
+                {
+                    outPacket.WriteShort(startPosition.X);
+                    outPacket.WriteShort(startPosition.Y);
+                }
+
+                outPacket.WriteShort(this.Position.X);
+                outPacket.WriteShort(this.Position.Y);
                 outPacket.WriteInt();
                 outPacket.WriteBytes(movements.ToByteArray());
 
@@ -420,9 +431,8 @@ namespace Loki.Maple.Life
             spawn.WriteInt(this.ObjectID);
             spawn.WriteByte((byte)(this.Controller == null ? 5 : 1));
             spawn.WriteInt(this.MapleID);
-            spawn.Skip(19);
-            spawn.WriteByte(0x88);
-            spawn.Skip(6);
+            spawn.WriteByte();
+            spawn.Skip(32);
             spawn.WriteShort(this.Position.X);
             spawn.WriteShort(this.Position.Y);
             spawn.WriteByte(this.Stance);
@@ -465,7 +475,6 @@ namespace Loki.Maple.Life
 
             destroy.WriteInt(this.ObjectID);
             destroy.WriteByte(1); // TODO: 0 = dissapear, 1 = fade out, 2+ = special
-            destroy.WriteByte(1); // Same.
 
             return destroy;
         }

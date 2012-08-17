@@ -526,12 +526,19 @@ namespace Loki.Maple.Characters
                         outPacket.WriteInt(); //wedding bonus
                         outPacket.WriteByte(); //0 = party bonus, 1 = Bonus Event party Exp () x0
                         outPacket.WriteInt(); // party bonus
-                        outPacket.WriteInt(); //equip bonus
-                        outPacket.WriteInt(); //Internet Cafe Bonus
-                        outPacket.WriteInt(); //Rainbow Week Bonus
-                        outPacket.WriteInt(); // Party Ring Bonus
-                        outPacket.WriteInt(); // Cake vs Pie Bonus
-                        outPacket.WriteByte();
+                        // Class_Bonus_EXP
+                        outPacket.WriteInt(); // Equip Item Bonus EXP
+                        outPacket.WriteInt(0); // Internet Cafe EXP Bonus (+%d)
+                        outPacket.WriteInt(0); // Rainbow Week Bonus EXP (+%d)
+                        outPacket.WriteByte(0); // Monster Card Completion Set +exp
+                        outPacket.WriteInt(0); // Boom Up Bonus EXP (+%d)
+                        outPacket.WriteInt(0); // Potion Bonus EXP (+%d)
+                        outPacket.WriteInt(0/*20021110*/); // %s Bonus EXP (+%d) (string bonus exp?)
+                        outPacket.WriteInt(0); // Buff Bonus EXP (+%d)
+                        outPacket.WriteInt(0); // Rest Bonus EXP (+%d)
+                        outPacket.WriteInt(0); // Item Bonus EXP (+%d)
+                        outPacket.WriteInt(); // Party Ring Bonus EXP(+%d)
+                        outPacket.WriteInt(0); // Cake vs Pie Bonus EXP(+%d)
 
                         this.Client.Send(outPacket);
                     }
@@ -603,10 +610,12 @@ namespace Loki.Maple.Characters
                 if (value && !ChannelServer.LoggedIn.Contains(this.AccountID))
                 {
                     ChannelServer.LoggedIn.Add(this.AccountID);
+                    ChannelServer.LoginServerConnection.LoggedInUpdate(this.AccountID, value);
                 }
                 else if (!value && ChannelServer.LoggedIn.Contains(this.AccountID))
                 {
                     ChannelServer.LoggedIn.Remove(this.AccountID);
+                    ChannelServer.LoginServerConnection.LoggedInUpdate(this.AccountID, value);
                 }
             }
         }
@@ -1583,9 +1592,9 @@ namespace Loki.Maple.Characters
                 outPacket.WriteShort(2);
                 outPacket.WriteLong(1);
                 outPacket.WriteLong(2);
-                outPacket.WriteInt(ChannelServer.InternalChannelID);
-                outPacket.WriteInt();
-                outPacket.WriteLong();
+                outPacket.WriteLong(ChannelServer.InternalChannelID);
+                outPacket.WriteByte();
+                outPacket.WriteLong(2);
                 outPacket.WriteByte();
                 outPacket.WriteInt(destinationMapId);
                 outPacket.WriteByte(portalId);
@@ -1593,6 +1602,8 @@ namespace Loki.Maple.Characters
                 outPacket.WriteByte();
                 outPacket.WriteDateTime(DateTime.UtcNow);
                 outPacket.WriteInt(100);
+                outPacket.WriteByte();
+                outPacket.WriteBool(!this.IsResistance);
 
                 this.Client.Send(outPacket);
             }
@@ -1617,7 +1628,14 @@ namespace Loki.Maple.Characters
 
             ChangeMapMode mode = (ChangeMapMode)inPacket.ReadByte();
             int destinationMapId = inPacket.ReadInt();
+            inPacket.ReadInt();
             string portalLabel = inPacket.ReadString();
+
+            if (inPacket.Remaining > 6)
+            {
+                inPacket.ReadInt();
+            }
+
             inPacket.ReadByte();
             bool wheel = inPacket.ReadShort() > 0;
             destinationMapId = this.Map.MapleID;
@@ -1710,7 +1728,7 @@ namespace Loki.Maple.Characters
                     mask |= (int)loopStatistic;
                 }
 
-                outPacket.WriteInt(mask);
+                outPacket.WriteLong(mask);
 
                 Array.Sort(statistics);
 
@@ -2497,10 +2515,10 @@ namespace Loki.Maple.Characters
         public void Damage(Packet inPacket)
         {
             inPacket.ReadInt();
+            inPacket.ReadInt();
             int damageFrom = inPacket.ReadByte();
             inPacket.ReadByte();
             int damage = inPacket.ReadInt();
-            Log.Warn(damage);
             int objectId = 0;
             int monsterIdFrom = 0;
             int pgmr = 0;

@@ -31,7 +31,8 @@ namespace Loki.Maple
         {
             get
             {
-                if (LoginServer.LoggedIn.Contains(this.ID))
+                //old system
+                /*if (LoginServer.LoggedIn.Contains(this.ID))
                 {
                     return true;
                 }
@@ -55,17 +56,41 @@ namespace Loki.Maple
                     }
 
                     return false;
+                }*/
+                if (Database.Fetch("accounts", "IsLoggedIn", "ID", this.ID))
+                {
+                    return true;
                 }
+
+                return false;
             }
             set
             {
-                if (value && !LoginServer.LoggedIn.Contains(this.ID))
+                //old system
+                /*if (value && !LoginServer.LoggedIn.Contains(this.ID))
                 {
                     LoginServer.LoggedIn.Add(this.ID);
                 }
                 else if (!value && LoginServer.LoggedIn.Contains(this.ID))
                 {
                     LoginServer.LoggedIn.Remove(this.ID);
+                }*/
+
+                if (value && !Database.Fetch("accounts", "IsLoggedIn", "ID", this.ID))
+                {
+                    dynamic datum = new Datum("accounts");
+
+                    datum.IsLoggedIn = value;
+
+                    datum.Update("ID = '{0}'", this.ID);
+                }
+                else if (!value && Database.Fetch("accounts", "IsLoggedIn", "ID", this.ID))
+                {
+                    dynamic datum = new Datum("accounts");
+
+                    datum.IsLoggedIn = value;
+
+                    datum.Update("ID = '{0}'", this.ID);
                 }
             }
         }

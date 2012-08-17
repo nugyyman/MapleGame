@@ -66,6 +66,7 @@ namespace Loki
 							  `Salt` varchar(32) NOT NULL,
 							  `Pin` varchar(64) NOT NULL DEFAULT '',
 							  `Pic` varchar(26) DEFAULT NULL,
+							  `IsLoggedIn` tinyint(1) unsigned NOT NULL
 							  `IsBanned` tinyint(1) unsigned NOT NULL,
 							  `IsMaster` tinyint(1) unsigned NOT NULL,
 							  `Birthday` date NOT NULL,

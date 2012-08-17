@@ -148,7 +148,7 @@ namespace Loki.Net
                     this.SendSpecialCharCreation();
                     break;
 
-                case MapleClientOperationCode.ClientStartError:
+                case MapleClientOperationCode.ClientStart:
                     this.AutoLogin("admin");
                     break;
 

@@ -29,7 +29,7 @@
         CharacterSelectWithRequestPic = 0x33,
         CharacterSelectFromViewAllWithRegisterPic = 0x34,
         CharacterSelectFromViewAllWithRequestPic = 0x35,
-        ClientStartError = 0x38,
+        ClientStart = 0x38,
         ClientFailed = 0x39,
         ClientError = 0x3B,
         EnableLv50Char = 0x3C,

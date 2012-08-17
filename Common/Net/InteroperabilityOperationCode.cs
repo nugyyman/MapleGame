@@ -13,6 +13,7 @@
         CharacterCreationResponse,
         ChannelIDUpdate,
         LoggedInCheck,
+        LoggedInUpdate,
         ChannelPortRequest,
         ChannelPortResponse,
         LoadInformationRequest,
