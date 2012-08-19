@@ -153,9 +153,9 @@ namespace Loki.Maple
             {
                 switch (this.MapleID)
                 {
-                    case (int)SkillNames.Corsair.SpeedInfusion:
+                    //case (int)SkillNames.Corsair.SpeedInfusion:
                     case (int)SkillNames.Buccaneer.SpeedInfusion:
-                    case (int)SkillNames.ThunderBreaker.SpeedInfusion:
+                    case (int)SkillNames.ThunderBreaker3.SpeedInfusion:
                         using (Packet outPacket = new Packet(MapleServerOperationCode.GiveBuff))
                         {
                             outPacket.WriteLong(this.PrimaryBuffMask);
@@ -189,7 +189,7 @@ namespace Loki.Maple
                         break;
 
                     case (int)SkillNames.Marauder.EnergyCharge:
-                    case (int)SkillNames.ThunderBreaker.EnergyCharge:
+                    case (int)SkillNames.ThunderBreaker2.EnergyCharge:
                         using (Packet outPacket = new Packet(MapleServerOperationCode.GiveBuff))
                         {
                             outPacket.WriteLong(this.PrimaryBuffMask);
@@ -281,9 +281,9 @@ namespace Loki.Maple
         {
             switch (this.MapleID)
             {
-                case (int)SkillNames.Corsair.SpeedInfusion:
+                //case (int)SkillNames.Corsair.SpeedInfusion:
                 case (int)SkillNames.Buccaneer.SpeedInfusion:
-                case (int)SkillNames.ThunderBreaker.SpeedInfusion:
+                case (int)SkillNames.ThunderBreaker3.SpeedInfusion:
                     using (Packet outPacket = new Packet(MapleServerOperationCode.GiveForeignBuff))
                     {
                         outPacket.WriteInt(this.Parent.Parent.ID);
@@ -301,7 +301,7 @@ namespace Loki.Maple
                     }
 
                 case (int)SkillNames.Marauder.EnergyCharge:
-                case (int)SkillNames.ThunderBreaker.EnergyCharge:
+                case (int)SkillNames.ThunderBreaker2.EnergyCharge:
                     using (Packet outPacket = new Packet(MapleServerOperationCode.GiveForeignBuff))
                     {
                         outPacket.WriteInt(this.Parent.Parent.ID);
@@ -429,12 +429,12 @@ namespace Loki.Maple
                     this.SecondaryStatups.Add(SecondaryBuffStat.Recovery, skill.ParameterA);
                     break;
 
-                case (int)SkillNames.Beginner.EchoOfHero:
-                case (int)SkillNames.Noblesse.EchoOfHero:
+                case (int)SkillNames.Beginner.EchoofHero:
+                case (int)SkillNames.Noblesse.EchoofHero:
                     this.SecondaryStatups.Add(SecondaryBuffStat.EchoOfHero, skill.ParameterA);
                     break;
 
-                case (int)SkillNames.Fighter.PowerGuard:
+                //case (int)SkillNames.Fighter.PowerGuard:
                 case (int)SkillNames.Page.PowerGuard:
                     this.SecondaryStatups.Add(SecondaryBuffStat.PowerGuard, skill.ParameterA);
                     break;
@@ -445,22 +445,18 @@ namespace Loki.Maple
                     this.SecondaryStatups.Add(SecondaryBuffStat.HyperBodyHP, skill.ParameterB);
                     break;
 
-                case (int)SkillNames.WhiteKnight.BwFireCharge:
-                case (int)SkillNames.WhiteKnight.BwIceCharge:
-                case (int)SkillNames.WhiteKnight.BwLitCharge:
-                case (int)SkillNames.WhiteKnight.SwordFireCharge:
-                case (int)SkillNames.WhiteKnight.SwordIceCharge:
-                case (int)SkillNames.WhiteKnight.SwordLitCharge:
-                case (int)SkillNames.Paladin.BwHolyCharge:
-                case (int)SkillNames.Paladin.SwordHolyCharge:
-                case (int)SkillNames.DawnWarrior.SoulCharge:
-                case (int)SkillNames.ThunderBreaker.LightningCharge:
+                case (int)SkillNames.WhiteKnight.FlameCharge:
+                case (int)SkillNames.WhiteKnight.BlizzardCharge:
+                case (int)SkillNames.WhiteKnight.LightningCharge:
+                case (int)SkillNames.Paladin.HolyCharge:
+                case (int)SkillNames.DawnWarrior3.SoulCharge:
+                case (int)SkillNames.ThunderBreaker2.LightningCharge:
                     this.SecondaryStatups.Add(SecondaryBuffStat.WKCharge, skill.ParameterA);
                     break;
 
-                case (int)SkillNames.DragonKnight.DragonBlood:
-                    this.SecondaryStatups.Add(SecondaryBuffStat.DragonBlood, skill.ParameterA);
-                    break;
+                //case (int)SkillNames.DragonKnight.DragonBlood:
+                //    this.SecondaryStatups.Add(SecondaryBuffStat.DragonBlood, skill.ParameterA);
+                //    break;
 
                 case (int)SkillNames.DragonKnight.DragonRoar:
                     // TODO: HP?
@@ -473,7 +469,7 @@ namespace Loki.Maple
                     break;
 
                 case (int)SkillNames.Magician.MagicGuard:
-                case (int)SkillNames.BlazeWizard.MagicGuard:
+                case (int)SkillNames.BlazeWizard1.MagicGuard:
                     this.SecondaryStatups.Add(SecondaryBuffStat.MagicGuard, skill.ParameterA);
                     break;
 
@@ -491,51 +487,47 @@ namespace Loki.Maple
                     this.SecondaryStatups.Add(SecondaryBuffStat.Infinity, skill.ParameterA);
                     break;
 
-                case (int)SkillNames.FirePoisonArchMage.ManaReflection:
-                case (int)SkillNames.IceLightningArchMage.ManaReflection:
+                //case (int)SkillNames.FirePoisonArchMage.ManaReflection:
+                //case (int)SkillNames.IceLightningArchMage.ManaReflection:
                 case (int)SkillNames.Bishop.ManaReflection:
                     this.SecondaryStatups.Add(SecondaryBuffStat.ManaReflection, 1);
                     break;
 
-                case (int)SkillNames.Bishop.HolyShield:
-                    this.SecondaryStatups.Add(SecondaryBuffStat.HolyShield, skill.ParameterA);
-                    break;
-
                 case (int)SkillNames.Priest.MysticDoor:
-                case (int)SkillNames.Hunter.SoulArrow:
-                case (int)SkillNames.Crossbowman.SoulArrow:
-                case (int)SkillNames.WindArcher.SoulArrow:
+                //case (int)SkillNames.Hunter.SoulArrow:
+                //case (int)SkillNames.CrossbowMan.SoulArrow:
+                case (int)SkillNames.WindArcher2.SoulArrow:
                     this.SecondaryStatups.Add(SecondaryBuffStat.SoulArrow, skill.ParameterA);
                     break;
 
                 case (int)SkillNames.Ranger.Puppet:
                 case (int)SkillNames.Sniper.Puppet:
-                case (int)SkillNames.WindArcher.Puppet:
+                case (int)SkillNames.WindArcher3.Puppet:
                     this.SecondaryStatups.Add(SecondaryBuffStat.Puppet, 1);
                     break;
 
-                case (int)SkillNames.Bowmaster.Concentrate:
-                    this.SecondaryStatups.Add(SecondaryBuffStat.Concentrate, skill.ParameterA);
-                    break;
+                //case (int)SkillNames.BowMaster.Concentrate:
+                //    this.SecondaryStatups.Add(SecondaryBuffStat.Concentrate, skill.ParameterA);
+                //    break;
 
-                case (int)SkillNames.Bowmaster.Hamstring:
-                    this.SecondaryStatups.Add(SecondaryBuffStat.Hamstring, skill.ParameterA);
+                //case (int)SkillNames.BowMaster.Hamstring:
+                //    this.SecondaryStatups.Add(SecondaryBuffStat.Hamstring, skill.ParameterA);
                     //TODO: Affect monster's speed here.
-                    break;
+                //    break;
 
-                case (int)SkillNames.Marksman.Blind:
-                    this.SecondaryStatups.Add(SecondaryBuffStat.Blind, skill.ParameterA);
+                //case (int)SkillNames.CrossbowMaster.Blind:
+                //    this.SecondaryStatups.Add(SecondaryBuffStat.Blind, skill.ParameterA);
                     //TODO: Affect monster's accuracy here.
-                    break;
+                //    break;
 
-                case (int)SkillNames.Bowmaster.SharpEyes:
-                case (int)SkillNames.Marksman.SharpEyes:
+                case (int)SkillNames.BowMaster.SharpEyes:
+                case (int)SkillNames.CrossbowMaster.SharpEyes:
                     this.SecondaryStatups.Add(SecondaryBuffStat.SharpEyes, (short)(skill.ParameterA << 8 | skill.ParameterB));
                     break;
 
-                case (int)SkillNames.Rogue.DarkSight:
-                case (int)SkillNames.WindArcher.WindWalk:
-                case (int)SkillNames.NightWalker.DarkSight:
+                case (int)SkillNames.Thief.DarkSight:
+                case (int)SkillNames.WindArcher2.WindWalk:
+                case (int)SkillNames.NightWalker1.DarkSight:
                     this.SecondaryStatups.Add(SecondaryBuffStat.DarkSight, skill.ParameterA);
                     break;
 
@@ -544,7 +536,7 @@ namespace Loki.Maple
                     break;
 
                 case (int)SkillNames.Hermit.ShadowPartner:
-                case (int)SkillNames.NightWalker.ShadowPartner:
+                case (int)SkillNames.NightWalker3.ShadowPartner:
                     this.SecondaryStatups.Add(SecondaryBuffStat.ShadowPartner, skill.ParameterA);
                     break;
 
@@ -565,30 +557,35 @@ namespace Loki.Maple
                     break;
 
                 case (int)SkillNames.Crusader.ComboAttack:
-                case (int)SkillNames.DawnWarrior.ComboAttack:
+                case (int)SkillNames.DawnWarrior3.ComboAttack:
                     this.SecondaryStatups.Add(SecondaryBuffStat.Combo, (short)(this.Value + 1));
                     break;
 
 
-                case (int)SkillNames.Fighter.AxeBooster:
-                case (int)SkillNames.Fighter.SwordBooster:
-                case (int)SkillNames.Page.BwBooster:
-                case (int)SkillNames.Page.SwordBooster:
-                case (int)SkillNames.Spearman.PolearmBooster:
-                case (int)SkillNames.Spearman.SpearBooster:
+                case (int)SkillNames.Fighter.WeaponBooster:
+                case (int)SkillNames.Page.WeaponBooster:
+                case (int)SkillNames.Spearman.WeaponBooster:
                 case (int)SkillNames.Hunter.BowBooster:
-                case (int)SkillNames.Crossbowman.CrossbowBooster:
+                case (int)SkillNames.CrossbowMan.CrossbowBooster:
                 case (int)SkillNames.Assassin.ClawBooster:
                 case (int)SkillNames.Bandit.DaggerBooster:
+                case (int)SkillNames.BladeRecruit.KataraBooster:
                 case (int)SkillNames.FirePoisonMage.SpellBooster:
                 case (int)SkillNames.IceLightningMage.SpellBooster:
-                case (int)SkillNames.Brawler.KnucklerBooster:
+                case (int)SkillNames.Brawler.KnuckleBooster:
                 case (int)SkillNames.Gunslinger.GunBooster:
-                case (int)SkillNames.DawnWarrior.SwordBooster:
-                case (int)SkillNames.BlazeWizard.SpellBooster:
-                case (int)SkillNames.WindArcher.BowBooster:
-                case (int)SkillNames.NightWalker.ClawBooster:
-                case (int)SkillNames.ThunderBreaker.KnucklerBooster:
+                case (int)SkillNames.Cannoneer.CannonBooster:
+                case (int)SkillNames.DawnWarrior2.SwordBooster:
+                case (int)SkillNames.BlazeWizard2.SpellBooster:
+                case (int)SkillNames.WindArcher2.BowBooster:
+                case (int)SkillNames.NightWalker2.ClawBooster:
+                case (int)SkillNames.ThunderBreaker2.KnuckleBooster:
+                case (int)SkillNames.Aran1.PolearmBooster:
+                case (int)SkillNames.Evan6.MagicBooster:
+                case (int)SkillNames.Mercedes2.DualBowgunsBoost:
+                case (int)SkillNames.BattleMage2.StaffBoost:
+                case (int)SkillNames.WildHunter1.CrossbowBooster:
+                case (int)SkillNames.Mechanic2.RocketBooster:
                     this.SecondaryStatups.Add(SecondaryBuffStat.Booster, skill.ParameterA);
                     break;
 
@@ -598,8 +595,8 @@ namespace Loki.Maple
                 case (int)SkillNames.FirePoisonArchMage.MapleWarrior:
                 case (int)SkillNames.IceLightningArchMage.MapleWarrior:
                 case (int)SkillNames.Bishop.MapleWarrior:
-                case (int)SkillNames.Bowmaster.MapleWarrior:
-                case (int)SkillNames.Marksman.MapleWarrior:
+                case (int)SkillNames.BowMaster.MapleWarrior:
+                case (int)SkillNames.CrossbowMaster.MapleWarrior:
                 case (int)SkillNames.NightLord.MapleWarrior:
                 case (int)SkillNames.Shadower.MapleWarrior:
                 case (int)SkillNames.Corsair.MapleWarrior:
@@ -607,19 +604,19 @@ namespace Loki.Maple
                     this.SecondaryStatups.Add(SecondaryBuffStat.MapleWarrrior, skill.ParameterA);
                     break;
                 case (int)SkillNames.Marauder.EnergyCharge:
-                case (int)SkillNames.ThunderBreaker.EnergyCharge:
+                case (int)SkillNames.ThunderBreaker2.EnergyCharge:
                     this.PrimaryStatups.Add(PrimaryBuffStat.EnergyCharge, (short)this.Value);
                     break;
 
                 case (int)SkillNames.Pirate.Dash:
-                case (int)SkillNames.ThunderBreaker.Dash:
+                case (int)SkillNames.ThunderBreaker1.Dash:
                     this.SecondaryStatups.Add(SecondaryBuffStat.Speed, skill.ParameterA);
                     this.SecondaryStatups.Add(SecondaryBuffStat.Jump, skill.ParameterB);
                     break;
 
-                case (int)SkillNames.Corsair.SpeedInfusion:
+                //case (int)SkillNames.Corsair.SpeedInfusion:
                 case (int)SkillNames.Buccaneer.SpeedInfusion:
-                case (int)SkillNames.ThunderBreaker.SpeedInfusion:
+                case (int)SkillNames.ThunderBreaker3.SpeedInfusion:
                     this.PrimaryStatups.Add(PrimaryBuffStat.SpeedInfusion, skill.ParameterA);
                     break;
 

@@ -29,23 +29,17 @@ namespace Loki.Maple.Characters
 
             int npcId = -1;
 
-            if (action != QuestAction.Forfeit)
-            {
-                npcId = inPacket.ReadInt();
-            }
-
             switch (action)
             {
-                case QuestAction.Start:
-                    if (inPacket.Remaining >= 4)
-                    {
-                        inPacket.ReadInt();
-                    }
-                    else
-                    {
-                        inPacket.ReadShort();
-                    }
+                case QuestAction.RestoreLostItem:
+                    inPacket.ReadInt();
+                    int itemID = inPacket.ReadInt();
+                    // TODO: Handle this
 
+                    break;
+
+                case QuestAction.Start:
+                    npcId = inPacket.ReadInt();
                     this.Started.Add(quest.ID, new Dictionary<int, short>());
 
                     foreach (KeyValuePair<int, short> requiredKills in World.Quests[quest.ID].PostRequiredKills)
@@ -63,11 +57,12 @@ namespace Loki.Maple.Characters
                         this.Parent.Client.Send(outPacket);
                     }
 
-                    //this.Update(quest.ID, npcId, 8);
+                    this.Update(quest.ID, npcId, 8);
 
                     break;
 
                 case QuestAction.Complete:
+                    npcId = inPacket.ReadInt();
                     inPacket.ReadInt();
 
                     foreach (KeyValuePair<int, short> item in quest.PostRequiredItems)
@@ -104,9 +99,8 @@ namespace Loki.Maple.Characters
                     {
                         outPacket.WriteByte(1);
                         outPacket.WriteUShort(quest.ID);
-                        outPacket.WriteBytes(0x02, 0xA0, 0x67, 0xB9, 0xDA, 0x69, 0x3A, 0xC8, 0x01);
-                        outPacket.WriteInt();
-                        outPacket.WriteInt();
+                        outPacket.WriteByte(2);
+                        outPacket.WriteDateTime(DateTime.UtcNow);
 
                         this.Parent.Client.Send(outPacket);
                     }
@@ -125,6 +119,7 @@ namespace Loki.Maple.Characters
                         outPacket.WriteByte(1);
                         outPacket.WriteUShort(quest.ID);
                         outPacket.WriteByte();
+                        outPacket.WriteByte();
 
                         this.Parent.Client.Send(outPacket);
                     }
@@ -132,15 +127,16 @@ namespace Loki.Maple.Characters
                     break;
 
                 case QuestAction.ScriptStart:
-                    //inPacket.ReadInt();
+                    npcId = inPacket.ReadInt();
 
                     //throw new NotImplementedException("Scripted quests not implemented.");
+                    break;
 
                 case QuestAction.ScriptEnd:
-                    inPacket.ReadInt();
+                    npcId = inPacket.ReadInt();
 
                     //throw new NotImplementedException("Scripted quests not implemented.");
-                    return;
+                    break;
             }
         }
 

@@ -966,7 +966,7 @@ namespace Loki.Maple
 
                 using (Packet outPacket = new Packet(MapleServerOperationCode.ModifyInventoryItem))
                 {
-                    outPacket.WriteBytes(0x01, 0x01, 0x02);
+                    outPacket.WriteBytes(1, 1, 0, 2);
                     outPacket.WriteByte((byte)this.Type);
                     outPacket.WriteShort((short)sourceSlot);
                     outPacket.WriteShort((short)destinationSlot);
@@ -1035,7 +1035,7 @@ namespace Loki.Maple
 
                 using (Packet outPacket = new Packet(MapleServerOperationCode.ModifyInventoryItem))
                 {
-                    outPacket.WriteBytes(1, 1, 2);
+                    outPacket.WriteBytes(1, 1, 0, 2);
                     outPacket.WriteByte((byte)this.Type);
                     outPacket.WriteShort((short)source);
                     outPacket.WriteShort((short)destination);
@@ -1067,7 +1067,7 @@ namespace Loki.Maple
 
                     using (Packet outPacket = new Packet(MapleServerOperationCode.ModifyInventoryItem))
                     {
-                        outPacket.WriteBytes(1, 2, 1);
+                        outPacket.WriteBytes(1, 2, 0, 1);
                         outPacket.WriteByte((byte)this.Type);
                         outPacket.WriteShort((short)sourceSlot);
                         outPacket.WriteShort((short)this.Quantity);
@@ -1085,7 +1085,7 @@ namespace Loki.Maple
 
                     using (Packet outPacket = new Packet(MapleServerOperationCode.ModifyInventoryItem))
                     {
-                        outPacket.WriteBytes(1, 2, 3);
+                        outPacket.WriteBytes(1, 2, 0, 3);
                         outPacket.WriteByte((byte)this.Type);
                         outPacket.WriteShort((short)sourceSlot);
                         outPacket.WriteByte(1); // UNK
@@ -1110,7 +1110,7 @@ namespace Loki.Maple
 
                 using (Packet outPacket = new Packet(MapleServerOperationCode.ModifyInventoryItem))
                 {
-                    outPacket.WriteBytes(1, 1, 2);
+                    outPacket.WriteBytes(1, 1, 0, 2);
                     outPacket.WriteByte((byte)this.Type);
                     outPacket.WriteShort((short)sourceSlot);
                     outPacket.WriteShort((short)destinationSlot);
@@ -1135,7 +1135,7 @@ namespace Loki.Maple
             {
                 using (Packet outPacket = new Packet(MapleServerOperationCode.ModifyInventoryItem))
                 {
-                    outPacket.WriteBytes(1, 1, 3);
+                    outPacket.WriteBytes(1, 1, 0, 3);
                     outPacket.WriteByte((byte)this.Type);
                     outPacket.WriteShort((short)this.Slot);
 
@@ -1159,7 +1159,8 @@ namespace Loki.Maple
 
                 using (Packet outPacket = new Packet(MapleServerOperationCode.ModifyInventoryItem))
                 {
-                    outPacket.WriteBytes(1, 1, 1);
+                    outPacket.WriteBytes(1, 1, 0, 1);
+                    outPacket.WriteBytes(1, 1, 0, 1);
                     outPacket.WriteByte((byte)this.Type);
                     outPacket.WriteShort((short)this.Slot);
                     outPacket.WriteShort(this.Quantity);
@@ -1186,10 +1187,9 @@ namespace Loki.Maple
             using (Packet outPacket = new Packet(MapleServerOperationCode.ModifyInventoryItem))
             {
                 outPacket.WriteBool(true); // TODO: From drop.
-                outPacket.WriteBytes(1, 1);
+                outPacket.WriteBytes(1, 0, 1);
                 outPacket.WriteByte((byte)this.Type);
-                outPacket.WriteByte((byte)this.Slot);
-                outPacket.WriteByte(); // UNK
+                outPacket.WriteShort((short)this.Slot);
                 outPacket.WriteShort(this.Quantity);
 
                 this.Character.Client.Send(outPacket);

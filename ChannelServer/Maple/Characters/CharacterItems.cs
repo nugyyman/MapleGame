@@ -81,7 +81,7 @@ namespace Loki.Maple.Characters
                     using (Packet outPacket = new Packet(MapleServerOperationCode.ModifyInventoryItem))
                     {
                         outPacket.WriteBool(fromDrop);
-                        outPacket.WriteBytes(1, 0);
+                        outPacket.WriteBytes(1, 0, 0);
                         outPacket.WriteByte((byte)item.Type);
                         outPacket.WriteShort((short)item.Slot);
                         outPacket.WriteBytes(item.ToByteArray(true));
@@ -134,9 +134,10 @@ namespace Loki.Maple.Characters
                 using (Packet outPacket = new Packet(MapleServerOperationCode.ModifyInventoryItem))
                 {
                     outPacket.WriteBool(fromDrop);
-                    outPacket.WriteBytes(1, 3);
+                    outPacket.WriteBytes(1, 0, 3);
                     outPacket.WriteByte((byte)item.Type);
                     outPacket.WriteShort((short)item.Slot);
+                    outPacket.WriteByte(8); // not always
 
                     this.Parent.Client.Send(outPacket);
                 }
@@ -275,7 +276,7 @@ namespace Loki.Maple.Characters
         {
             using (Packet outPacket = new Packet(MapleServerOperationCode.ModifyInventoryItem))
             {
-                outPacket.WriteBytes(1, 0);
+                outPacket.WriteBytes(1, 0, 0);
 
                 this.Parent.Client.Send(outPacket);
             }
@@ -694,7 +695,7 @@ namespace Loki.Maple.Characters
                     switch (weapon.WeaponType)
                     {
                         case WeaponType.Bow:
-                            if (loopItem.IsArrowForBow)
+                            if (loopItem.IsArrowForBow && loopItem.RequiredLevel <= this.Parent.Level)
                             {
                                 loopItem.Quantity -= bulletCount;
                                 loopItem.Update();
@@ -703,7 +704,7 @@ namespace Loki.Maple.Characters
                             break;
 
                         case WeaponType.Crossbow:
-                            if (loopItem.IsArrowForCrossbow)
+                            if (loopItem.IsArrowForCrossbow && loopItem.RequiredLevel <= this.Parent.Level)
                             {
                                 loopItem.Quantity -= bulletCount;
                                 loopItem.Update();
@@ -712,7 +713,7 @@ namespace Loki.Maple.Characters
                             break;
 
                         case WeaponType.Claw:
-                            if (loopItem.IsThrowingStar)
+                            if (loopItem.IsThrowingStar && loopItem.RequiredLevel <= this.Parent.Level)
                             {
                                 loopItem.Quantity -= bulletCount;
                                 loopItem.Update();
@@ -721,7 +722,7 @@ namespace Loki.Maple.Characters
                             break;
 
                         case WeaponType.Gun:
-                            if (loopItem.IsBullet)
+                            if (loopItem.IsBullet && loopItem.RequiredLevel <= this.Parent.Level)
                             {
                                 loopItem.Quantity -= bulletCount;
                                 loopItem.Update();

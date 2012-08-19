@@ -66,25 +66,30 @@ namespace Loki.Maple.Characters
             {
                 switch (loopBuff.MapleID)
                 {
-                    case (int)SkillNames.Fighter.AxeBooster:
-                    case (int)SkillNames.Fighter.SwordBooster:
-                    case (int)SkillNames.Page.BwBooster: // TODO: Review names and remove abbreviations.
-                    case (int)SkillNames.Page.SwordBooster:
-                    case (int)SkillNames.Spearman.PolearmBooster:
-                    case (int)SkillNames.Spearman.SpearBooster:
+                    case (int)SkillNames.Fighter.WeaponBooster:
+                    case (int)SkillNames.Page.WeaponBooster:
+                    case (int)SkillNames.Spearman.WeaponBooster:
                     case (int)SkillNames.Hunter.BowBooster:
-                    case (int)SkillNames.Crossbowman.CrossbowBooster:
+                    case (int)SkillNames.CrossbowMan.CrossbowBooster:
                     case (int)SkillNames.Assassin.ClawBooster:
                     case (int)SkillNames.Bandit.DaggerBooster:
+                    case (int)SkillNames.BladeRecruit.KataraBooster:
                     case (int)SkillNames.FirePoisonMage.SpellBooster:
                     case (int)SkillNames.IceLightningMage.SpellBooster:
-                    case (int)SkillNames.Brawler.KnucklerBooster:
+                    case (int)SkillNames.Brawler.KnuckleBooster:
                     case (int)SkillNames.Gunslinger.GunBooster:
-                    case (int)SkillNames.DawnWarrior.SwordBooster:
-                    case (int)SkillNames.BlazeWizard.SpellBooster:
-                    case (int)SkillNames.WindArcher.BowBooster:
-                    case (int)SkillNames.NightWalker.ClawBooster:
-                    case (int)SkillNames.ThunderBreaker.KnucklerBooster:
+                    case (int)SkillNames.Cannoneer.CannonBooster:
+                    case (int)SkillNames.DawnWarrior2.SwordBooster:
+                    case (int)SkillNames.BlazeWizard2.SpellBooster:
+                    case (int)SkillNames.WindArcher2.BowBooster:
+                    case (int)SkillNames.NightWalker2.ClawBooster:
+                    case (int)SkillNames.ThunderBreaker2.KnuckleBooster:
+                    case (int)SkillNames.Aran1.PolearmBooster:
+                    case (int)SkillNames.Evan6.MagicBooster:
+                    case (int)SkillNames.Mercedes2.DualBowgunsBoost:
+                    case (int)SkillNames.BattleMage2.StaffBoost:
+                    case (int)SkillNames.WildHunter1.CrossbowBooster:
+                    case (int)SkillNames.Mechanic2.RocketBooster:
                         this.Remove(loopBuff);
                         break;
                 }
@@ -160,10 +165,10 @@ namespace Loki.Maple.Characters
                 case (int)SkillNames.FirePoisonArchMage.BigBang:
                 case (int)SkillNames.IceLightningArchMage.BigBang:
                 case (int)SkillNames.Bishop.BigBang:
-                case (int)SkillNames.Bowmaster.Hurricane:
-                case (int)SkillNames.Marksman.PiercingArrow:
+                case (int)SkillNames.BowMaster.Hurricane:
+                case (int)SkillNames.CrossbowMaster.PiercingArrow:
                 case (int)SkillNames.Corsair.RapidFire:
-                case (int)SkillNames.WindArcher.Hurricane:
+                case (int)SkillNames.WindArcher3.Hurricane:
 
                     using (Packet outPacket = new Packet(MapleServerOperationCode.CancelSkillEffect))
                     {

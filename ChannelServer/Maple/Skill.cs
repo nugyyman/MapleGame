@@ -362,10 +362,10 @@ namespace Loki.Maple
             {
                 switch (this.MapleID)
                 {
-                    case (int)SkillNames.GM.Haste:
+                    case (int)SkillNames.GM.HasteNormal:
                     case (int)SkillNames.SuperGM.Bless:
-                    case (int)SkillNames.SuperGM.Haste:
-                    case (int)SkillNames.SuperGM.HealPlusDispel:
+                    case (int)SkillNames.SuperGM.HasteSuper:
+                    case (int)SkillNames.SuperGM.HealDispel:
                     case (int)SkillNames.SuperGM.HolySymbol:
                     case (int)SkillNames.SuperGM.HyperBody:
                     case (int)SkillNames.SuperGM.Resurrection:
@@ -399,7 +399,7 @@ namespace Loki.Maple
             {
                 outPacket.WriteInt(character.ObjectID);
 
-                if (this.MapleID == (int)SkillNames.Buccaneer.SuperTransformation || this.MapleID == (int)SkillNames.Marauder.Transformation || this.MapleID == (int)SkillNames.WindArcher.EagleEye || this.MapleID == (int)SkillNames.ThunderBreaker.Transformation)
+                if (this.MapleID == (int)SkillNames.Buccaneer.SuperTransformation || this.MapleID == (int)SkillNames.Marauder.Transformation || this.MapleID == (int)SkillNames.WindArcher3.EagleEye || this.MapleID == (int)SkillNames.ThunderBreaker3.Transformation)
                 {
                     outPacket.WriteByte(1);
                     outPacket.WriteInt(this.MapleID);

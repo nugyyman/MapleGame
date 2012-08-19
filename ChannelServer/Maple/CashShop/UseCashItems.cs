@@ -129,6 +129,7 @@ namespace Loki.Maple.CashShop
                                 {
                                     outPacket.WriteByte(0); // could be from drop
                                     outPacket.WriteByte(2); // always 2
+                                    outPacket.WriteByte();
                                     outPacket.WriteByte(3); // quantity > 0 (?)
                                     outPacket.WriteByte(1); // Inventory type
                                     outPacket.WriteShort((short)pEquip.Slot); // item slot
@@ -356,6 +357,7 @@ namespace Loki.Maple.CashShop
                         {
                             outPacket.WriteByte(0); // could be from drop
                             outPacket.WriteByte(2); // always 2
+                            outPacket.WriteByte();
                             outPacket.WriteByte(3); // quantity > 0 (?)
                             outPacket.WriteByte(1); // Inventory type
                             outPacket.WriteShort((short)equip.Slot); // item slot

@@ -2078,11 +2078,9 @@ namespace Loki.Maple.Characters
             }
 
             inPacket.ReadByte();
-            inPacket.Skip(8);
             byte amountAttackedDamaged = inPacket.ReadByte();
             byte amountAttacked = (byte)((amountAttackedDamaged >> 4) & 0xF);
             byte amountDamaged = (byte)(amountAttackedDamaged & 0xF);
-            inPacket.Skip(8);
             int skillID = inPacket.ReadInt();
 
             Skill skill = null;
@@ -2097,12 +2095,12 @@ namespace Loki.Maple.Characters
                 }
             }
 
-            inPacket.Skip(17);
-            if (type == AttackType.Magic)
-            {
-                inPacket.Skip(24);
-            }
-            else if (type == AttackType.Ranged)
+            inPacket.Skip(9);
+            //if (type == AttackType.Magic)
+            //{
+            //    inPacket.Skip(1);
+            //}
+            if (type == AttackType.Ranged)
             {
                 inPacket.Skip(1);
             }
@@ -2118,9 +2116,9 @@ namespace Loki.Maple.Characters
                 charge = -1;
             }
 
+            byte stance = inPacket.ReadByte();
             byte display = inPacket.ReadByte();
             byte direction = inPacket.ReadByte();
-            byte stance = inPacket.ReadByte();
             inPacket.Skip(4);
             inPacket.ReadByte(); // Weapon
             byte speed = inPacket.ReadByte();
@@ -2130,10 +2128,10 @@ namespace Loki.Maple.Characters
             {
                 inPacket.Skip(5);
 
-                if (skillID == 3121004 || skillID == 3221001 || skillID == 5221004)
-                {
-                    inPacket.Skip(4);
-                }
+                //if (skillID == 3121004 || skillID == 3221001 || skillID == 5221004)
+                //{
+                //    inPacket.Skip(4);
+                //}
             }
 
             if (skillID == 4211006)
@@ -2155,12 +2153,11 @@ namespace Loki.Maple.Characters
                     {
                         outPacket.WriteInt(this.ID);
                         outPacket.WriteByte(amountAttackedDamaged);
-                        outPacket.WriteByte(10);
+                        outPacket.WriteByte((byte)(this.Skills.Contains(skillID) ? this.Skills[skillID].CurrentLevel : 0));
+                        //outPacket.WriteByte(this.Skills[skillID].CurrentLevel);
 
                         if (this.Skills.Contains(skillID))
                         {
-                            outPacket.WriteByte(this.Skills[skillID].CurrentLevel);
-
                             if (this.Skills[skillID].CurrentLevel > 0)
                                 outPacket.WriteInt(skillID);
                         }
@@ -2169,11 +2166,11 @@ namespace Loki.Maple.Characters
                             outPacket.WriteByte();
                         }
 
+                        outPacket.WriteByte(stance);
                         outPacket.WriteByte(display);
                         outPacket.WriteByte(direction);
-                        outPacket.WriteByte(stance);
                         outPacket.WriteByte(speed);
-                        outPacket.WriteByte(0x32);
+                        outPacket.WriteByte();
                         outPacket.WriteInt();
 
                         for (int i = 0; i < amountAttacked; i++)
@@ -2190,7 +2187,7 @@ namespace Loki.Maple.Characters
                                     target.SwitchController(this);
 
                                     outPacket.WriteInt(target.ObjectID);
-                                    outPacket.WriteByte(0xFF);
+                                    outPacket.WriteByte(0x07);
 
                                     if (skillID == 4211006)
                                     {
@@ -2243,12 +2240,11 @@ namespace Loki.Maple.Characters
                 {
                     outPacket.WriteInt(this.ID);
                     outPacket.WriteByte(amountAttackedDamaged);
-                    outPacket.WriteByte(10);
+                    outPacket.WriteByte((byte)(this.Skills.Contains(skillID) ? this.Skills[skillID].CurrentLevel : 0));
+                    //outPacket.WriteByte(this.Skills[skillID].CurrentLevel);
 
                     if (this.Skills.Contains(skillID))
                     {
-                        outPacket.WriteByte(this.Skills[skillID].CurrentLevel);
-
                         if (this.Skills[skillID].CurrentLevel > 0)
                             outPacket.WriteInt(skillID);
                     }
@@ -2257,11 +2253,11 @@ namespace Loki.Maple.Characters
                         outPacket.WriteByte();
                     }
 
+                    outPacket.WriteByte(stance);
                     outPacket.WriteByte(display);
                     outPacket.WriteByte(direction);
-                    outPacket.WriteByte(stance);
                     outPacket.WriteByte(speed);
-                    outPacket.WriteByte(0x32);
+                    outPacket.WriteByte();
                     outPacket.WriteInt(projectile);
 
                     for (int i = 0; i < amountAttacked; i++)
@@ -2278,7 +2274,7 @@ namespace Loki.Maple.Characters
                                 target.SwitchController(this);
 
                                 outPacket.WriteInt(target.ObjectID);
-                                outPacket.WriteByte(0xFF);
+                                outPacket.WriteByte(0x07);
 
                                 uint totalDamage = 0;
 
@@ -2286,6 +2282,7 @@ namespace Loki.Maple.Characters
                                 {
                                     uint value = inPacket.ReadUInt();
                                     totalDamage += value;
+                                    outPacket.WriteByte();
                                     outPacket.WriteUInt(value);
                                 }
                                 
@@ -2308,12 +2305,11 @@ namespace Loki.Maple.Characters
                 {
                     outPacket.WriteInt(this.ID);
                     outPacket.WriteByte(amountAttackedDamaged);
-                    outPacket.WriteByte(10);
+                    outPacket.WriteByte((byte)(this.Skills.Contains(skillID) ? this.Skills[skillID].CurrentLevel : 0));
+                    //outPacket.WriteByte(this.Skills[skillID].CurrentLevel);
 
                     if (this.Skills.Contains(skillID))
                     {
-                        outPacket.WriteByte(this.Skills[skillID].CurrentLevel);
-
                         if (this.Skills[skillID].CurrentLevel > 0)
                             outPacket.WriteInt(skillID);
                     }
@@ -2322,9 +2318,9 @@ namespace Loki.Maple.Characters
                         outPacket.WriteByte();
                     }
 
+                    outPacket.WriteByte(stance);
                     outPacket.WriteByte(display);
                     outPacket.WriteByte(direction);
-                    outPacket.WriteByte(stance);
                     outPacket.WriteByte(speed);
                     outPacket.WriteByte(0x32);
                     outPacket.WriteInt();
@@ -2343,7 +2339,7 @@ namespace Loki.Maple.Characters
                                 target.SwitchController(this);
 
                                 outPacket.WriteInt(target.ObjectID);
-                                outPacket.WriteByte(0xFF);
+                                outPacket.WriteByte(0x07);
 
                                 uint totalDamage = 0;
 
@@ -2351,6 +2347,7 @@ namespace Loki.Maple.Characters
                                 {
                                     uint value = inPacket.ReadUInt();
                                     totalDamage += value;
+                                    outPacket.WriteByte();
                                     outPacket.WriteUInt(value);
                                 }
 
@@ -2535,8 +2532,8 @@ namespace Loki.Maple.Characters
 
         public void HandleComboOrbGain()
         {
-            int comboSkillID = this.IsCygnus ? (int)SkillNames.DawnWarrior.ComboAttack : (int)SkillNames.Crusader.ComboAttack;
-            int advancedComboSkillID = this.IsCygnus ? (int)SkillNames.DawnWarrior.AdvancedCombo : (int)SkillNames.Hero.AdvancedComboAttack;
+            int comboSkillID = this.IsCygnus ? (int)SkillNames.DawnWarrior3.ComboAttack : (int)SkillNames.Crusader.ComboAttack;
+            int advancedComboSkillID = this.IsCygnus ? (int)SkillNames.DawnWarrior3.Advancedcombo : (int)SkillNames.Hero.AdvancedComboAttack;
 
             if (this.Buffs.Contains(comboSkillID))
             {
@@ -2566,7 +2563,7 @@ namespace Loki.Maple.Characters
 
         public void HandleEnergyChargeGain()
         {
-            int energyChargeID = this.IsCygnus ? (int)SkillNames.ThunderBreaker.EnergyCharge : (int)SkillNames.Marauder.EnergyCharge;
+            int energyChargeID = this.IsCygnus ? (int)SkillNames.ThunderBreaker2.EnergyCharge : (int)SkillNames.Marauder.EnergyCharge;
 
             if (this.Skills[energyChargeID] != null)
             {
@@ -2672,15 +2669,15 @@ namespace Loki.Maple.Characters
                 case (int)SkillNames.FirePoisonArchMage.BigBang:
                 case (int)SkillNames.IceLightningArchMage.BigBang:
                 case (int)SkillNames.Bishop.BigBang:
-                case (int)SkillNames.Bowmaster.Hurricane:
-                case (int)SkillNames.Marksman.PiercingArrow:
+                case (int)SkillNames.BowMaster.Hurricane:
+                case (int)SkillNames.CrossbowMaster.PiercingArrow:
                 case (int)SkillNames.ChiefBandit.Chakra:
                 case (int)SkillNames.Brawler.CorkscrewBlow:
                 case (int)SkillNames.Gunslinger.Grenade:
                 case (int)SkillNames.Corsair.RapidFire:
-                case (int)SkillNames.WindArcher.Hurricane:
-                case (int)SkillNames.NightWalker.PoisonBomb:
-                case (int)SkillNames.ThunderBreaker.CorkscrewBlow:
+                case (int)SkillNames.WindArcher3.Hurricane:
+                case (int)SkillNames.NightWalker3.PoisonBomb:
+                case (int)SkillNames.ThunderBreaker2.CorkscrewBlow:
 
                     using (Packet outPacket = new Packet(MapleServerOperationCode.SkillEffect))
                     {
@@ -2897,6 +2894,7 @@ namespace Loki.Maple.Characters
                 {
                     outPacket.WriteByte(1);
                     outPacket.WriteByte(2);
+                    outPacket.WriteByte();
                     outPacket.WriteByte(scrollsLeft ? (byte)1 : (byte)3);
                     outPacket.WriteByte((byte)ItemType.Usable);
                     outPacket.WriteShort(slot);
@@ -2922,6 +2920,7 @@ namespace Loki.Maple.Characters
                 {
                     outPacket.WriteByte(1);
                     outPacket.WriteByte(3);
+                    outPacket.WriteByte();
                     outPacket.WriteByte(scrollsLeft ? (byte)1 : (byte)3);
                     outPacket.WriteByte((byte)ItemType.Usable);
                     outPacket.WriteShort(slot);
@@ -3338,6 +3337,7 @@ namespace Loki.Maple.Characters
                 {
                     outPacket.WriteByte(1);
                     outPacket.WriteByte(3);
+                    outPacket.WriteByte();
                     outPacket.WriteByte(scrollsLeft ? (byte) 1 : (byte)3);
                     outPacket.WriteByte((byte)ItemType.Usable);
                     outPacket.WriteShort(slot);
@@ -3366,6 +3366,7 @@ namespace Loki.Maple.Characters
                 {
                     outPacket.WriteByte(1);
                     outPacket.WriteByte(2);
+                    outPacket.WriteByte();
                     outPacket.WriteByte(scrollsLeft ? (byte)1 : (byte)3);
                     outPacket.WriteByte((byte)ItemType.Usable);
                     outPacket.WriteShort(slot);
