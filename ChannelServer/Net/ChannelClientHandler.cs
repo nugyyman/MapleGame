@@ -172,7 +172,7 @@ namespace Loki.Net
                     break;
 
                 case MapleClientOperationCode.CancelBuff:
-                    this.Character.Buffs.CancelBuffEffect(inPacket);
+                    //this.Character.Buffs.CancelBuffEffect(inPacket);
                     break;
 
                 case MapleClientOperationCode.SkillEffect:
@@ -233,6 +233,10 @@ namespace Loki.Net
 
                 case MapleClientOperationCode.Storage:
                     this.Character.Storage.Handle(inPacket);
+                    break;
+
+                case MapleClientOperationCode.AranComboCounter:
+                    this.Character.AranCombo++;
                     break;
             }
         }

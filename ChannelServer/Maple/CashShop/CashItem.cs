@@ -106,12 +106,7 @@ namespace Loki.Maple.CashShop
                     return buffer.GetContent();
                 }
 
-                // TODO: This is expiration time: Implement it.
-                buffer.WriteByte();
-                buffer.WriteBytes(PacketConstants.Item);
-                buffer.WriteBytes((byte)0xBB, 0x46, (byte)0xE6, 0x17);
-                buffer.WriteByte(2); // 1 to show it, 2 to hide it.
-
+                buffer.WriteLong((long)ExpirationTime.DefaultTime);
                 buffer.WriteLong();
 
                 buffer.Flip();

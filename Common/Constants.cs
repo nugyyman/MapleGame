@@ -3003,10 +3003,17 @@ namespace Loki.Maple
         Phantom
     }
 
-    public enum SpecialJob
+    public enum SpecialJob : byte
     {
         Regular,
         DualBlade,
         Cannoneer
+    }
+
+    public enum ExpirationTime : long
+    {
+        DefaultTime = 150842304000000000L,
+        ZeroTime = 94354848000000000L,
+        Permanent = 150841440000000000L
     }
 }

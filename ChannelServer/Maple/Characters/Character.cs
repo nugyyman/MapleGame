@@ -69,6 +69,9 @@ namespace Loki.Maple.Characters
         private int meso;
         private Npc lastNpc;
 
+        private int aranCombo;
+        private DateTime lastAranCombo;
+
         public byte Skin
         {
             get
@@ -238,7 +241,7 @@ namespace Loki.Maple.Characters
                                     }
                                 }
 
-                                if (this.Level < 11)
+                                if (this.Level > 10 && !(this.Job == Job.Beginner || this.Job == Job.Noblesse || this.Job == Maple.Job.Legend || this.Job == Maple.Job.Farmer || this.Job == Maple.Job.Citizen))
                                 {
                                     if (this.SPTable.GetSPType(this) == ExtendedSPType.Regular)
                                     {
@@ -914,6 +917,39 @@ namespace Loki.Maple.Characters
             return false;
         }
 
+        public int AranCombo
+        {
+            get
+            {
+                return this.aranCombo;
+            }
+            set
+            {
+                this.aranCombo = value;
+
+                if ((DateTime.Now - this.lastAranCombo).TotalMilliseconds > 3500)
+                {
+                    this.aranCombo = 1;
+                }
+                this.lastAranCombo = DateTime.Now;
+
+                if (this.aranCombo > 30000)
+                {
+                    this.aranCombo = 30000;
+                }
+
+                if (this.IsInitialized)
+                {
+                    using (Packet outPacket = new Packet(MapleServerOperationCode.AranComboCounter))
+                    {
+                        outPacket.WriteInt(this.AranCombo);
+
+                        this.Client.Send(outPacket);
+                    }
+                }
+            }
+        }
+
         private bool Assigned { get; set; }
 
         public Character(int id = 0, ChannelClientHandler client = null)
@@ -971,6 +1007,8 @@ namespace Loki.Maple.Characters
             this.Map = World.Maps[datum.MapID];
             this.SpecialJob = (SpecialJob)(byte.Parse(datum.SpecialJob));
             this.DemonMark = datum.DemonMark;
+            this.aranCombo = 0;
+            this.lastAranCombo = DateTime.Now;
 
             this.Items.MaxSlots[ItemType.Equipment] = datum.EquipmentSlots;
             this.Items.MaxSlots[ItemType.Usable] = datum.UsableSlots;
@@ -1337,8 +1375,8 @@ namespace Loki.Maple.Characters
                 outPacket.WriteLong(2);
                 outPacket.WriteInt(ChannelServer.InternalChannelID);
 
-                outPacket.WriteInt();
                 outPacket.WriteByte();
+                outPacket.WriteInt();
                 outPacket.WriteByte(1);
                 outPacket.WriteInt();
                 outPacket.WriteByte(1);
@@ -1737,7 +1775,7 @@ namespace Loki.Maple.Characters
                     switch (loopStatistic)
                     {
                         case StatisticType.Skin:
-                            outPacket.WriteShort(this.Skin);
+                            outPacket.WriteByte(this.Skin);
                             break;
 
                         case StatisticType.Face:
@@ -1757,19 +1795,19 @@ namespace Loki.Maple.Characters
                             break;
 
                         case StatisticType.Strength:
-                            outPacket.WriteInt(this.Strength);
+                            outPacket.WriteShort(this.Strength);
                             break;
 
                         case StatisticType.Dexterity:
-                            outPacket.WriteInt(this.Dexterity);
+                            outPacket.WriteShort(this.Dexterity);
                             break;
 
                         case StatisticType.Intelligence:
-                            outPacket.WriteInt(this.Intelligence);
+                            outPacket.WriteShort(this.Intelligence);
                             break;
 
                         case StatisticType.Luck:
-                            outPacket.WriteInt(this.Luck);
+                            outPacket.WriteShort(this.Luck);
                             break;
 
                         case StatisticType.CurrentHP:
@@ -1789,7 +1827,7 @@ namespace Loki.Maple.Characters
                             break;
 
                         case StatisticType.AvailableAP:
-                            outPacket.WriteInt(this.AvailableAP);
+                            outPacket.WriteShort(this.AvailableAP);
                             break;
 
                         case StatisticType.AvailableSP:
@@ -1877,7 +1915,7 @@ namespace Loki.Maple.Characters
 
             for (int i = 0; i < 2; i++)
             {
-                stat = inPacket.ReadInt();
+                stat = (int)inPacket.ReadLong();
                 ap = inPacket.ReadInt();
 
                 if (ap > this.AvailableAP || ap < 0)
@@ -1965,8 +2003,7 @@ namespace Loki.Maple.Characters
             inPacket.ReadInt();
 
             int skillID = inPacket.ReadInt();
-
-            if (this.SPTable.GetAvailableSPByJob(this) < 1)
+            if (this.SPTable.GetAvailableSPByJob(skillID) < 1)
             {
                 this.Release();
 
@@ -1991,7 +2028,7 @@ namespace Loki.Maple.Characters
             {
                 if (!skill.IsFromBeginner)
                 {
-                    this.SPTable.SetAvailableSPByJob((short)(this.SPTable.GetAvailableSPByJob(this) - 1));
+                    this.SPTable.SetAvailableSPByJob((short)(this.SPTable.GetAvailableSPByJob(skillID) - 1), skillID);
                 }
 
                 this.Release();

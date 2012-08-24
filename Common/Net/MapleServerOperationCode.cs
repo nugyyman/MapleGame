@@ -32,7 +32,7 @@
         UpdateStats = 0x22,
         GiveBuff = 0x23,
         CancelBuff = 0x24,
-        UpdateSkills = 0x25,
+        UpdateSkills = 0x27,
         FameResponse = 0x2B,
         ShowLog = 0x2C,
         ShowNotes = 0x2E,

@@ -271,18 +271,14 @@ namespace Loki.Maple
             using (Packet outPacket = new Packet(MapleServerOperationCode.UpdateSkills))
             {
                 outPacket.WriteByte(1);
+                outPacket.WriteByte(0);
                 outPacket.WriteShort(1);
                 outPacket.WriteInt(this.MapleID);
                 outPacket.WriteInt(this.CurrentLevel);
                 outPacket.WriteInt(this.MaxLevel);
+                outPacket.WriteLong((long)ExpirationTime.DefaultTime);
 
-                // TODO: This is expiration time: Implement it.
-                outPacket.WriteByte();
-                outPacket.WriteBytes(PacketConstants.Item);
-                outPacket.WriteBytes((byte)0xBB, 0x46, (byte)0xE6, 0x17);
-                outPacket.WriteByte(2); // 1 to show it, 2 to hide it.
-
-                outPacket.WriteByte(1);
+                outPacket.WriteByte(3);
 
                 this.Character.Client.Send(outPacket);
             }

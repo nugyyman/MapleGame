@@ -55,24 +55,25 @@ namespace Loki.Maple.Characters
             }
         }
 
-        public short GetAvailableSPByJob(Character character)
+        public short GetAvailableSPByJob(int skill)
         {
             short sp;
 
-            if (this.GetSPType(character) == ExtendedSPType.Regular)
+            if (this.GetSPType(this.Parent) == ExtendedSPType.Regular)
             {
                 sp = this.Parent.AvailableSP;
             }
             else
             {
-                byte adv = (byte)((short)character.Job % 100 == 0 ? 1 : ((short)character.Job % 10) + 2);
+                int job = skill / 10000;
+                byte adv = (byte)((short)job % 100 == 0 ? 1 : ((short)job % 10) + 2);
                 sp = this[adv];
             }
 
             return sp;
         }
 
-        public void SetAvailableSPByJob( short sp)
+        public void SetAvailableSPByJob(short sp, int skill)
         {
             if (this.GetSPType(this.Parent) == ExtendedSPType.Regular)
             {
@@ -80,8 +81,8 @@ namespace Loki.Maple.Characters
             }
             else
             {
-                byte adv = (byte)((short)this.Parent.Job % 100 == 0 ? 1 : ((short)this.Parent.Job % 10) + 2);
-
+                int job = skill / 10000;
+                byte adv = (byte)((short)job % 100 == 0 ? 1 : ((short)job % 10) + 2);
                 this[adv] = (byte)sp;
 
                 if (this.Parent.IsInitialized)
@@ -163,7 +164,7 @@ namespace Loki.Maple.Characters
 
                     foreach (KeyValuePair<byte, byte> advance in this)
                     {
-                        buffer.WriteByte((byte)(advance.Key));
+                        buffer.WriteByte(advance.Key);
                         buffer.WriteByte(advance.Value);
                     }
                 }
