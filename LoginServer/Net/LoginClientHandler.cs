@@ -255,6 +255,7 @@ namespace Loki.Net
                         this.Account.Creation = DateTime.UtcNow;
                         this.Account.IsBanned = false;
                         this.Account.IsMaster = false;
+                        this.Account.IsLoggedIn = false;
                         this.Account.Pin = string.Empty;
                         this.Account.Pic = string.Empty;
                         this.Account.MaplePoints = 0;
