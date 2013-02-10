@@ -162,7 +162,7 @@ namespace Loki
             while (!WorldNameResolver.IsValid(WorldName));
 
             WorldIP = Log.Input("Host IP (external for remote only): ", IPAddress.Loopback);
-            WorldRecommendedMessage = Log.Input("World recommended message (leave blank if you don't want to have one.): ", "");
+            WorldRecommendedMessage = Log.Input("World recommended message (leave blank if you don't want): ", "");
 
             Log.SkipLine();
             Log.Inform("Please specify the World rates: ");
@@ -260,13 +260,13 @@ namespace Loki
 				HostIP={1}
 				RecommendedMessage={2}
 				StaffOnly=False
-				Flag={2}
-				ExperienceRate={3}
-				QuestExperienceRate={4}
-				PartyQuestExperienceRate={5}
-				MesoDropRate={6}
-				ItemDropRate={7}",
-                WorldName, WorldIP, WorldFlag, WorldExperienceRate, WorldQuestExperienceRate,
+				Flag={3}
+				ExperienceRate={4}
+				QuestExperienceRate={5}
+				PartyQuestExperienceRate={6}
+				MesoDropRate={7}
+				ItemDropRate={8}",
+                WorldName, WorldIP, WorldRecommendedMessage, WorldFlag, WorldExperienceRate, WorldQuestExperienceRate,
                 WorldPartyQuestExperienceRate, WorldMesoDropRate, WorldItemDropRate).Replace("	", "");
             }
 

@@ -19,6 +19,7 @@ namespace Loki.Maple
         public string Pic { get; set; }
         public DateTime Birthday { get; set; }
         public DateTime Creation { get; set; }
+        public bool IsLoggedIn { get; set; }
         public bool IsBanned { get; set; }
         public bool IsMaster { get; set; }
         public int MaplePoints { get; set; }
@@ -27,12 +28,12 @@ namespace Loki.Maple
 
         private bool Assigned { get; set; }
 
-        public bool IsLoggedIn
+        /*public bool IsLoggedIn
         {
             get
             {
                 //old system
-                /*if (LoginServer.LoggedIn.Contains(this.ID))
+                if (LoginServer.LoggedIn.Contains(this.ID))
                 {
                     return true;
                 }
@@ -56,7 +57,7 @@ namespace Loki.Maple
                     }
 
                     return false;
-                }*/
+                }
                 if (Database.Fetch("accounts", "IsLoggedIn", "ID", this.ID))
                 {
                     return true;
@@ -67,14 +68,14 @@ namespace Loki.Maple
             set
             {
                 //old system
-                /*if (value && !LoginServer.LoggedIn.Contains(this.ID))
+                if (value && !LoginServer.LoggedIn.Contains(this.ID))
                 {
                     LoginServer.LoggedIn.Add(this.ID);
                 }
                 else if (!value && LoginServer.LoggedIn.Contains(this.ID))
                 {
                     LoginServer.LoggedIn.Remove(this.ID);
-                }*/
+                }
 
                 if (value && !Database.Fetch("accounts", "IsLoggedIn", "ID", this.ID))
                 {
@@ -93,7 +94,7 @@ namespace Loki.Maple
                     datum.Update("ID = '{0}'", this.ID);
                 }
             }
-        }
+        }*/
 
         public Account(MapleClientHandler client)
         {
@@ -123,6 +124,7 @@ namespace Loki.Maple
             this.Pic = datum.Pic;
             this.Birthday = datum.Birthday;
             this.Creation = datum.Creation;
+            this.IsLoggedIn = datum.IsLoggedIn;
             this.IsBanned = datum.IsBanned;
             this.IsMaster = datum.IsMaster;
             this.MaplePoints = datum.MaplePoints;
@@ -141,6 +143,7 @@ namespace Loki.Maple
             datum.Pic = this.Pic;
             datum.Birthday = this.Birthday;
             datum.Creation = this.Creation;
+            datum.IsLoggedIn = this.IsLoggedIn;
             datum.IsBanned = this.IsBanned;
             datum.IsMaster = this.IsMaster;
             datum.MaplePoints = this.MaplePoints;
