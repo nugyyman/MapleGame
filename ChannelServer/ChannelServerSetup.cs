@@ -41,6 +41,7 @@ namespace Loki
                 using (Database.TemporaryConnection(databaseHost, databaseSchema, databaseUsername, databasePassword))
                 {
                     Database.Test();
+                    Database.Fetch("characters", "AccountID", "ID = '{0}'", 1);
                 }
             }
             catch (MySqlException e)
@@ -51,10 +52,10 @@ namespace Loki
 
                 Log.SkipLine();
 
-                if (e.Message.Contains("Unknown database") && Log.YesNo("Create and populate the " + databaseSchema + " database? ", true))
+                if ((e.Message.Contains("Unknown database") && Log.YesNo("Create and populate the " + databaseSchema + " database? ", true)) || (e.Message.Contains("Table") && Log.YesNo("Populate the " + databaseSchema + " database? ", true)))
                 {
                     Database.ExecuteScript(databaseHost, databaseUsername, databasePassword, @"
-							CREATE DATABASE {0};
+							CREATE DATABASE IF NOT EXISTS {0};
 							USE {0};
 
 							SET FOREIGN_KEY_CHECKS=0;
@@ -292,11 +293,14 @@ namespace Loki
                     goto databaseConfiguration;
                 }
             }
-            catch
+            catch (Exception e)
             {
-                Log.SkipLine();
+                if (!e.Message.Contains("Row"))
+                {
+                    Log.SkipLine();
 
-                goto databaseConfiguration;
+                    goto databaseConfiguration;
+                }
             }
 
             Log.SkipLine();
