@@ -68,7 +68,7 @@ namespace Loki.Maple
         public short Potential3 { get; set; }
         public byte PotentialLines { get; set; }
 
-        public byte AttackSpeed { get; private set; }
+        public sbyte AttackSpeed { get; private set; }
         public short RecoveryRate { get; private set; }
         public short KnockBackChance { get; private set; }
 
@@ -126,7 +126,6 @@ namespace Loki.Maple
         public short CSpeed { get; private set; }
         public short CJump { get; private set; }
         public short CMorph { get; private set; }
-        public string CDropUp { get; private set; }
 
         // Cash items data
         public int SerialNumber { get; set; }
@@ -590,7 +589,6 @@ namespace Loki.Maple
                 this.CSpeed = this.CachedReference.CSpeed;
                 this.CJump = this.CachedReference.CJump;
                 this.CMorph = this.CachedReference.CMorph;
-                this.CDropUp = this.CachedReference.CDropUp;
             }
         }
 
@@ -610,8 +608,8 @@ namespace Loki.Maple
             this.RequiredFame = equipDatum.req_fame;
             if (equipDatum.req_job != "beginner,warrior,magician,bowman,thief,pirate") this.RequiredJob = (Job)Enum.Parse(typeof(Job), equipDatum.req_job, true);
 
-            this.UpgradesAvailable = equipDatum.scroll_slots;
-            this.MaxUpgradesAvailable = equipDatum.scroll_slots;
+            this.UpgradesAvailable = (byte)equipDatum.scroll_slots;
+            this.MaxUpgradesAvailable = (byte)equipDatum.scroll_slots;
             this.UpgradesApplied = 0;
             this.HP = equipDatum.hp;
             this.MP = equipDatum.hp;
@@ -687,7 +685,6 @@ namespace Loki.Maple
             this.CSpeed = ItemConsumeDatum.speed;
             this.CJump = ItemConsumeDatum.jump;
             this.CMorph = ItemConsumeDatum.morph;
-            this.CDropUp = ItemConsumeDatum.drop_up;
         }
 
         public Item(dynamic itemDatum)
@@ -818,7 +815,6 @@ namespace Loki.Maple
                     this.CSpeed = this.CachedReference.CSpeed;
                     this.CJump = this.CachedReference.CJump;
                     this.CMorph = this.CachedReference.CMorph;
-                    this.CDropUp = this.CachedReference.CDropUp;
                 }
             }
         }

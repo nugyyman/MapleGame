@@ -47,7 +47,7 @@ namespace Loki.Maple
         {
             this.ID = questDatum.questid;
             this.NextQuestID = questDatum.next_quest;
-            this.Area = questDatum.quest_area;
+            this.Area = (sbyte)questDatum.quest_area;
             this.MinimumLevel = questDatum.min_level;
             this.MaximumLevel = questDatum.max_level;
             this.PetCloseness = questDatum.pet_closeness;

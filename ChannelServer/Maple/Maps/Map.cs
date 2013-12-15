@@ -10,7 +10,7 @@ namespace Loki.Maple.Maps
         public int MapleID { get; private set; }
         public int ReturnMapID { get; private set; }
         public int ForcedReturnMapID { get; private set; }
-        public byte RegenerationRate { get; private set; }
+        public sbyte RegenerationRate { get; private set; }
         public byte DecreaseHP { get; private set; }
         public ushort DamagePerSecond { get; private set; }
         public int ProtectorItemID { get; private set; }

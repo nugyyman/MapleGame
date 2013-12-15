@@ -44,15 +44,15 @@ namespace Loki.Maple.Life
         public int DamagedBySkillOnly { get; private set; }
         public int DamagedByMobOnly { get; private set; }
         public int DropItemPeriod { get; private set; }
-        public byte HpBarForeColor { get; private set; }
-        public byte HpBarBackColor { get; private set; }
-        public ushort CarnivalPoints { get; private set; }
+        public sbyte HpBarForeColor { get; private set; }
+        public sbyte HpBarBackColor { get; private set; }
+        public short CarnivalPoints { get; private set; }
         public int WeaponAttack { get; private set; }
         public int WeaponDefense { get; private set; }
         public int MagicAttack { get; private set; }
         public int MagicDefense { get; private set; }
         public int Accuracy { get; private set; }
-        public short Avoidability { get; private set; }
+        public int Avoidability { get; private set; }
         public short Speed { get; private set; }
         public short ChaseSpeed { get; private set; }
 

@@ -30,7 +30,7 @@ namespace Loki.Maple.Life
         {
             this.MapleID = (byte)mobSkillDatum.skillid;
             this.Level = (byte)mobSkillDatum.skill_level;
-            this.EffectDelay = (short)mobSkillDatum.effect_delay;
+            //this.EffectDelay = (short)mobSkillDatum.effect_delay;
         }
 
         public void Load(dynamic mobSkillDatum)

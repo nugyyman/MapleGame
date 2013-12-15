@@ -166,8 +166,8 @@ namespace Loki.Maple
                 this.ItemCount = (short)skillDatum.item_count;
                 this.CostBullet = (short)skillDatum.bullet_cost;
                 this.CostMeso = (short)skillDatum.money_cost;
-                this.ParameterA = (short)skillDatum.x_property;
-                this.ParameterB = (short)skillDatum.y_property;
+                this.ParameterA = (short)skillDatum.x;
+                this.ParameterB = (short)skillDatum.y;
                 this.Speed = (short)skillDatum.speed;
                 this.Jump = (short)skillDatum.jump;
                 this.Strength = (short)skillDatum.str;

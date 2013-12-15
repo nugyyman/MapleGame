@@ -11,7 +11,6 @@ namespace Loki.Maple.Maps
         public int DestinationMapID { get; set; }
         public string DestinationLabel { get; set; }
         public string Script { get; private set; }
-        public bool OnlyOnce { get; private set; }
 
         public bool IsSpawnPoint
         {
@@ -39,14 +38,13 @@ namespace Loki.Maple.Maps
 
         public Portal(dynamic datum)
         {
-            this.ID = datum.id;
+            this.ID = (byte)datum.id;
             this.Label = datum.label;
 
             this.DestinationMapID = datum.destination;
             this.DestinationLabel = datum.destination_label;
 
             this.Script = datum.script;
-            this.OnlyOnce = datum.flags.Contains("only_once");
 
             this.Position = new Point(datum.x_pos, datum.y_pos);
         }

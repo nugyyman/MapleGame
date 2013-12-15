@@ -2778,7 +2778,7 @@ namespace Loki.Maple.Characters
                 toScroll = this.Items[(EquipmentSlot)dst];
             }
 
-            byte oldLevel = toScroll.UpgradesApplied;
+            short oldLevel = toScroll.UpgradesApplied;
 
             if (toScroll.UpgradesAvailable < 1)
             {
@@ -3072,7 +3072,7 @@ namespace Loki.Maple.Characters
             sbyte slot = (sbyte)inPacket.ReadShort();
             int itemId = inPacket.ReadInt();
             Item consume = this.Items[ItemType.Usable, slot];
-            if (consume.CFlags == "" && consume.CBuffTime == 0 && consume.CEffect == 0 && consume.CMoveTo == 0 && consume.CDropUp.Equals("none"))
+            if (consume.CFlags == "" && consume.CBuffTime == 0 && consume.CEffect == 0 && consume.CMoveTo == 0)
             {
                 this.CurrentHP = (short)(this.CurrentHP + consume.CHP >= this.MaxHP ? this.MaxHP : this.CurrentHP + consume.CHP);
                 this.CurrentMP = (short)(this.CurrentMP + consume.CMP >= this.MaxMP ? this.MaxMP : this.CurrentMP + consume.CMP);
@@ -3082,7 +3082,7 @@ namespace Loki.Maple.Characters
                 this.UpdateStatistics(StatisticType.CurrentMP);
                 this.Items.Remove(itemId, 1);
             }
-            else if (consume.CFlags == "" && consume.CBuffTime != 0 && consume.CEffect == 0 && consume.CMoveTo == 0 && consume.CDropUp.Equals("none"))
+            else if (consume.CFlags == "" && consume.CBuffTime != 0 && consume.CEffect == 0 && consume.CMoveTo == 0)
             {
                 Buff buff = new Buff(this.Buffs, consume, 0);
                 buff.End = DateTime.Now.AddMinutes(consume.CBuffTime / 60);

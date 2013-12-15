@@ -15,12 +15,12 @@ namespace Loki.Maple.Shops
 
             foreach (dynamic datum in new Datums("shop_recharge_data").Populate())
             {
-                if (!Shop.RechargeTiers.ContainsKey(datum.tierid))
+                if (!Shop.RechargeTiers.ContainsKey((byte)datum.tierid))
                 {
-                    Shop.RechargeTiers.Add(datum.tierid, new Dictionary<int, double>());
+                    Shop.RechargeTiers.Add((byte)datum.tierid, new Dictionary<int, double>());
                 }
 
-                Shop.RechargeTiers[datum.tierid].Add(datum.itemid, datum.price);
+                Shop.RechargeTiers[(byte)datum.tierid].Add(datum.itemid, datum.price);
             }
         }
 
@@ -44,7 +44,7 @@ namespace Loki.Maple.Shops
             this.Parent = parent;
 
             this.ID = shopDatum.shopid;
-            this.RechargeTierID = shopDatum.recharge_tier;
+            this.RechargeTierID = (byte)shopDatum.recharge_tier;
 
             this.Items = new List<ShopItem>();
 
