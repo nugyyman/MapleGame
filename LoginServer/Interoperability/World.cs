@@ -24,6 +24,7 @@ namespace Loki.Interoperability
         public PendingKeyedQueue<int, List<byte[]>> CharacterListPool = new PendingKeyedQueue<int, List<byte[]>>();
         public PendingKeyedQueue<string, bool> NameCheckPool = new PendingKeyedQueue<string, bool>();
         public PendingKeyedQueue<int, byte[]> CreatedCharacterPool = new PendingKeyedQueue<int, byte[]>();
+        public Dictionary<byte, List<int>> CharacterStorage = new Dictionary<byte,List<int>>();
 
         public string Name
         {

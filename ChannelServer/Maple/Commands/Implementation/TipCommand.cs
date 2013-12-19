@@ -25,12 +25,12 @@ namespace Loki.Maple.Commands.Implementation
                     }
                     else
                     {
-                        World.Tip(CombineArgs(args, 1), args[0].Split(':')[1]);
+                        ChannelData.Tip(CombineArgs(args, 1), args[0].Split(':')[1]);
                     }
                 }
                 else
                 {
-                    World.Tip(CombineArgs(args, 0));
+                    ChannelData.Tip(CombineArgs(args, 0));
                 }
             }
         }

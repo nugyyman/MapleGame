@@ -59,7 +59,7 @@ namespace Loki.Maple.CashShop
 
                         try
                         {
-                            package = World.CachedCashItems.Packages[cashItem.MapleID];
+                            package = ChannelData.CachedCashItems.Packages[cashItem.MapleID];
                         }
                         catch (KeyNotFoundException)
                         {

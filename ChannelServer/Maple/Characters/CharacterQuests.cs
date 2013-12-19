@@ -25,7 +25,7 @@ namespace Loki.Maple.Characters
         public void Handle(Packet inPacket)
         {
             QuestAction action = (QuestAction)inPacket.ReadByte();
-            Quest quest = World.Quests[inPacket.ReadUShort()];
+            Quest quest = ChannelData.Quests[inPacket.ReadUShort()];
 
             int npcId = -1;
 
@@ -42,7 +42,7 @@ namespace Loki.Maple.Characters
                     npcId = inPacket.ReadInt();
                     this.Started.Add(quest.ID, new Dictionary<int, short>());
 
-                    foreach (KeyValuePair<int, short> requiredKills in World.Quests[quest.ID].PostRequiredKills)
+                    foreach (KeyValuePair<int, short> requiredKills in ChannelData.Quests[quest.ID].PostRequiredKills)
                     {
                         this.Started[quest.ID].Add(requiredKills.Key, 0);
                     }
@@ -289,7 +289,7 @@ namespace Loki.Maple.Characters
 
         public bool CanComplete(ushort questId, bool onlyOnFinalKill = false)
         {
-            foreach (KeyValuePair<int, short> requiredItem in World.Quests[questId].PostRequiredItems)
+            foreach (KeyValuePair<int, short> requiredItem in ChannelData.Quests[questId].PostRequiredItems)
             {
                 if (!this.Parent.Items.Contains(requiredItem.Key, requiredItem.Value))
                 {
@@ -297,7 +297,7 @@ namespace Loki.Maple.Characters
                 }
             }
 
-            foreach (ushort requiredQuest in World.Quests[questId].PostRequiredQuests)
+            foreach (ushort requiredQuest in ChannelData.Quests[questId].PostRequiredQuests)
             {
                 if (!this.Completed.ContainsKey(requiredQuest))
                 {
@@ -305,7 +305,7 @@ namespace Loki.Maple.Characters
                 }
             }
 
-            foreach (KeyValuePair<int, short> requiredKill in World.Quests[questId].PostRequiredKills)
+            foreach (KeyValuePair<int, short> requiredKill in ChannelData.Quests[questId].PostRequiredKills)
             {
                 if (onlyOnFinalKill)
                 {

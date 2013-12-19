@@ -24,7 +24,7 @@ namespace Loki.Maple.Maps
         {
             get
             {
-                return World.Maps[this.DestinationMapID];
+                return ChannelData.Maps[this.DestinationMapID];
             }
         }
 
@@ -32,7 +32,7 @@ namespace Loki.Maple.Maps
         {
             get
             {
-                return World.Maps[this.DestinationMapID].Portals[this.DestinationLabel];
+                return ChannelData.Maps[this.DestinationMapID].Portals[this.DestinationLabel];
             }
         }
 

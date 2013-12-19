@@ -9,17 +9,17 @@ using Loki.Maple.Life;
 
 namespace Loki.Maple.Data
 {
-    public static class World
+    public static class ChannelData
     {
         public static bool IsInitialized { get; private set; }
 
-        public static WorldMaps Maps { get; private set; }
+        public static ChannelMaps Maps { get; private set; }
         public static CachedItems CachedItems { get; private set; }
         public static CachedSkills CachedSkills { get; private set; }
         public static CachedMobs CachedMobs { get; private set; }
         public static CachedCashItems CachedCashItems { get; private set; }
         public static AvailableStyles AvailableStyles { get; private set; }
-        public static WorldCharactersHelper Characters { get; private set; }
+        public static ChannelCharactersHelper Characters { get; private set; }
         public static WorldNpcsHelper Npcs { get; private set; }
         public static QuestData Quests { get; private set; }
         public static CharacterCreationData CharacterCreationData { get; private set; }
@@ -29,45 +29,45 @@ namespace Loki.Maple.Data
         {
             using (Database.TemporarySchema("mcdb"))
             {
-                World.IsInitialized = false;
+                ChannelData.IsInitialized = false;
 
-                if (World.AvailableStyles != null)
+                if (ChannelData.AvailableStyles != null)
                 {
-                    World.AvailableStyles.Skins.Clear();
-                    World.AvailableStyles.MaleHairs.Clear();
-                    World.AvailableStyles.FemaleHairs.Clear();
-                    World.AvailableStyles.MaleFaces.Clear();
-                    World.AvailableStyles.FemaleFaces.Clear();
+                    ChannelData.AvailableStyles.Skins.Clear();
+                    ChannelData.AvailableStyles.MaleHairs.Clear();
+                    ChannelData.AvailableStyles.FemaleHairs.Clear();
+                    ChannelData.AvailableStyles.MaleFaces.Clear();
+                    ChannelData.AvailableStyles.FemaleFaces.Clear();
                 }
 
-                if (World.CachedItems != null)
+                if (ChannelData.CachedItems != null)
                 {
-                    World.CachedItems.Clear();
+                    ChannelData.CachedItems.Clear();
                 }
 
-                if (World.CachedSkills != null)
+                if (ChannelData.CachedSkills != null)
                 {
-                    World.CachedSkills.Clear();
+                    ChannelData.CachedSkills.Clear();
                 }
 
-                if (World.CachedMobs != null)
+                if (ChannelData.CachedMobs != null)
                 {
-                    World.CachedMobs.Clear();
+                    ChannelData.CachedMobs.Clear();
                 }
 
-                if (World.CachedCashItems != null)
+                if (ChannelData.CachedCashItems != null)
                 {
-                    World.CachedCashItems.Clear();
+                    ChannelData.CachedCashItems.Clear();
                 }
 
-                if (World.Maps != null)
+                if (ChannelData.Maps != null)
                 {
-                    World.Maps.Clear();
+                    ChannelData.Maps.Clear();
                 }
 
-                if (World.Quests != null)
+                if (ChannelData.Quests != null)
                 {
-                    World.Quests.Clear();
+                    ChannelData.Quests.Clear();
                 }
 
                 if (MobSkill.Summons != null)
@@ -84,14 +84,14 @@ namespace Loki.Maple.Data
                     Strings.Quests.Clear();
                 }
 
-                if (World.CharacterCreationData != null)
+                if (ChannelData.CharacterCreationData != null)
                 {
-                    World.CharacterCreationData.Clear();
+                    ChannelData.CharacterCreationData.Clear();
                 }
 
-                if (World.ForbiddenNames != null)
+                if (ChannelData.ForbiddenNames != null)
                 {
-                    World.ForbiddenNames.Clear();
+                    ChannelData.ForbiddenNames.Clear();
                 }
 
                 Database.Test();
@@ -101,22 +101,22 @@ namespace Loki.Maple.Data
                 Log.Inform("Loading data...");
                 Thread.Sleep(100);
 
-                World.AvailableStyles = new AvailableStyles();
-                World.CachedMobs = new CachedMobs();
-                World.CachedItems = new CachedItems();
-                World.CachedSkills = new CachedSkills();
-                World.CachedCashItems = new CachedCashItems();
-                World.Maps = new WorldMaps();
-                World.Quests = new QuestData();
-                World.CharacterCreationData = new CharacterCreationData();
-                World.ForbiddenNames = new ForbiddenNames();
+                ChannelData.AvailableStyles = new AvailableStyles();
+                ChannelData.CachedMobs = new CachedMobs();
+                ChannelData.CachedItems = new CachedItems();
+                ChannelData.CachedSkills = new CachedSkills();
+                ChannelData.CachedCashItems = new CachedCashItems();
+                ChannelData.Maps = new ChannelMaps();
+                ChannelData.Quests = new QuestData();
+                ChannelData.CharacterCreationData = new CharacterCreationData();
+                ChannelData.ForbiddenNames = new ForbiddenNames();
 
                 Strings.Load();
                 CommandFactory.Initialize();
 
                 List<SpawnPoint> toSpawn = new List<SpawnPoint>();
 
-                foreach (Map loopMap in World.Maps)
+                foreach (Map loopMap in ChannelData.Maps)
                 {
                     foreach (SpawnPoint loopSpawnPoint in loopMap.SpawnPoints)
                     {
@@ -133,16 +133,16 @@ namespace Loki.Maple.Data
 
                 Log.Success("Maple data loaded in {0} seconds.", (DateTime.Now - dti).Seconds);
 
-                World.Characters = new WorldCharactersHelper();
-                World.Npcs = new WorldNpcsHelper();
+                ChannelData.Characters = new ChannelCharactersHelper();
+                ChannelData.Npcs = new WorldNpcsHelper();
 
-                World.IsInitialized = true;
+                ChannelData.IsInitialized = true;
             }
         }
 
         public static void Broadcast(Packet inPacket)
         {
-            foreach (Map loopMap in World.Maps)
+            foreach (Map loopMap in ChannelData.Maps)
             {
                 loopMap.Broadcast(inPacket);
             }
@@ -152,7 +152,7 @@ namespace Loki.Maple.Data
         {
             set
             {
-                World.Notify(value, NoticeType.Header);
+                ChannelData.Notify(value, NoticeType.Header);
             }
         }
 
@@ -162,7 +162,7 @@ namespace Loki.Maple.Data
             {
                 outPacket.WriteByte((byte)type);
                 outPacket.WriteString(message);
-                World.Broadcast(outPacket);
+                ChannelData.Broadcast(outPacket);
             }
         }
 
@@ -172,7 +172,7 @@ namespace Loki.Maple.Data
             {
                 outPacket.WriteByte(0xFF);
                 outPacket.WriteString("[{0}] {1}", header, message);
-                World.Broadcast(outPacket);
+                ChannelData.Broadcast(outPacket);
             }
         }
     }

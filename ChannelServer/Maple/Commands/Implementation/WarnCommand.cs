@@ -27,8 +27,8 @@ namespace Loki.Maple.Commands.Implementation
                 {
                     try
                     {
-                        World.Characters[args[0]].Notify("[Warning] " + CombineArgs(args, 1), NoticeType.Pink);
-                        World.Characters[args[0]].Notify("[GameMaster Warning]\r\n\r\n" + CombineArgs(args, 1) + "\r\n", NoticeType.Popup);
+                        ChannelData.Characters[args[0]].Notify("[Warning] " + CombineArgs(args, 1), NoticeType.Pink);
+                        ChannelData.Characters[args[0]].Notify("[GameMaster Warning]\r\n\r\n" + CombineArgs(args, 1) + "\r\n", NoticeType.Popup);
                     }
                     catch (KeyNotFoundException)
                     {

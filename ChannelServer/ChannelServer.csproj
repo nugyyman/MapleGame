@@ -120,7 +120,7 @@
     <Compile Include="Maple\Data\CachedSkills.cs" />
     <Compile Include="Maple\Data\Strings.cs" />
     <Compile Include="Maple\Data\QuestData.cs" />
-    <Compile Include="Maple\Data\WorldHelpers.cs" />
+    <Compile Include="Maple\Data\ChannelHelpers.cs" />
     <Compile Include="Maple\EnumerationHelper.cs" />
     <Compile Include="Maple\HackException.cs" />
     <Compile Include="Maple\Life\MobSkill.cs" />
@@ -165,14 +165,14 @@
     <Compile Include="Maple\Item.cs" />
     <Compile Include="Maple\Characters\CharacterItems.cs" />
     <Compile Include="Maple\Maps\Map.cs" />
-    <Compile Include="Maple\Data\WorldMaps.cs" />
+    <Compile Include="Maple\Data\ChannelMaps.cs" />
     <Compile Include="Maple\Maps\MapObject.cs" />
     <Compile Include="Maple\Maps\Portal.cs" />
     <Compile Include="Maple\Movement.cs" />
     <Compile Include="Maple\Point.cs" />
     <Compile Include="Maple\Skill.cs" />
     <Compile Include="Maple\Characters\CharacterSkills.cs" />
-    <Compile Include="Maple\Data\World.cs" />
+    <Compile Include="Maple\Data\Channel.cs" />
     <Compile Include="Net\ChannelClientHandler.cs" />
     <Compile Include="Net\ChannelServer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

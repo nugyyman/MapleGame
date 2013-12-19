@@ -14,7 +14,7 @@ namespace Loki.Maple.Maps
             {
                 base.InsertItem(index, item);
 
-                if (World.IsInitialized)
+                if (ChannelData.IsInitialized)
                 {
                     using (Packet create = item.GetCreatePacket())
                     {
@@ -37,7 +37,7 @@ namespace Loki.Maple.Maps
             {
                 Npc item = this.GetAtIndex(index);
 
-                if (World.IsInitialized)
+                if (ChannelData.IsInitialized)
                 {
                     item.Controller.ControlledNpcs.Remove(item);
 

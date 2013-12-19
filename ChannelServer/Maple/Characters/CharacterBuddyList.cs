@@ -31,13 +31,10 @@ namespace Loki.Maple.Characters
         {
             string name;
 
-            foreach (dynamic datum in new Datums("buddies").Populate("CharacterID = '{0}'", this.Parent.ID))
+            foreach (dynamic datum in new Datums("buddies").Populate("CharacterID = '{0}' AND Pending = '0'", this.Parent.ID))
             {
-                if (datum.Pending == 0)
-                {
-                    name = Database.Fetch("characters", "Name", "ID = '{0}'", datum.BuddyID);
-                    this.Add(datum.BuddyID, new Buddy(name, datum.GroupName, datum.BuddyID, (byte)(World.Characters[name] == null ? 0 : World.Characters[name].BuddyList.ContainsKey(this.Parent.ID) ? World.Characters[name].Channel : 0), true));
-                }
+                name = Database.Fetch("characters", "Name", "ID = '{0}'", datum.BuddyID);
+                this.Add(datum.BuddyID, new Buddy(name, datum.GroupName, datum.BuddyID, 0, true));
             }
         }
 
@@ -45,13 +42,10 @@ namespace Loki.Maple.Characters
         {
             string name;
 
-            foreach (dynamic datum in new Datums("buddies").Populate("CharacterID = '{0}'", this.Parent.ID))
+            foreach (dynamic datum in new Datums("buddies").Populate("CharacterID = '{0}' AND Pending = '1'", this.Parent.ID))
             {
-                if (datum.Pending == 1)
-                {
-                    name = Database.Fetch("characters", "Name", "ID = '{0}'", datum.BuddyID);
-                    this.pendingBuddies.Add(new Buddy(name, datum.GroupName, datum.BuddyID, 0, false));
-                }
+                name = Database.Fetch("characters", "Name", "ID = '{0}'", datum.BuddyID);
+                this.pendingBuddies.Add(new Buddy(name, datum.GroupName, datum.BuddyID, 0, false));
             }
 
             Database.Delete("buddies", "CharacterID = '{0}' AND Pending = '1'", this.Parent.ID);
@@ -62,9 +56,9 @@ namespace Loki.Maple.Characters
             Database.Delete("buddies", "CharacterID = '{0}'", this.Parent.ID);
         }
 
-        public void DeleteBuddy(int id)
+        public void DeleteBuddy(int buddyID)
         {
-            Database.Delete("buddies", "CharacterID = '{0}' AND BuddyID = '{1}'", this.Parent.ID, id);
+            Database.Delete("buddies", "CharacterID = '{0}' AND BuddyID = '{1}'", this.Parent.ID, buddyID);
         }
 
         public void Save()
@@ -112,6 +106,29 @@ namespace Loki.Maple.Characters
             }
         }
 
+        public void UpdateChannels()
+        {
+            List<int> buddies = new List<int>();
+
+            foreach (int loopBuddy in this.Keys)
+            {
+                buddies.Add(loopBuddy);
+            }
+
+            foreach (int loopBuddy in buddies)
+            {
+                if (!this.IsMutualBuddy(loopBuddy))
+                    buddies.Remove(loopBuddy);
+            }
+
+            Dictionary<int, byte> onlineBuddies = ChannelServer.LoginServerConnection.UpdateBuddies(this.Parent.ID, false, buddies);
+
+            foreach (KeyValuePair<int, byte> loopBuddy in onlineBuddies)
+            {
+                this[loopBuddy.Key].Channel = (byte)(loopBuddy.Value + 1);
+            }
+        }
+
         public void UpdateBuddyChannel(Buddy buddy)
         {
             using (Packet outPacket = new Packet(MapleServerOperationCode.BuddyList))
@@ -138,6 +155,11 @@ namespace Loki.Maple.Characters
 
                 return null;
             }
+        }
+
+        private bool IsMutualBuddy(int buddyID)
+        {
+            return Database.Exists("buddies", "CharacterID = '{0}' AND BuddyID = '{1}' AND Pending = '0'", buddyID, this.Parent.ID);
         }
     }
 }

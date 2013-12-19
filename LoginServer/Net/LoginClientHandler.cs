@@ -52,7 +52,11 @@ namespace Loki.Net
         {
             if (this.Account != null)
             {
-                this.Account.IsLoggedIn = false;
+                if (!this.Account.LoggedIn)
+                {
+                    this.Account.IsLoggedIn = false;
+                }
+
                 this.Account.Save();
             }
         }
@@ -669,6 +673,15 @@ namespace Loki.Net
 
                         this.Send(outPacket);
                     }
+
+                    if (!this.World.CharacterStorage.ContainsKey(this.Channel.InternalID))
+                    {
+                        this.World.CharacterStorage.Add(this.Channel.InternalID, new List<int>());
+                    }
+
+                    this.World.CharacterStorage[this.Channel.InternalID].Add(characterID);
+
+                    this.Account.LoggedIn = true;
                 }
                 else
                 {

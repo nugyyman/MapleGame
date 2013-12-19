@@ -47,7 +47,7 @@ namespace Loki.Maple.Commands.Implementation
                     mobId = Strings.Mobs[isAmountSpecified ? CombineArgs(args, 0, args.Length - 1) : CombineArgs(args)];
                 }
 
-                if (World.CachedMobs.Contains(mobId))
+                if (ChannelData.CachedMobs.Contains(mobId))
                 {
                     for (int i = 0; i < amount; i++)
                     {

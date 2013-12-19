@@ -88,7 +88,7 @@ namespace Loki.Maple
 
             if (this.Type == 1)
             {
-                this.CalculateStatups(World.CachedSkills[this.MapleID][this.SkillLevel]);
+                this.CalculateStatups(ChannelData.CachedSkills[this.MapleID][this.SkillLevel]);
             }
 
             Delay.Execute((this.End - DateTime.Now).TotalMilliseconds, () => this.Parent.Remove(this));

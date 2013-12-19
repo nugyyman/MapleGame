@@ -21,7 +21,7 @@ namespace Loki.Maple
         {
             get
             {
-                return World.Quests[this.NextQuestID];
+                return ChannelData.Quests[this.NextQuestID];
             }
         }
 

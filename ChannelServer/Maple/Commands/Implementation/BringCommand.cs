@@ -45,8 +45,8 @@ namespace Loki.Maple.Commands.Implementation
                             case "-char":
                                 try
                                 {
-                                    mapId = World.Characters[args[3]].Map.MapleID;
-                                    portalId = World.Characters[args[3]].ClosestPortal.ID;
+                                    mapId = ChannelData.Characters[args[3]].Map.MapleID;
+                                    portalId = ChannelData.Characters[args[3]].ClosestPortal.ID;
                                 }
                                 catch (KeyNotFoundException)
                                 {
@@ -74,7 +74,7 @@ namespace Loki.Maple.Commands.Implementation
 
                 try
                 {
-                    World.Characters[args[0]].ChangeMap(mapId, portalId);
+                    ChannelData.Characters[args[0]].ChangeMap(mapId, portalId);
                 }
                 catch (KeyNotFoundException)
                 {

@@ -20,7 +20,7 @@ namespace Loki.Maple.Commands.Implementation
             {
                 try
                 {
-                    caller.ChangeMap(World.Characters[args[0]].Map.MapleID, World.Characters[args[0]].ClosestPortal.ID);
+                    caller.ChangeMap(ChannelData.Characters[args[0]].Map.MapleID, ChannelData.Characters[args[0]].ClosestPortal.ID);
                 }
                 catch (KeyNotFoundException)
                 {

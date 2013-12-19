@@ -121,7 +121,7 @@ namespace Loki.Maple.Maps
             {
                 Character item = this.GetAtIndex(index);
 
-                if (World.IsInitialized)
+                if (ChannelData.IsInitialized)
                 {
                     item.ControlledMobs.Clear();
                     item.ControlledNpcs.Clear();
@@ -129,7 +129,7 @@ namespace Loki.Maple.Maps
 
                 base.RemoveItem(index);
 
-                if (World.IsInitialized)
+                if (ChannelData.IsInitialized)
                 {
                     lock (this.Map.Npcs)
                     {

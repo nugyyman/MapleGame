@@ -89,7 +89,6 @@ namespace Loki.Net
             int port = 0;
 
         start:
-            ChannelServer.LoggedIn = new List<int>();
             ChannelServer.Clients = new List<ChannelClientHandler>();
 
             Log.Entitle("Channel Server v.{0}.{1}", Application.MapleVersion, Application.PatchVersion);
@@ -122,7 +121,7 @@ namespace Loki.Net
 
                 ChannelServer.RemoteEndPoint = new IPEndPoint(Settings.GetIPAddress("Server/ExternalIP"), port);
 
-                World.Initialize();
+                ChannelData.Initialize();
 
                 ChannelServer.Listener = new TcpListener(IPAddress.Any, ChannelServer.RemoteEndPoint.Port);
                 ChannelServer.Listener.Start();

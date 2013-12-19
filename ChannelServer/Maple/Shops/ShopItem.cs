@@ -16,7 +16,7 @@ namespace Loki.Maple.Shops
         {
             get
             {
-                return World.CachedItems[this.MapleID].MaxPerStack;
+                return ChannelData.CachedItems[this.MapleID].MaxPerStack;
             }
         }
 
@@ -24,7 +24,7 @@ namespace Loki.Maple.Shops
         {
             get
             {
-                return World.CachedItems[this.MapleID].SalePrice;
+                return ChannelData.CachedItems[this.MapleID].SalePrice;
             }
         }
 
@@ -40,7 +40,7 @@ namespace Loki.Maple.Shops
         {
             get
             {
-                return World.CachedItems[this.MapleID].IsRechargeable;
+                return ChannelData.CachedItems[this.MapleID].IsRechargeable;
             }
         }
 

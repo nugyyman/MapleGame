@@ -17,7 +17,7 @@ namespace Loki.Maple.Commands.Implementation
             }
             else
             {
-                World.Notify(caller.Name + ": " + CombineArgs(args));
+                ChannelData.Notify(caller.Name + ": " + CombineArgs(args));
             }
         }
     }

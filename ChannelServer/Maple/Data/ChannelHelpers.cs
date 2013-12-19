@@ -5,13 +5,13 @@ using Loki.Maple.Characters;
 
 namespace Loki.Maple.Maps
 {
-    public class WorldCharactersHelper : EnumerationHelper<int, Character>
+    public class ChannelCharactersHelper : EnumerationHelper<int, Character>
     {
-        public WorldCharactersHelper() : base() { }
+        public ChannelCharactersHelper() : base() { }
 
         public override IEnumerator<Character> GetEnumerator()
         {
-            foreach (Map loopMap in World.Maps)
+            foreach (Map loopMap in ChannelData.Maps)
             {
                 lock (loopMap.Characters)
                 {
@@ -51,7 +51,7 @@ namespace Loki.Maple.Maps
 
         public override IEnumerator<Npc> GetEnumerator()
         {
-            foreach (Map loopMap in World.Maps)
+            foreach (Map loopMap in ChannelData.Maps)
             {
                 lock (loopMap.Npcs)
                 {

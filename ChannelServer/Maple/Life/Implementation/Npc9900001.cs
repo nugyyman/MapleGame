@@ -15,7 +15,7 @@ namespace Loki.Maple.Life.Implementation
             {
                 bool advanced = talker.Job == Job.SuperGM;
 
-                foreach (int loopWizetItem in World.CachedItems.WizetItemIDs)
+                foreach (int loopWizetItem in ChannelData.CachedItems.WizetItemIDs)
                 {
                     if (!talker.Items.Contains(loopWizetItem))
                     {
@@ -37,7 +37,7 @@ namespace Loki.Maple.Life.Implementation
                     talker.MaxHP = talker.MaxMP = 10000;
                     talker.CurrentHP = talker.CurrentMP = 10000;
 
-                    foreach (int loopWizetItem in World.CachedItems.WizetItemIDs)
+                    foreach (int loopWizetItem in ChannelData.CachedItems.WizetItemIDs)
                     {
                         if (!talker.Items.Contains(loopWizetItem))
                         {
@@ -47,7 +47,7 @@ namespace Loki.Maple.Life.Implementation
 
                     foreach (Item loopItem in talker.Items)
                     {
-                        foreach (int loopWizetItem in World.CachedItems.WizetItemIDs)
+                        foreach (int loopWizetItem in ChannelData.CachedItems.WizetItemIDs)
                         {
                             if (loopItem.MapleID == loopWizetItem)
                             {

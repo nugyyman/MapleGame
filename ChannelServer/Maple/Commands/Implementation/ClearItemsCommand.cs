@@ -24,7 +24,7 @@ namespace Loki.Maple.Commands.Implementation
                 }
                 else
                 {
-                    World.Characters[args[0]].Items.Clear(true);
+                    ChannelData.Characters[args[0]].Items.Clear(true);
                 }
             }
         }

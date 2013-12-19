@@ -19,7 +19,6 @@ namespace Loki.Net
             this.Character = new Character(characterId, this);
             this.Character.Load();
             this.Character.IsMaster = ChannelServer.LoginServerConnection.IsMaster(this.Character.AccountID);
-            this.Character.IsLoggedIn = true;
             this.Character.Initialize();
 
             this.Title = this.Character.Name;
@@ -34,11 +33,12 @@ namespace Loki.Net
         {
             if (this.Character != null)
             {
-                this.Character.IsLoggedIn = false;
                 this.Character.Save();
                 this.Character.LastNpc = null;
                 this.Character.Map.Characters.Remove(this.Character);
                 this.Character.UpdateBuddies(false);
+
+                ChannelServer.LoginServerConnection.LoggedInUpdate(this.Character.AccountID, this.Character.ID);
             }
         }
 

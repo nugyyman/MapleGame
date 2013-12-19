@@ -17,7 +17,6 @@ namespace Loki.Interoperability
         public static string SecurityCode { get; set; }
         public new IPEndPoint RemoteEndPoint { get; private set; }
 
-        public PendingKeyedQueue<int, bool> LoggedInPool = new PendingKeyedQueue<int, bool>();
         public PendingQueue<float> LoadPool = new PendingQueue<float>();
 
         public World World
@@ -136,10 +135,6 @@ namespace Loki.Interoperability
                     this.LoadPool.Enqueue(inPacket.ReadFloat());
                     break;
 
-                case InteroperabilityOperationCode.LoggedInCheck:
-                    this.LoggedInPool.Enqueue(inPacket.ReadInt(), inPacket.ReadBool());
-                    break;
-
                 case InteroperabilityOperationCode.LoggedInUpdate:
                     this.LoggedInUpdate(inPacket);
                     break;
@@ -158,6 +153,10 @@ namespace Loki.Interoperability
 
                 case InteroperabilityOperationCode.SetCashRequest:
                     this.SetCash(inPacket);
+                    break;
+
+                case InteroperabilityOperationCode.UpdateBuddiesRequest:
+                    this.UpdateBuddies(inPacket);
                     break;
             }
         }
@@ -261,26 +260,18 @@ namespace Loki.Interoperability
             }
         }
 
-        public bool IsLoggedIn(int accountID)
-        {
-            using (Packet outPacket = new Packet(InteroperabilityOperationCode.LoggedInCheck))
-            {
-                outPacket.WriteInt(accountID);
-                this.Send(outPacket);
-            }
-
-            return this.LoggedInPool.Dequeue(accountID);
-        }
-
         public void LoggedInUpdate(Packet inPacket)
         {
             int accountID = inPacket.ReadInt();
+            int characterID = inPacket.ReadInt();
 
             dynamic datum = new Datum("accounts");
 
-            datum.IsLoggedIn = inPacket.ReadBool();
+            datum.IsLoggedIn = false;
+            datum.Update("ID = '{0}'", accountID);
 
-            datum.Update("ID = '{0}'", this.ID);
+            LoginServer.LoggedIn.Remove(accountID);
+            this.World.CharacterStorage[this.InternalID].Remove(characterID);
         }
 
         public float LoadProportion
@@ -359,6 +350,39 @@ namespace Loki.Interoperability
             }
 
             datum.Update("ID = '{0}'", accountID);
+        }
+
+        public void UpdateBuddies(Packet inPacket)
+        {
+            int buddyID;
+            bool update;
+
+            using (Packet outPacket = new Packet(InteroperabilityOperationCode.UpdateBuddiesResponse))
+            {
+                outPacket.WriteInt(inPacket.ReadInt());
+                update = inPacket.ReadBool();
+
+                while (inPacket.Remaining > 0)
+                {
+                    buddyID = inPacket.ReadInt();
+
+                    foreach (byte loopChannel in this.World.CharacterStorage.Keys)
+                    {
+                        if (this.World.CharacterStorage[loopChannel].Contains(buddyID))
+                        {
+                            outPacket.WriteInt(buddyID);
+                            outPacket.WriteByte(loopChannel);
+
+                            if (update)
+                            {
+                                //TODO: Update this buddy!
+                            }
+                        }
+                    }
+                }
+
+                this.Send(outPacket);
+            }
         }
     }
 }

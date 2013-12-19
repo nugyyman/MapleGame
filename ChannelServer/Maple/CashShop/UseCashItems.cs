@@ -239,7 +239,7 @@ namespace Loki.Maple.CashShop
                                     outPacket.WriteByte((byte)(ChannelServer.InternalChannelID));
                                     outPacket.WriteByte((byte)(whisper2 != 0 ? 1 : 0));
 
-                                    World.Broadcast(outPacket);
+                                    ChannelData.Broadcast(outPacket);
                                 }
                                 player.Items.Remove(itemId, 1);
                                 break;
@@ -268,7 +268,7 @@ namespace Loki.Maple.CashShop
                                             outPacket.WriteBytes(item.ToByteArray(false));
                                         }
 
-                                        World.Broadcast(outPacket);
+                                        ChannelData.Broadcast(outPacket);
                                         
                                     }
                                     player.Items.Remove(itemId, 1);
@@ -305,7 +305,7 @@ namespace Loki.Maple.CashShop
                                     outPacket.WriteByte((byte)(whisper ? 1 : 0));
                                     outPacket.WriteByte(1);
 
-                                    World.Broadcast(outPacket);
+                                    ChannelData.Broadcast(outPacket);
                                 }
                                 player.Items.Remove(itemId, 1);
                                 break;
@@ -331,7 +331,7 @@ namespace Loki.Maple.CashShop
                             outPacket.WriteByte((byte)(whisper ? 1 : 0));
                             outPacket.WriteBytes(player.AppearanceToByteArray());
 
-                            World.Broadcast(outPacket);
+                            ChannelData.Broadcast(outPacket);
                         }
                         player.Items.Remove(itemId, 1);
                         break;

@@ -24,7 +24,7 @@ namespace Loki.Maple.Commands.Implementation
                     {
                         if (args[0].ToLower() == "-all")
                         {
-                            foreach (Character loopCharacter in World.Characters)
+                            foreach (Character loopCharacter in ChannelData.Characters)
                             {
                                 loopCharacter.Save();
                             }
@@ -35,7 +35,7 @@ namespace Loki.Maple.Commands.Implementation
                         {
                             try
                             {
-                                Character target = World.Characters[args[0]];
+                                Character target = ChannelData.Characters[args[0]];
 
                                 target.Save();
                                 caller.Notify("[Command] Character '" + args[0] + "' saved to database.");

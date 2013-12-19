@@ -2,6 +2,7 @@
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
+using System.Collections.Generic;
 using Loki.Collections;
 using Loki.Data;
 using Loki.IO;
@@ -127,10 +128,6 @@ namespace Loki.Interoperability
                     this.CreateCharacter(inPacket);
                     break;
 
-                case InteroperabilityOperationCode.LoggedInCheck:
-                    this.CheckLogin(inPacket);
-                    break;
-
                 case InteroperabilityOperationCode.ChannelIDUpdate:
                     ChannelServer.ChannelID = inPacket.ReadByte();
                     break;
@@ -149,6 +146,16 @@ namespace Loki.Interoperability
 
                 case InteroperabilityOperationCode.GetCashResponse:
                     this.CashPool.Enqueue(inPacket.ReadInt(), inPacket.ReadInt());
+                    break;
+
+                case InteroperabilityOperationCode.UpdateBuddiesResponse:
+                    Dictionary<int, byte> buddies = new Dictionary<int, byte>();
+                    int characterID = inPacket.ReadInt();
+
+                    while (inPacket.Remaining > 0)
+                        buddies.Add(inPacket.ReadInt(), inPacket.ReadByte());
+
+                    this.BuddiesPool.Enqueue(characterID, buddies);
                     break;
             }
         }
@@ -175,7 +182,7 @@ namespace Loki.Interoperability
                 foreach (dynamic datum in new Datums("characters").PopulateWith("ID", "AccountID = '{0}'", accountID))
                 {
                     Character character = new Character(datum.ID);
-                    character.Load();
+                    character.Load(false);
 
                     byte[] entry = character.ToByteArray(fromViewAll);
 
@@ -345,7 +352,7 @@ namespace Loki.Interoperability
 
             bool charOk = true;
 
-            if (Database.Exists("characters", "Name = '{0}'", name) || (World.ForbiddenNames.Contains(name) && !isMaster))
+            if (Database.Exists("characters", "Name = '{0}'", name) || (ChannelData.ForbiddenNames.Contains(name) && !isMaster))
                 charOk = false;
 
             //if (!World.CharacterCreationData.checkData(job, gender, face, hair, hair_color, skin, topID, bottomID, shoesID, weaponID))
@@ -375,25 +382,12 @@ namespace Loki.Interoperability
             }
         }
 
-        public void CheckLogin(Packet inPacket)
-        {
-            int accountID = inPacket.ReadInt();
-
-            using (Packet outPacket = new Packet(InteroperabilityOperationCode.LoggedInCheck))
-            {
-                outPacket.WriteInt(accountID);
-                outPacket.WriteBool(ChannelServer.LoggedIn.Contains(accountID));
-
-                this.Send(outPacket);
-            }
-        }
-
-        public void LoggedInUpdate(int accountID, bool LoggedIn)
+        public void LoggedInUpdate(int accountID, int characterID)
         {
             using (Packet outPacket = new Packet(InteroperabilityOperationCode.LoggedInUpdate))
             {
                 outPacket.WriteInt(accountID);
-                outPacket.WriteBool(LoggedIn);
+                outPacket.WriteInt(characterID);
 
                 this.Send(outPacket);
             }
@@ -406,6 +400,7 @@ namespace Loki.Interoperability
             using (Packet outPacket = new Packet(InteroperabilityOperationCode.ChannelPortRequest))
             {
                 outPacket.WriteByte(channelID);
+
                 this.Send(outPacket);
             }
 
@@ -419,6 +414,7 @@ namespace Loki.Interoperability
             using (Packet outPacket = new Packet(InteroperabilityOperationCode.IsMasterCheck))
             {
                 outPacket.WriteInt(accountID);
+
                 this.Send(outPacket);
             }
 
@@ -433,6 +429,7 @@ namespace Loki.Interoperability
             {
                 outPacket.WriteInt(accountID);
                 outPacket.WriteByte(type);
+
                 this.Send(outPacket);
             }
 
@@ -446,8 +443,29 @@ namespace Loki.Interoperability
                 outPacket.WriteInt(accountID);
                 outPacket.WriteByte(type);
                 outPacket.WriteInt(cash);
+
                 this.Send(outPacket);
             }
+        }
+
+        private PendingKeyedQueue<int, Dictionary<int, byte>> BuddiesPool = new PendingKeyedQueue<int, Dictionary<int, byte>>();
+
+        public Dictionary<int, byte> UpdateBuddies(int characterID, bool update, List<int> buddies)
+        {
+            using (Packet outPacket = new Packet(InteroperabilityOperationCode.UpdateBuddiesRequest))
+            {
+                outPacket.WriteInt(characterID);
+                outPacket.WriteBool(update);
+
+                foreach (int loopBuddy in buddies)
+                {
+                    outPacket.WriteInt(loopBuddy);
+                }
+
+                this.Send(outPacket);
+            }
+
+            return this.BuddiesPool.Dequeue(characterID);
         }
     }
 }

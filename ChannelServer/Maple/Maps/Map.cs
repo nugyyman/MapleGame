@@ -42,7 +42,7 @@ namespace Loki.Maple.Maps
         {
             get
             {
-                return World.Maps[this.ReturnMapID];
+                return ChannelData.Maps[this.ReturnMapID];
             }
         }
 

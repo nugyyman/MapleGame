@@ -52,7 +52,7 @@ namespace Loki.Maple.Commands.Implementation
                         mapId = Strings.Maps[isPortalSpecified ? CombineArgs(args, 0, args.Length - 1) : CombineArgs(args)];
                     }
 
-                    if (World.Maps.Contains(mapId))
+                    if (ChannelData.Maps.Contains(mapId))
                     {
                         caller.ChangeMap(mapId, portal);
                     }

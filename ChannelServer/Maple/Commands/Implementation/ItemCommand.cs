@@ -46,9 +46,9 @@ namespace Loki.Maple.Commands.Implementation
                     itemId = Strings.Items[isQuantitySpecified ? CombineArgs(args, 0, args.Length - 1) : CombineArgs(args)];
                 }
 
-                if (World.CachedItems.Contains(itemId))
+                if (ChannelData.CachedItems.Contains(itemId))
                 {
-                    if (World.CachedItems[itemId].IsSealed)
+                    if (ChannelData.CachedItems[itemId].IsSealed)
                     {
                         caller.Notify("[Command] Restricted item.");
                     }

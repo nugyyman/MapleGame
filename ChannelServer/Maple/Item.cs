@@ -150,7 +150,7 @@ namespace Loki.Maple
         {
             get
             {
-                return World.CachedItems[this.MapleID];
+                return ChannelData.CachedItems[this.MapleID];
             }
         }
 
@@ -280,7 +280,7 @@ namespace Loki.Maple
         {
             get
             {
-                return World.CachedItems.WizetItemIDs.Contains(this.MapleID);
+                return ChannelData.CachedItems.WizetItemIDs.Contains(this.MapleID);
             }
         }
 
@@ -689,7 +689,7 @@ namespace Loki.Maple
 
         public Item(dynamic itemDatum)
         {
-            if (!World.IsInitialized)
+            if (!ChannelData.IsInitialized)
             {
                 this.MapleID = itemDatum.itemid;
                 this.MaxPerStack = itemDatum.max_slot_quantity;

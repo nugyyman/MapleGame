@@ -103,7 +103,7 @@ namespace Loki.Maple
         {
             get
             {
-                return World.CachedSkills[this.MapleID][this.CurrentLevel];
+                return ChannelData.CachedSkills[this.MapleID][this.CurrentLevel];
             }
         }
 
@@ -135,7 +135,7 @@ namespace Loki.Maple
         {
             this.MapleID = mapleId;
             this.CurrentLevel = 0;
-            this.MaxLevel = (byte)World.CachedSkills[this.MapleID].Count;
+            this.MaxLevel = (byte)ChannelData.CachedSkills[this.MapleID].Count;
         }
 
         public Skill(int mapleId, byte currentLevel, byte maxLevel) // Used for fourth job skills
@@ -147,7 +147,7 @@ namespace Loki.Maple
 
         public Skill(dynamic skillDatum)
         {
-            if (!World.IsInitialized)
+            if (!ChannelData.IsInitialized)
             {
                 this.MapleID = skillDatum.skillid;
                 this.CurrentLevel = (byte)skillDatum.skill_level;

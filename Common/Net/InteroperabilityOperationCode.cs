@@ -12,7 +12,6 @@
         CharacterCreationRequest,
         CharacterCreationResponse,
         ChannelIDUpdate,
-        LoggedInCheck,
         LoggedInUpdate,
         ChannelPortRequest,
         ChannelPortResponse,
@@ -21,6 +20,8 @@
         IsMasterCheck,
         GetCashRequest,
         GetCashResponse,
-        SetCashRequest
+        SetCashRequest,
+        UpdateBuddiesRequest,
+        UpdateBuddiesResponse
     }
 }

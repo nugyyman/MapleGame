@@ -8,9 +8,9 @@ using Loki.Maple.Life;
 
 namespace Loki.Maple.Data
 {
-    public class WorldMaps : KeyedCollection<int, Map>
+    public class ChannelMaps : KeyedCollection<int, Map>
     {
-        public WorldMaps()
+        public ChannelMaps()
             : base()
         {
             using (Log.Load("Maps"))

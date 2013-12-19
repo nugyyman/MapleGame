@@ -68,7 +68,7 @@ namespace Loki.Maple.Life
         {
             get
             {
-                return World.CachedMobs[this.MapleID];
+                return ChannelData.CachedMobs[this.MapleID];
             }
         }
 

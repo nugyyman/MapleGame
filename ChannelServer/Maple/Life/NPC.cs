@@ -404,11 +404,11 @@ namespace Loki.Maple.Life
 
             foreach (int loopStyle in styleChoices)
             {
-                if (World.AvailableStyles.Skins.Contains((byte)loopStyle) ||
-                    World.AvailableStyles.MaleHairs.Contains(loopStyle) ||
-                    World.AvailableStyles.FemaleHairs.Contains(loopStyle) ||
-                    World.AvailableStyles.MaleFaces.Contains(loopStyle) ||
-                    World.AvailableStyles.FemaleFaces.Contains(loopStyle))
+                if (ChannelData.AvailableStyles.Skins.Contains((byte)loopStyle) ||
+                    ChannelData.AvailableStyles.MaleHairs.Contains(loopStyle) ||
+                    ChannelData.AvailableStyles.FemaleHairs.Contains(loopStyle) ||
+                    ChannelData.AvailableStyles.MaleFaces.Contains(loopStyle) ||
+                    ChannelData.AvailableStyles.FemaleFaces.Contains(loopStyle))
                 {
                     validStyles.Add(loopStyle);
                 }

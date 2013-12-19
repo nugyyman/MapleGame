@@ -19,82 +19,36 @@ namespace Loki.Maple
         public string Pic { get; set; }
         public DateTime Birthday { get; set; }
         public DateTime Creation { get; set; }
-        public bool IsLoggedIn { get; set; }
+        private bool isLoggedIn;
         public bool IsBanned { get; set; }
         public bool IsMaster { get; set; }
         public int MaplePoints { get; set; }
         public int PaypalNX { get; set; }
         public int CardNX { get; set; }
+        public bool LoggedIn { get; set; }
 
         private bool Assigned { get; set; }
 
-        /*public bool IsLoggedIn
+        public bool IsLoggedIn
         {
             get
             {
-                //old system
-                if (LoginServer.LoggedIn.Contains(this.ID))
-                {
-                    return true;
-                }
-                else
-                {
-                    MultiThreadedCollection<bool, int> collection = new MultiThreadedCollection<bool, int>(LoginServer.Channels.Count);
-
-                    foreach (ChannelServerHandler loopChannel in LoginServer.Channels)
-                    {
-                        collection.AddFromThread(new Func<int, bool>(loopChannel.IsLoggedIn), this.ID);
-                    }
-
-                    collection.WaitUntilDone();
-
-                    foreach (bool value in collection)
-                    {
-                        if (value)
-                        {
-                            return true;
-                        }
-                    }
-
-                    return false;
-                }
-                if (Database.Fetch("accounts", "IsLoggedIn", "ID", this.ID))
-                {
-                    return true;
-                }
-
-                return false;
+                return this.isLoggedIn && !LoginServer.LoggedIn.Contains(this.ID);
             }
             set
             {
-                //old system
-                if (value && !LoginServer.LoggedIn.Contains(this.ID))
+                this.isLoggedIn = value;
+
+                if (value)
                 {
                     LoginServer.LoggedIn.Add(this.ID);
                 }
-                else if (!value && LoginServer.LoggedIn.Contains(this.ID))
+                else
                 {
                     LoginServer.LoggedIn.Remove(this.ID);
                 }
-
-                if (value && !Database.Fetch("accounts", "IsLoggedIn", "ID", this.ID))
-                {
-                    dynamic datum = new Datum("accounts");
-
-                    datum.IsLoggedIn = value;
-
-                    datum.Update("ID = '{0}'", this.ID);
-                }
-                else if (!value && Database.Fetch("accounts", "IsLoggedIn", "ID", this.ID))
-                {
-                    dynamic datum = new Datum("accounts");
-
-                    datum.IsLoggedIn = value;
-
-                    datum.Update("ID = '{0}'", this.ID);
-                }
             }
-        }*/
+        }
 
         public Account(MapleClientHandler client)
         {
@@ -130,6 +84,8 @@ namespace Loki.Maple
             this.MaplePoints = datum.MaplePoints;
             this.PaypalNX = datum.PaypalNX;
             this.CardNX = datum.CardNX;
+
+            this.LoggedIn = false;
         }
 
         public void Save()

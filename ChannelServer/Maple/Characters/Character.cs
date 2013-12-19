@@ -80,7 +80,7 @@ namespace Loki.Maple.Characters
             }
             set
             {
-                if (!World.AvailableStyles.Skins.Contains(value))
+                if (!ChannelData.AvailableStyles.Skins.Contains(value))
                 {
                     throw new StyleUnavailableException();
                 }
@@ -105,7 +105,7 @@ namespace Loki.Maple.Characters
             }
             set
             {
-                if (!(World.AvailableStyles.MaleFaces.Contains(value) || World.AvailableStyles.FemaleFaces.Contains(value)))
+                if (!(ChannelData.AvailableStyles.MaleFaces.Contains(value) || ChannelData.AvailableStyles.FemaleFaces.Contains(value)))
                 {
                     throw new StyleUnavailableException();
                 }
@@ -130,7 +130,7 @@ namespace Loki.Maple.Characters
             }
             set
             {
-                if (!(World.AvailableStyles.MaleHairs.Contains(value) || World.AvailableStyles.FemaleHairs.Contains(value)))
+                if (!(ChannelData.AvailableStyles.MaleHairs.Contains(value) || ChannelData.AvailableStyles.FemaleHairs.Contains(value)))
                 {
                     throw new StyleUnavailableException();
                 }
@@ -486,31 +486,37 @@ namespace Loki.Maple.Characters
             }
             set
             {
+                if (this.Level >= 200)
+                {
+                    this.experience = 0;
+                    return;
+                }
+
                 int delta = value - experience;
 
                 experience = value;
 
                 if (ChannelServer.AllowMultiLeveling)
                 {
-                    while (experience >= ExperienceTables.CharacterLevel[this.Level])
+                    while (experience >= ExperienceTables.CharacterLevel[this.Level - 1])
                     {
-                        experience -= ExperienceTables.CharacterLevel[this.Level];
+                        experience -= ExperienceTables.CharacterLevel[this.Level - 1];
 
                         this.Level++;
                     }
                 }
                 else
                 {
-                    if (experience >= ExperienceTables.CharacterLevel[this.Level])
+                    if (experience >= ExperienceTables.CharacterLevel[this.Level - 1])
                     {
-                        experience -= ExperienceTables.CharacterLevel[this.Level];
+                        experience -= ExperienceTables.CharacterLevel[this.Level - 1];
 
                         this.Level++;
                     }
 
-                    if (experience >= ExperienceTables.CharacterLevel[this.Level])
+                    if (experience >= ExperienceTables.CharacterLevel[this.Level - 1])
                     {
-                        experience = ExperienceTables.CharacterLevel[this.Level] - 1;
+                        experience = ExperienceTables.CharacterLevel[this.Level - 1] - 1;
                     }
                 }
 
@@ -599,27 +605,6 @@ namespace Loki.Maple.Characters
             get
             {
                 return this.CurrentHP > 0;
-            }
-        }
-
-        public bool IsLoggedIn
-        {
-            get
-            {
-                return ChannelServer.LoggedIn.Contains(this.AccountID);
-            }
-            set
-            {
-                if (value && !ChannelServer.LoggedIn.Contains(this.AccountID))
-                {
-                    ChannelServer.LoggedIn.Add(this.AccountID);
-                    ChannelServer.LoginServerConnection.LoggedInUpdate(this.AccountID, value);
-                }
-                else if (!value && ChannelServer.LoggedIn.Contains(this.AccountID))
-                {
-                    ChannelServer.LoggedIn.Remove(this.AccountID);
-                    ChannelServer.LoginServerConnection.LoggedInUpdate(this.AccountID, value);
-                }
             }
         }
 
@@ -715,11 +700,11 @@ namespace Loki.Maple.Characters
                 {
                     try
                     {
-                        return World.Maps[Database.Fetch("characters", "MapID", "ID = '{0}'", this.ID)];
+                        return ChannelData.Maps[Database.Fetch("characters", "MapID", "ID = '{0}'", this.ID)];
                     }
                     catch
                     {
-                        return World.Maps[0];
+                        return ChannelData.Maps[0];
                     }
                 }
             }
@@ -972,7 +957,7 @@ namespace Loki.Maple.Characters
             this.ControlledNpcs = new ControlledNpcs(this);
         }
 
-        public void Load()
+        public void Load(bool initialize = true)
         {
             dynamic datum = new Datum("characters");
 
@@ -1004,7 +989,7 @@ namespace Loki.Maple.Characters
             this.AvailableSP = datum.AvailableSP;
             this.SpawnPoint = datum.SpawnPoint;
             this.MaxBuddies = datum.MaxBuddies;
-            this.Map = World.Maps[datum.MapID];
+            this.Map = ChannelData.Maps[datum.MapID];
             this.SpecialJob = (SpecialJob)(byte.Parse(datum.SpecialJob));
             this.DemonMark = datum.DemonMark;
             this.aranCombo = 0;
@@ -1016,14 +1001,18 @@ namespace Loki.Maple.Characters
             this.Items.MaxSlots[ItemType.Etcetera] = datum.EtceteraSlots;
 
             this.Items.Load();
-            this.Skills.Load();
-            this.Buffs.Load();
-            this.Quests.Load();
-            this.KeyMap.Load();
-            this.BuddyList.Load();
-            this.SPTable.Load();
-            this.CashShop.Load();
-            this.Storage.Load();
+
+            if (initialize)
+            {
+                this.Skills.Load();
+                this.Buffs.Load();
+                this.Quests.Load();
+                this.KeyMap.Load();
+                this.BuddyList.Load();
+                this.SPTable.Load();
+                this.CashShop.Load();
+                this.Storage.Load();
+            }
         }
 
         public void Save()
@@ -1402,15 +1391,16 @@ namespace Loki.Maple.Characters
             this.IsInitialized = true;
 
             this.KeyMap.Send();
-            /*this.UpdateBuddies(true);
+            this.UpdateBuddies(true);
+            this.BuddyList.UpdateChannels();
             this.BuddyList.Update();
 
             // NOTE: Until we find out more about buffs in the SpawnPlayer packet
 
-            foreach (Buff loopBuff in this.Buffs)
-            {
-                loopBuff.Apply();
-            }
+            //foreach (Buff loopBuff in this.Buffs)
+            //{
+            //    loopBuff.Apply();
+            //}
 
             this.BuddyList.LoadPendingBuddies();
 
@@ -1434,7 +1424,7 @@ namespace Loki.Maple.Characters
                 }
             }
 
-            this.BuddyList.pendingBuddies.Clear();*/
+            this.BuddyList.pendingBuddies.Clear();
         }
 
         public Packet GetCreatePacket()
@@ -1651,7 +1641,7 @@ namespace Loki.Maple.Characters
 
             this.SpawnPoint = portalId;
             this.Map.Characters.Remove(this);
-            World.Maps[destinationMapId].Characters.Add(this);
+            ChannelData.Maps[destinationMapId].Characters.Add(this);
         }
 
         public void ChangeMap(Packet inPacket)
@@ -1676,8 +1666,6 @@ namespace Loki.Maple.Characters
 
             inPacket.ReadByte();
             bool wheel = inPacket.ReadShort() > 0;
-            destinationMapId = this.Map.MapleID;
-            portalLabel = null;
 
             if (!this.IsAlive && this.IsMaster)
             {
@@ -1879,7 +1867,7 @@ namespace Loki.Maple.Characters
 
         public void Converse(int npcMapleId)
         {
-            this.Converse(World.Npcs[npcMapleId]);
+            this.Converse(ChannelData.Npcs[npcMapleId]);
         }
 
         public void Converse(Packet inPacket)
@@ -3123,13 +3111,13 @@ namespace Loki.Maple.Characters
 
         public void MaxSkills()
         {
-            foreach (int skill in World.CachedSkills.Keys)
+            foreach (int skill in ChannelData.CachedSkills.Keys)
             {
-                byte masterLevel = (byte)World.CachedSkills[skill].Count;
+                byte masterLevel = (byte)ChannelData.CachedSkills[skill].Count;
                 if (!this.Skills.Contains(skill))
                 {
                     if (masterLevel > 0 && (skill / 1000000 == (short)this.Job / 100))
-                        this.Skills.Add(World.CachedSkills[skill][masterLevel]);
+                        this.Skills.Add(ChannelData.CachedSkills[skill][masterLevel]);
                 }
                 else
                 {
@@ -3148,7 +3136,7 @@ namespace Loki.Maple.Characters
             {
                 if (loopBuddy.IsOnline)
                 {
-                    Character buddy = World.Characters[loopBuddy.Name];
+                    Character buddy = ChannelData.Characters[loopBuddy.Name];
 
                     if (buddy.BuddyList.ContainsKey(this.ID))
                     {
@@ -3182,10 +3170,7 @@ namespace Loki.Maple.Characters
             }
             else
             {
-                foreach (Buddy loopBuddy in this.BuddyList.Values)
-                {
-                    buddies++;
-                }
+                buddies = (byte)(this.BuddyList.Count);
 
                 if (addCharacter.MaxBuddies == buddies)
                 {
@@ -3222,7 +3207,7 @@ namespace Loki.Maple.Characters
         public void BuddyListModify(Packet inPacket)
         {
             byte mode = inPacket.ReadByte();
-            CharacterBuddyList bl = this.BuddyList;
+            CharacterBuddyList buddyList = this.BuddyList;
 
             switch (mode)
             {
@@ -3236,25 +3221,25 @@ namespace Loki.Maple.Characters
                         return;
                     }
 
-                    Buddy b = bl[name];
+                    Buddy buddy = buddyList[name];
 
-                    if (b != null && b.Group.Equals(group))
+                    if (buddy != null && buddy.Group.Equals(group))
                     {
                         this.Notify("You already have " + name + " on your Buddylist.");
                     }
-                    else if (b == null && bl.IsFull)
+                    else if (buddy == null && buddyList.IsFull)
                     {
                         this.Notify("Your Buddylist is already full.");
                     }
-                    else if (b != null) //Change group
+                    else if (buddy != null) //Change group
                     {
-                        b.Group = group;
-                        bl.Update();
+                        buddy.Group = group;
+                        buddyList.Update();
                     }
-                    else if (b == null)
+                    else if (buddy == null) // Add buddy
                     {
                         int addBuddyID = Database.Fetch("characters", "ID", "Name = '{0}'", name);
-                        Character newBuddyCharacter = World.Characters[name];
+                        Character newBuddyCharacter = ChannelData.Characters[name];
 
                         BuddyAddResults result = this.BuddyRequest(newBuddyCharacter, addBuddyID);
 
@@ -3266,10 +3251,10 @@ namespace Loki.Maple.Characters
                         {
                             string realName = Database.Fetch("characters", "Name", "ID = '{0}'", addBuddyID);
                             Buddy newBuddy = new Buddy(realName, group, addBuddyID, 0, false);
-                            bl.Add(newBuddy.CharacterID, newBuddy);
-                            bl.Update();
-                            bl[name].Channel = (byte)(newBuddyCharacter == null ? 0 : newBuddyCharacter.Channel);
-                            bl.UpdateBuddyChannel(bl[name]);
+                            buddyList.Add(newBuddy.CharacterID, newBuddy);
+                            buddyList.Update();
+                            buddyList[name].Channel = (byte)(newBuddyCharacter == null ? 0 : newBuddyCharacter.Channel);
+                            buddyList.UpdateBuddyChannel(buddyList[name]);
                             if (newBuddyCharacter != null)
                             {
                                 newBuddyCharacter.BuddyList[this.ID].Channel = this.Channel;
@@ -3280,8 +3265,8 @@ namespace Loki.Maple.Characters
                         {
                             string realName = Database.Fetch("characters", "Name", "ID = '{0}'", addBuddyID);
                             Buddy newBuddy = new Buddy(realName, group, addBuddyID, 0, false);
-                            bl.Add(newBuddy.CharacterID, newBuddy);
-                            bl.Update();
+                            buddyList.Add(newBuddy.CharacterID, newBuddy);
+                            buddyList.Update();
 
                             if (newBuddyCharacter == null)
                             {
@@ -3298,20 +3283,20 @@ namespace Loki.Maple.Characters
                     break;
                 case 2: //Accept
                     int addCharacterID = inPacket.ReadInt();
-                    Character addCharacter = World.Characters[Database.Fetch("characters", "Name", "ID = '{0}'", addCharacterID)];
+                    Character addCharacter = ChannelData.Characters[Database.Fetch("characters", "Name", "ID = '{0}'", addCharacterID)];
 
                     if (addCharacter != null)
                     {
-                        bl.Add(addCharacterID, new Buddy(addCharacter.Name, "Default Group", addCharacterID, addCharacter.Channel, false));
+                        buddyList.Add(addCharacterID, new Buddy(addCharacter.Name, "Default Group", addCharacterID, addCharacter.Channel, false));
                         addCharacter.BuddyList[this.ID].Channel = this.Channel;
                         addCharacter.BuddyList.UpdateBuddyChannel(addCharacter.BuddyList[this.ID]);
                     }
                     else
                     {
-                        bl.Add(addCharacterID, new Buddy(Database.Fetch("characters", "Name", "ID = '{0}'", addCharacterID), "Default Group", addCharacterID, 0, false));
+                        buddyList.Add(addCharacterID, new Buddy(Database.Fetch("characters", "Name", "ID = '{0}'", addCharacterID), "Default Group", addCharacterID, 0, false));
                     }
                     
-                    bl.Update();
+                    buddyList.Update();
                     break;
                 case 3: //Delete
                     int deleteID = inPacket.ReadInt();
@@ -3319,7 +3304,7 @@ namespace Loki.Maple.Characters
                     {
                         if (this.BuddyList[deleteID].IsOnline)
                         {
-                            Character deleteCharacter = World.Characters[this.BuddyList[deleteID].Name];
+                            Character deleteCharacter = ChannelData.Characters[this.BuddyList[deleteID].Name];
                             deleteCharacter.BuddyList[this.ID].Channel = 0;
                             deleteCharacter.BuddyList.UpdateBuddyChannel(deleteCharacter.BuddyList[this.ID]);
                         }
@@ -3460,7 +3445,7 @@ namespace Loki.Maple.Characters
             this.Save();
             int mapId = this.Map.MapleID;
             this.Map.Characters.Remove(this);
-            this.Map = World.Maps[mapId];
+            this.Map = ChannelData.Maps[mapId];
             this.CashShop.Enter();
         }
     }

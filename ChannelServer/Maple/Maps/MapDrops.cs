@@ -24,7 +24,7 @@ namespace Loki.Maple.Maps
 
                 item.Expiry = new Delay(60 * 1000, () => { if (item.Map == this.Map) this.Remove(item); });// TODO: Real constant... 
 
-                if (World.IsInitialized)
+                if (ChannelData.IsInitialized)
                 {
                     lock (this.Map.Characters)
                     {
@@ -64,7 +64,7 @@ namespace Loki.Maple.Maps
                     item.Expiry.Cancel();
                 }
 
-                if (World.IsInitialized)
+                if (ChannelData.IsInitialized)
                 {
                     using (Packet destroy = item.GetDestroyPacket())
                     {

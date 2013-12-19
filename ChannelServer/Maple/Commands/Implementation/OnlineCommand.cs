@@ -20,7 +20,7 @@ namespace Loki.Maple.Commands.Implementation
             {
                 caller.Notify("[Online]");
 
-                foreach (Character loopCharacter in World.Characters)
+                foreach (Character loopCharacter in ChannelData.Characters)
                 {
                     caller.Notify("   -" + loopCharacter.Name);
                 }

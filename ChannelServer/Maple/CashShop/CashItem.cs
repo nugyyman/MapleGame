@@ -23,13 +23,13 @@ namespace Loki.Maple.CashShop
         {
             get
             {
-                return World.CachedCashItems[this.SerialNumber];
+                return ChannelData.CachedCashItems[this.SerialNumber];
             }
         }
 
         public CashItem(dynamic itemDatum)
         {
-            if (!World.IsInitialized)
+            if (!ChannelData.IsInitialized)
             {
                 this.SerialNumber = itemDatum.serial_number;
                 this.MapleID = itemDatum.itemid;
@@ -65,7 +65,7 @@ namespace Loki.Maple.CashShop
 
         public static CashItem GetCashItem(int serialNumber)
         {
-            if (World.CachedCashItems.Contains(serialNumber))
+            if (ChannelData.CachedCashItems.Contains(serialNumber))
             {
                 return new CashItem(serialNumber);
             }

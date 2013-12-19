@@ -24,7 +24,7 @@ namespace Loki.Maple.Commands.Implementation
                         break;
 
                     case "-world":
-                        World.Notify(CombineArgs(args, 1));
+                        ChannelData.Notify(CombineArgs(args, 1));
                         break;
 
                     default:

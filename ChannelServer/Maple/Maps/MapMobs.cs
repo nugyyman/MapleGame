@@ -18,7 +18,7 @@ namespace Loki.Maple.Maps
             {
                 base.InsertItem(index, item);
 
-                if (World.IsInitialized)
+                if (ChannelData.IsInitialized)
                 {
                     using (Packet create = item.GetCreatePacket())
                     {
@@ -130,7 +130,7 @@ namespace Loki.Maple.Maps
                     }
                 }
 
-                if (World.IsInitialized)
+                if (ChannelData.IsInitialized)
                 {
                     item.Controller.ControlledMobs.Remove(item);
 
