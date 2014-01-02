@@ -5,10 +5,11 @@ using System.Text;
 using Loki.Net;
 using Loki.Data;
 using Loki.Maple.Data;
+using System.Collections.ObjectModel;
 
 namespace Loki.Maple.Characters
 {
-    public class CharacterBuddyList : Dictionary<int, Buddy>
+    public class CharacterBuddyList : KeyedCollection<int, Buddy>
     {
         public Character Parent { get; private set; }
         public List<Buddy> pendingBuddies = new List<Buddy>();
@@ -31,24 +32,37 @@ namespace Loki.Maple.Characters
         {
             string name;
 
-            foreach (dynamic datum in new Datums("buddies").Populate("CharacterID = '{0}' AND Pending = '0'", this.Parent.ID))
+            foreach (dynamic datum in new Datums("buddies").Populate("CharacterID = '{0}'", this.Parent.ID))
             {
                 name = Database.Fetch("characters", "Name", "ID = '{0}'", datum.BuddyID);
-                this.Add(datum.BuddyID, new Buddy(name, datum.GroupName, datum.BuddyID, 0, true));
+
+                if (datum.Pending == 0)
+                {
+                    this.Add(new Buddy(name, datum.GroupName, datum.BuddyID, 0, true));
+                }
+                else
+                {
+                    this.pendingBuddies.Add(new Buddy(name, datum.GroupName, datum.BuddyID, 0, false));
+                }
+
+                Database.Delete("buddies", "CharacterID = '{0}' AND Pending = '1'", this.Parent.ID);
             }
-        }
 
-        public void LoadPendingBuddies()
-        {
-            string name;
+            Dictionary<byte, List<int>> characterStorage = ChannelData.GetCharacterStorage(this.Parent.ID);
 
-            foreach (dynamic datum in new Datums("buddies").Populate("CharacterID = '{0}' AND Pending = '1'", this.Parent.ID))
+            foreach (Buddy loopBuddy in this)
             {
-                name = Database.Fetch("characters", "Name", "ID = '{0}'", datum.BuddyID);
-                this.pendingBuddies.Add(new Buddy(name, datum.GroupName, datum.BuddyID, 0, false));
+                if (this.IsMutualBuddy(loopBuddy.CharacterID))
+                {
+                    foreach (byte loopChannel in characterStorage.Keys)
+                    {
+                        if (characterStorage[loopChannel].Contains(loopBuddy.CharacterID))
+                        {
+                            loopBuddy.Channel = (byte)(loopChannel + 1);
+                        }
+                    }
+                }
             }
-
-            Database.Delete("buddies", "CharacterID = '{0}' AND Pending = '1'", this.Parent.ID);
         }
 
         public void Delete()
@@ -63,7 +77,7 @@ namespace Loki.Maple.Characters
 
         public void Save()
         {
-            foreach (Buddy loopBuddy in this.Values)
+            foreach (Buddy loopBuddy in this)
             {
                 dynamic datum = new Datum("buddies");
 
@@ -83,14 +97,14 @@ namespace Loki.Maple.Characters
             }
         }
 
-        public void Update()
+        public void Update(byte operation)
         {
             using (Packet outPacket = new Packet(MapleServerOperationCode.BuddyList))
             {
-                outPacket.WriteByte(7);
+                outPacket.WriteByte(operation);
                 outPacket.WriteByte((byte)this.Count);
 
-                foreach (Buddy buddy in this.Values)
+                foreach (Buddy buddy in this)
                 {
                     outPacket.WriteInt(buddy.CharacterID);
                     outPacket.WriteStringFixed(buddy.Name, 13);
@@ -103,29 +117,6 @@ namespace Loki.Maple.Characters
                     outPacket.WriteInt();
 
                 this.Parent.Client.Send(outPacket);
-            }
-        }
-
-        public void UpdateChannels()
-        {
-            List<int> buddies = new List<int>();
-
-            foreach (int loopBuddy in this.Keys)
-            {
-                buddies.Add(loopBuddy);
-            }
-
-            foreach (int loopBuddy in buddies)
-            {
-                if (!this.IsMutualBuddy(loopBuddy))
-                    buddies.Remove(loopBuddy);
-            }
-
-            Dictionary<int, byte> onlineBuddies = ChannelServer.LoginServerConnection.UpdateBuddies(this.Parent.ID, false, buddies);
-
-            foreach (KeyValuePair<int, byte> loopBuddy in onlineBuddies)
-            {
-                this[loopBuddy.Key].Channel = (byte)(loopBuddy.Value + 1);
             }
         }
 
@@ -143,11 +134,40 @@ namespace Loki.Maple.Characters
             }
         }
 
+        public void UpdateCapacity(byte capacity)
+        {
+            using (Packet outPacket = new Packet(MapleServerOperationCode.BuddyList))
+            {
+                outPacket.WriteByte(0x15);
+                outPacket.WriteByte(capacity);
+
+                this.Parent.Client.Send(outPacket);
+            }
+        }
+
+        /// <param name="message">
+        /// 11: Your buddy list is full.
+        /// 12: The user's buddy list is full
+        /// 13: That character is already registered as your buddy.
+        /// 14: Gamemaster is not available as a buddy.
+        /// 15: That character is not registered.
+        /// 23: You've already made the Friend Request. Please try again later.
+        /// </param>
+        public void SendMessage(byte message)
+        {
+            using (Packet outPacket = new Packet(MapleServerOperationCode.BuddyList))
+            {
+                outPacket.WriteByte(message);
+
+                this.Parent.Client.Send(outPacket);
+            }
+        }
+
         public Buddy this[string name]
         {
             get
             {
-                foreach (Buddy buddy in this.Values)
+                foreach (Buddy buddy in this)
                 {
                     if (buddy.Name.ToLower().Equals(name.ToLower()))
                         return buddy;
@@ -157,9 +177,26 @@ namespace Loki.Maple.Characters
             }
         }
 
-        private bool IsMutualBuddy(int buddyID)
+        public bool IsMutualBuddy(int buddyID)
         {
-            return Database.Exists("buddies", "CharacterID = '{0}' AND BuddyID = '{1}' AND Pending = '0'", buddyID, this.Parent.ID);
+            if (this[buddyID].IsOnline)
+            {
+                if (ChannelServer.LoginServerConnection.RequestBuddyAddResult(buddyID, (byte)(this[buddyID].Channel - 1), this.Parent.ID) == BuddyAddResult.AlreadyOnList)
+                {
+                    return true;
+                }
+
+                return false;
+            }
+            else
+            {
+                return Database.Exists("buddies", "CharacterID = '{0}' AND BuddyID = '{1}' AND Pending = '0'", buddyID, this.Parent.ID);
+            }
+        }
+
+        protected override int GetKeyForItem(Buddy item)
+        {
+            return item.CharacterID;
         }
     }
 }

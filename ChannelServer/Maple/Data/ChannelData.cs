@@ -175,5 +175,10 @@ namespace Loki.Maple.Data
                 ChannelData.Broadcast(outPacket);
             }
         }
+
+        public static Dictionary<byte, List<int>> GetCharacterStorage(int characterID)
+        {
+            return ChannelServer.LoginServerConnection.GetCharacterStorage(characterID);
+        }
     }
 }

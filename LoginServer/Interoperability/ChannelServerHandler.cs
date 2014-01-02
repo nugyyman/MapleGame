@@ -155,8 +155,20 @@ namespace Loki.Interoperability
                     this.SetCash(inPacket);
                     break;
 
-                case InteroperabilityOperationCode.UpdateBuddiesRequest:
-                    this.UpdateBuddies(inPacket);
+                case InteroperabilityOperationCode.CharacterStorageRequest:
+                    this.SendCharacterStorage(inPacket);
+                    break;
+
+                case InteroperabilityOperationCode.CharacterWorldInteraction:
+                    this.World.CharacterWorldInteraction(inPacket);
+                    break;
+
+                case InteroperabilityOperationCode.BuddyAddResultRequest:
+                    this.World.GetBuddyAddResult(inPacket);
+                    break;
+
+                case InteroperabilityOperationCode.BuddyAddResultResponse:
+                    this.BuddyAddResultPool.Enqueue(inPacket.ReadInt(), (BuddyAddResult)inPacket.ReadByte());
                     break;
             }
         }
@@ -262,16 +274,29 @@ namespace Loki.Interoperability
 
         public void LoggedInUpdate(Packet inPacket)
         {
-            int accountID = inPacket.ReadInt();
+            bool loggedIn = inPacket.ReadBool();
             int characterID = inPacket.ReadInt();
+            int accountID = inPacket.ReadInt();
+
 
             dynamic datum = new Datum("accounts");
 
-            datum.IsLoggedIn = false;
+            datum.IsLoggedIn = loggedIn;
             datum.Update("ID = '{0}'", accountID);
 
-            LoginServer.LoggedIn.Remove(accountID);
-            this.World.CharacterStorage[this.InternalID].Remove(characterID);
+            if (!loggedIn)
+            {
+                this.World.CharacterStorage[this.InternalID].Remove(characterID);
+            }
+            else
+            {
+                if (!this.World.CharacterStorage.ContainsKey(this.InternalID))
+                {
+                    this.World.CharacterStorage.Add(this.InternalID, new List<int>());
+                }
+
+                this.World.CharacterStorage[this.InternalID].Add(characterID);
+            }
         }
 
         public float LoadProportion
@@ -352,37 +377,64 @@ namespace Loki.Interoperability
             datum.Update("ID = '{0}'", accountID);
         }
 
-        public void UpdateBuddies(Packet inPacket)
+        public void SendCharacterStorage(Packet inPacket)
         {
-            int buddyID;
-            bool update;
+            int characterID = inPacket.ReadInt();
 
-            using (Packet outPacket = new Packet(InteroperabilityOperationCode.UpdateBuddiesResponse))
+            using (Packet outPacket = new Packet(InteroperabilityOperationCode.CharacterStorageResponse))
             {
-                outPacket.WriteInt(inPacket.ReadInt());
-                update = inPacket.ReadBool();
+                outPacket.WriteInt(characterID);
 
-                while (inPacket.Remaining > 0)
+                foreach (byte loopChannel in this.World.CharacterStorage.Keys)
                 {
-                    buddyID = inPacket.ReadInt();
-
-                    foreach (byte loopChannel in this.World.CharacterStorage.Keys)
+                    foreach (int loopCharacter in this.World.CharacterStorage[loopChannel])
                     {
-                        if (this.World.CharacterStorage[loopChannel].Contains(buddyID))
-                        {
-                            outPacket.WriteInt(buddyID);
-                            outPacket.WriteByte(loopChannel);
-
-                            if (update)
-                            {
-                                //TODO: Update this buddy!
-                            }
-                        }
+                        outPacket.WriteByte(loopChannel);
+                        outPacket.WriteInt(loopCharacter);
                     }
                 }
 
                 this.Send(outPacket);
             }
+        }
+
+        public void UpdateBuddy(int characterID, string buddyName, byte channel)
+        {
+            using (Packet outPacket = new Packet(InteroperabilityOperationCode.CharacterWorldInteraction))
+            {
+                outPacket.WriteByte((byte)CharacterWorldInteractionAction.UpdateBuddyChannel);
+                outPacket.WriteInt(characterID);
+                outPacket.WriteString(buddyName);
+                outPacket.WriteByte(channel);
+
+                this.Send(outPacket);
+            }
+        }
+
+        public void SendBuddyRequest(Packet inPacket)
+        {
+            using (Packet outPacket = new Packet(InteroperabilityOperationCode.CharacterWorldInteraction))
+            {
+                outPacket.WriteByte((byte)CharacterWorldInteractionAction.SendBuddyRequest);
+                outPacket.WriteBytes(inPacket.ReadBytes());
+
+                this.Send(outPacket);
+            }
+        }
+
+        private PendingKeyedQueue<int, BuddyAddResult> BuddyAddResultPool = new PendingKeyedQueue<int, BuddyAddResult>();
+
+        public BuddyAddResult RequestBuddyAddResult(int addBuddyID, int characterID)
+        {
+            using (Packet outPacket = new Packet(InteroperabilityOperationCode.BuddyAddResultRequest))
+            {
+                outPacket.WriteInt(addBuddyID);
+                outPacket.WriteInt(characterID);
+
+                this.Send(outPacket);
+            }
+
+            return this.BuddyAddResultPool.Dequeue(addBuddyID);
         }
     }
 }

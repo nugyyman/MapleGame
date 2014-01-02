@@ -2976,7 +2976,7 @@ namespace Loki.Maple
         Curse = 3
     }
 
-    public enum BuddyAddResults
+    public enum BuddyAddResult
     {
         BuddyListFull,
         AlreadyOnList,
@@ -3015,5 +3015,12 @@ namespace Loki.Maple
         DefaultTime = 150842304000000000L,
         ZeroTime = 94354848000000000L,
         Permanent = 150841440000000000L
+    }
+
+    public enum CharacterWorldInteractionAction : byte
+    {
+        UpdateBuddies,
+        UpdateBuddyChannel,
+        SendBuddyRequest
     }
 }

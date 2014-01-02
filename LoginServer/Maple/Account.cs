@@ -19,36 +19,14 @@ namespace Loki.Maple
         public string Pic { get; set; }
         public DateTime Birthday { get; set; }
         public DateTime Creation { get; set; }
-        private bool isLoggedIn;
+        public bool IsLoggedIn { get; set; }
         public bool IsBanned { get; set; }
         public bool IsMaster { get; set; }
         public int MaplePoints { get; set; }
         public int PaypalNX { get; set; }
         public int CardNX { get; set; }
-        public bool LoggedIn { get; set; }
 
         private bool Assigned { get; set; }
-
-        public bool IsLoggedIn
-        {
-            get
-            {
-                return this.isLoggedIn && !LoginServer.LoggedIn.Contains(this.ID);
-            }
-            set
-            {
-                this.isLoggedIn = value;
-
-                if (value)
-                {
-                    LoginServer.LoggedIn.Add(this.ID);
-                }
-                else
-                {
-                    LoginServer.LoggedIn.Remove(this.ID);
-                }
-            }
-        }
 
         public Account(MapleClientHandler client)
         {
@@ -84,8 +62,6 @@ namespace Loki.Maple
             this.MaplePoints = datum.MaplePoints;
             this.PaypalNX = datum.PaypalNX;
             this.CardNX = datum.CardNX;
-
-            this.LoggedIn = false;
         }
 
         public void Save()

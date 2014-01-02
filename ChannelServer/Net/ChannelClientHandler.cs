@@ -20,6 +20,7 @@ namespace Loki.Net
             this.Character.Load();
             this.Character.IsMaster = ChannelServer.LoginServerConnection.IsMaster(this.Character.AccountID);
             this.Character.Initialize();
+            ChannelServer.LoginServerConnection.LoggedInUpdate(true, this.Character.ID, this.Character.AccountID);
 
             this.Title = this.Character.Name;
         }
@@ -33,12 +34,15 @@ namespace Loki.Net
         {
             if (this.Character != null)
             {
-                this.Character.Save();
-                this.Character.LastNpc = null;
-                this.Character.Map.Characters.Remove(this.Character);
-                this.Character.UpdateBuddies(false);
+                if (!this.Character.IsChangingChannel)
+                {
+                    this.Character.Save();
+                    this.Character.LastNpc = null;
+                    this.Character.Map.Characters.Remove(this.Character);
+                    ChannelServer.LoginServerConnection.UpdateBuddies(this.Character, false);
+                }
 
-                ChannelServer.LoginServerConnection.LoggedInUpdate(this.Character.AccountID, this.Character.ID);
+                ChannelServer.LoginServerConnection.LoggedInUpdate(false, this.Character.ID, this.Character.AccountID);
             }
         }
 
@@ -243,6 +247,11 @@ namespace Loki.Net
 
         public void ChangeChannel(Packet inPacket)
         {
+            this.Character.IsChangingChannel = true;
+            this.Character.Save();
+            this.Character.LastNpc = null;
+            this.Character.Map.Characters.Remove(this.Character);
+
             byte channelID = inPacket.ReadByte();
 
             using (Packet outPacket = new Packet(MapleServerOperationCode.ChangeChannel))

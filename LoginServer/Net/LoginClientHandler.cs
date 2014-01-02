@@ -52,11 +52,7 @@ namespace Loki.Net
         {
             if (this.Account != null)
             {
-                if (!this.Account.LoggedIn)
-                {
-                    this.Account.IsLoggedIn = false;
-                }
-
+                this.Account.IsLoggedIn = false;
                 this.Account.Save();
             }
         }
@@ -195,7 +191,7 @@ namespace Loki.Net
                     outPacket.WriteInt();
                     outPacket.WriteByte(0); // pin 0 = Enable, 1 = Disable
                     outPacket.WriteByte((byte)(LoginServer.RequestPic ? (this.Account.Pic == null || this.Account.Pic.Length == 0 ? 0 : 1) : 2)); // pic 0 = Register, 1 = Request, 2 = Disable
-                    outPacket.WriteLong();
+                    outPacket.WriteLong(); // SessionID
                 }
                 else
                 {
@@ -309,6 +305,7 @@ namespace Loki.Net
                 else
                 {
                     this.Account.IsLoggedIn = true;
+                    this.Account.Save();
                     this.RespondPin(PinResponse.Valid);
                 }
             }
@@ -327,6 +324,7 @@ namespace Loki.Net
                         if (alpha == 1) // Request pin validation.
                         {
                             this.Account.IsLoggedIn = true;
+                            this.Account.Save();
                             this.RespondPin(PinResponse.Valid);
                         }
                         else if (alpha == 2) // Request new pin registration.
@@ -673,15 +671,6 @@ namespace Loki.Net
 
                         this.Send(outPacket);
                     }
-
-                    if (!this.World.CharacterStorage.ContainsKey(this.Channel.InternalID))
-                    {
-                        this.World.CharacterStorage.Add(this.Channel.InternalID, new List<int>());
-                    }
-
-                    this.World.CharacterStorage[this.Channel.InternalID].Add(characterID);
-
-                    this.Account.LoggedIn = true;
                 }
                 else
                 {

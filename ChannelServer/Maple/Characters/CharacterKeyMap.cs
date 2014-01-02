@@ -7,6 +7,7 @@ namespace Loki.Maple.Characters
     public class CharacterKeyMap : Dictionary<int, Shortcut>
     {
         public Character Parent { get; private set; }
+        private bool Changed { get; set; }
 
         public CharacterKeyMap(Character parent)
             : base()
@@ -29,18 +30,21 @@ namespace Loki.Maple.Characters
 
         public void Save()
         {
-            this.Delete();
-
-            foreach (KeyValuePair<int, Shortcut> loopKeyMap in this)
+            if (Changed)
             {
-                dynamic datum = new Datum("keymaps");
+                this.Delete();
 
-                datum.CharacterID = this.Parent.ID;
-                datum.KeyID = loopKeyMap.Key;
-                datum.Type = loopKeyMap.Value.Type;
-                datum.Action = loopKeyMap.Value.Action;
+                foreach (KeyValuePair<int, Shortcut> loopKeyMap in this)
+                {
+                    dynamic datum = new Datum("keymaps");
 
-                datum.Insert();
+                    datum.CharacterID = this.Parent.ID;
+                    datum.KeyID = loopKeyMap.Key;
+                    datum.Type = loopKeyMap.Value.Type;
+                    datum.Action = loopKeyMap.Value.Action;
+
+                    datum.Insert();
+                }
             }
         }
 
@@ -48,6 +52,8 @@ namespace Loki.Maple.Characters
         {
             if (inPacket.Remaining != 8)
             {
+                this.Changed = true;
+
                 inPacket.ReadInt();
                 int amountChanges = inPacket.ReadInt();
 

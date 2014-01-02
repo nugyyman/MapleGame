@@ -18,7 +18,6 @@ namespace Loki.Net
         public static TcpListener Listener { get; private set; }
         public static Worlds Worlds { get; private set; }
         public static ChannelsHelper Channels { get; private set; }
-        public static List<int> LoggedIn { get; private set; }
         public static List<LoginClientHandler> Clients { get; private set; }
 
         public static bool AutoRegister { get; private set; }
@@ -54,7 +53,6 @@ namespace Loki.Net
 
             LoginServer.Worlds = new Worlds();
             LoginServer.Channels = new ChannelsHelper();
-            LoginServer.LoggedIn = new List<int>();
             LoginServer.Clients = new List<LoginClientHandler>();
 
             Log.Entitle("Login Server v.{0}.{1}", Application.MapleVersion, Application.PatchVersion);

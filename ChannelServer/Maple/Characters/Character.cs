@@ -37,6 +37,7 @@ namespace Loki.Maple.Characters
         public int AccountID { get; set; }
         public string Name { get; set; }
         public bool IsInitialized { get; private set; }
+        public bool IsChangingChannel { get; set; }
 
         private DateTime LastHealHPOverTime = new DateTime();
         private DateTime LastHealMPOverTime = new DateTime();
@@ -1389,11 +1390,11 @@ namespace Loki.Maple.Characters
             this.Map.Characters.Add(this);
 
             this.IsInitialized = true;
+            this.IsChangingChannel = false;
 
             this.KeyMap.Send();
-            this.UpdateBuddies(true);
-            this.BuddyList.UpdateChannels();
-            this.BuddyList.Update();
+
+            this.BuddyList.Update(7);
 
             // NOTE: Until we find out more about buffs in the SpawnPlayer packet
 
@@ -1402,8 +1403,6 @@ namespace Loki.Maple.Characters
             //    loopBuff.Apply();
             //}
 
-            this.BuddyList.LoadPendingBuddies();
-
             foreach (Buddy loopBuddy in this.BuddyList.pendingBuddies)
             {
                 using (Packet outPacket = new Packet(MapleServerOperationCode.BuddyList))
@@ -1411,20 +1410,23 @@ namespace Loki.Maple.Characters
                     outPacket.WriteByte(9);
                     outPacket.WriteInt(loopBuddy.CharacterID);
                     outPacket.WriteString(loopBuddy.Name);
+                    outPacket.WriteShort(Database.Fetch("characters", "Level", "ID = '{0}'", loopBuddy.CharacterID));
+                    outPacket.WriteShort();
+                    outPacket.WriteShort(Database.Fetch("characters", "Job", "ID = '{0}'", loopBuddy.CharacterID));
+                    outPacket.WriteShort();
                     outPacket.WriteInt(loopBuddy.CharacterID);
-                    outPacket.WriteStringFixed(loopBuddy.Name, 11);
-                    outPacket.WriteByte(0x09);
-                    outPacket.WriteByte(0xF0);
-                    outPacket.WriteByte(0x01);
-                    outPacket.WriteInt(0x0F);
-                    outPacket.WriteStringFixed("Default Group", 14);
-                    outPacket.WriteInt(this.ID);
+                    outPacket.WriteStringFixed(loopBuddy.Name, 13);
+                    outPacket.WriteByte(1);
+                    outPacket.WriteInt(0);
+                    outPacket.WriteStringFixed("Default Group", 17);
+                    outPacket.WriteByte();
 
                     this.Client.Send(outPacket);
                 }
             }
 
             this.BuddyList.pendingBuddies.Clear();
+            ChannelServer.LoginServerConnection.UpdateBuddies(this, true);
         }
 
         public Packet GetCreatePacket()
@@ -1439,60 +1441,76 @@ namespace Loki.Maple.Characters
             spawn.WriteInt(this.ID);
             spawn.WriteByte(this.Level);
             spawn.WriteString(this.Name);
-            spawn.WriteShort();
+            spawn.WriteString(string.Empty); //UA stuff
 
             // If not in guild:
-            spawn.WriteString(string.Empty);
-            spawn.Skip(6);
-
-            spawn.WriteByte(3);
-            spawn.WriteInt(); // UNK: Maybe not an int.
-            spawn.WriteShort();
-            spawn.WriteByte(0xF8);
-            spawn.WriteInt(0x00); // TODO: 2 if morphed.
+            spawn.WriteInt();
+            spawn.WriteInt();
 
             // TODO: Buffs?
-            long buffMask = 0;
-            spawn.WriteInt((int)((buffMask >> 32) & 0xffffffffL));
-            spawn.WriteInt((int)(buffMask & 0xffffffffL));
+            //long buffMask = 0;
+            //spawn.WriteInt((int)((buffMask >> 32) & 0xffffffffL));
+            //spawn.WriteInt((int)(buffMask & 0xffffffffL));
+
+            spawn.Skip(32); //buff stats?
+            spawn.WriteInt(-1);
 
             int characterSpawn = Application.Random.Next(5000000);
-            spawn.Skip(10);
+            spawn.WriteInt(0); //start of energy charge
+            spawn.WriteLong(0);
+            spawn.WriteByte(1);
             spawn.WriteInt(characterSpawn);
-            spawn.Skip(11);
+            spawn.WriteShort(0); //start of dash_speed
+            spawn.WriteLong(0);
+            spawn.WriteByte(1);
             spawn.WriteInt(characterSpawn);
-            spawn.Skip(11);
+            spawn.WriteShort(0); //start of dash_jump
+            spawn.WriteLong(0);
+            spawn.WriteByte(1);
             spawn.WriteInt(characterSpawn);
-            spawn.Skip(3);
-
-            // TODO: Mount.
-            spawn.WriteLong();
-
+            spawn.WriteShort(0);
+            spawn.WriteLong(); // TODO: Mount.
+            spawn.WriteByte(1);
             spawn.WriteInt(characterSpawn);
-            spawn.Skip(9);
+            spawn.WriteLong(0); //speed infusion behaves differently here
+            spawn.WriteByte(1);
             spawn.WriteInt(characterSpawn);
-            spawn.Skip(2);
-            spawn.WriteInt(); // UNK.
-            spawn.Skip(10);
+            spawn.WriteInt(1);
+            spawn.WriteLong(0); //homing beacon
+            spawn.WriteByte(0); //random
+            spawn.WriteShort(0);
+            spawn.WriteByte(1);
             spawn.WriteInt(characterSpawn);
-            spawn.Skip(13);
+            spawn.Skip(16); //and finally, something ive no idea
+            spawn.WriteByte(1);
             spawn.WriteInt(characterSpawn);
-            spawn.Skip(3);
+            spawn.WriteShort();
 
             spawn.WriteShort((short)this.Job);
+            spawn.WriteShort();
             spawn.WriteBytes(this.AppearanceToByteArray(false));
-            spawn.WriteLong();
             spawn.WriteInt();
             spawn.WriteInt();
-            spawn.WriteInt(); // TODO: Item effect.
-            spawn.WriteInt(); // TODO: Chair.
+            spawn.WriteInt();
+            spawn.WriteInt();
+            spawn.WriteInt();
+            spawn.WriteInt();
+            spawn.WriteInt();
+            spawn.WriteInt();
+            spawn.WriteInt();
+            spawn.WriteInt();
+            spawn.WriteInt();
+            spawn.WriteInt();
+            spawn.WriteInt();
             spawn.WriteShort(this.Position.X);
             spawn.WriteShort(this.Position.Y);
             spawn.WriteByte(this.Stance);
             spawn.WriteShort();
             spawn.WriteByte();
+            spawn.WriteByte();
 
             // TODO: Pets.
+            spawn.WriteByte(1);
             spawn.WriteByte();
 
             spawn.WriteInt(1); // TODO: Mount level.
@@ -1512,7 +1530,11 @@ namespace Loki.Maple.Characters
             // TODO: Marriage rings.
             spawn.WriteByte();
 
-            spawn.Skip(6);
+            spawn.WriteByte();
+            spawn.WriteInt();
+            spawn.WriteByte();
+            spawn.WriteInt();
+            spawn.Skip(100);
 
             return spawn;
         }
@@ -3130,75 +3152,44 @@ namespace Loki.Maple.Characters
             }
         }
 
-        public void UpdateBuddies(bool initialize)
+        public BuddyAddResult BuddyRequest(int addBuddyID, byte addBuddyChannel)
         {
-            foreach (Buddy loopBuddy in this.BuddyList.Values)
+            BuddyAddResult result = BuddyAddResult.Success;
+
+            if (addBuddyChannel == 0)
             {
-                if (loopBuddy.IsOnline)
-                {
-                    Character buddy = ChannelData.Characters[loopBuddy.Name];
+                byte buddies = 0;
 
-                    if (buddy.BuddyList.ContainsKey(this.ID))
-                    {
-                        buddy.BuddyList[this.ID].Channel = (byte)(initialize ? ChannelServer.ChannelID : 0);
-                        buddy.BuddyList.UpdateBuddyChannel(buddy.BuddyList[this.ID]);
-                    }
-                }
-            }
-        }
-
-        public BuddyAddResults BuddyRequest(Character addCharacter, int id)
-        {
-            BuddyAddResults result = BuddyAddResults.Success;
-            byte buddies = 0;
-
-            if (addCharacter == null)
-            {
-                foreach (dynamic datum in new Datums("buddies").Populate("CharacterID = '{0}'", id))
+                foreach (dynamic datum in new Datums("buddies").Populate("CharacterID = '{0}'", addBuddyID))
                 {
                     buddies++;
                 }
 
-                if (Database.Fetch("characters", "MaxBuddies", "ID = '{0}'", id) == buddies)
+                if (Database.Fetch("characters", "MaxBuddies", "ID = '{0}'", addBuddyID) == buddies)
                 {
-                    result = BuddyAddResults.BuddyListFull;
+                    result = BuddyAddResult.BuddyListFull;
                 }
-                else if (Database.Exists("buddies", "CharacterID = '{0}' AND BuddyID = '{1}'", id, this.ID))
+                else if (Database.Exists("buddies", "CharacterID = '{0}' AND BuddyID = '{1}'", addBuddyID, this.ID))
                 {
-                    result = BuddyAddResults.AlreadyOnList;
+                    result = BuddyAddResult.AlreadyOnList;
+                }
+            }
+            else if (this.Channel == addBuddyChannel)
+            {
+                Character addBuddy = ChannelData.Characters[addBuddyID];
+
+                if (addBuddy.BuddyList.Count == addBuddy.MaxBuddies)
+                {
+                    result = BuddyAddResult.BuddyListFull;
+                }
+                else if (addBuddy.BuddyList.Contains(this.ID))
+                {
+                    result = BuddyAddResult.AlreadyOnList;
                 }
             }
             else
             {
-                buddies = (byte)(this.BuddyList.Count);
-
-                if (addCharacter.MaxBuddies == buddies)
-                {
-                    result = BuddyAddResults.BuddyListFull;
-                }
-                else if (addCharacter.BuddyList.ContainsKey(this.ID))
-                {
-                    result = BuddyAddResults.AlreadyOnList;
-                }
-                else
-                {
-                    using (Packet outPacket = new Packet(MapleServerOperationCode.BuddyList))
-                    {
-                        outPacket.WriteByte(9);
-                        outPacket.WriteInt(this.ID);
-                        outPacket.WriteString(this.Name);
-                        outPacket.WriteInt(this.ID);
-                        outPacket.WriteStringFixed(this.Name, 11);
-                        outPacket.WriteByte(0x09);
-                        outPacket.WriteByte(0xF0);
-                        outPacket.WriteByte(0x01);
-                        outPacket.WriteInt(0x0F);
-                        outPacket.WriteStringFixed("Default Group", 14);
-                        outPacket.WriteInt(addCharacter.ID);
-
-                        addCharacter.Client.Send(outPacket);
-                    }
-                }
+                result = ChannelServer.LoginServerConnection.RequestBuddyAddResult(addBuddyID, (byte)(addBuddyChannel - 1), this.ID);
             }
 
             return result;
@@ -3207,7 +3198,9 @@ namespace Loki.Maple.Characters
         public void BuddyListModify(Packet inPacket)
         {
             byte mode = inPacket.ReadByte();
-            CharacterBuddyList buddyList = this.BuddyList;
+            int addBuddyID;
+            byte addBuddyChannel;
+            Dictionary<byte, List<int>> OnlineCharacters;
 
             switch (mode)
             {
@@ -3217,58 +3210,66 @@ namespace Loki.Maple.Characters
 
                     if (!Database.Exists("characters", "Name = '{0}'", name))
                     {
-                        this.Notify(name + " does not exists.");
+                        this.BuddyList.SendMessage(15);
                         return;
                     }
 
-                    Buddy buddy = buddyList[name];
+                    Buddy buddy = this.BuddyList[name];
 
                     if (buddy != null && buddy.Group.Equals(group))
                     {
-                        this.Notify("You already have " + name + " on your Buddylist.");
-                    }
-                    else if (buddy == null && buddyList.IsFull)
-                    {
-                        this.Notify("Your Buddylist is already full.");
+                        this.BuddyList.SendMessage(13);
                     }
                     else if (buddy != null) //Change group
                     {
                         buddy.Group = group;
-                        buddyList.Update();
+                        this.BuddyList.Update(10);
                     }
-                    else if (buddy == null) // Add buddy
+                    else if (buddy == null && this.BuddyList.IsFull)
                     {
-                        int addBuddyID = Database.Fetch("characters", "ID", "Name = '{0}'", name);
-                        Character newBuddyCharacter = ChannelData.Characters[name];
+                        this.BuddyList.SendMessage(11);
+                    }
+                    else // Add buddy
+                    {
+                        addBuddyID = Database.Fetch("characters", "ID", "Name = '{0}'", name);
 
-                        BuddyAddResults result = this.BuddyRequest(newBuddyCharacter, addBuddyID);
-
-                        if (result == BuddyAddResults.BuddyListFull)
+                        addBuddyChannel = 0;
+                        OnlineCharacters = ChannelData.GetCharacterStorage(this.ID);
+                        foreach (byte loopChannel in OnlineCharacters.Keys)
                         {
-                            this.Notify(name + "'s Buddylist is already full.");
-                        }
-                        else if (result == BuddyAddResults.AlreadyOnList)
-                        {
-                            string realName = Database.Fetch("characters", "Name", "ID = '{0}'", addBuddyID);
-                            Buddy newBuddy = new Buddy(realName, group, addBuddyID, 0, false);
-                            buddyList.Add(newBuddy.CharacterID, newBuddy);
-                            buddyList.Update();
-                            buddyList[name].Channel = (byte)(newBuddyCharacter == null ? 0 : newBuddyCharacter.Channel);
-                            buddyList.UpdateBuddyChannel(buddyList[name]);
-                            if (newBuddyCharacter != null)
+                            if (OnlineCharacters[loopChannel].Contains(addBuddyID))
                             {
-                                newBuddyCharacter.BuddyList[this.ID].Channel = this.Channel;
-                                newBuddyCharacter.BuddyList.UpdateBuddyChannel(newBuddyCharacter.BuddyList[this.ID]);
+                                addBuddyChannel = (byte)(loopChannel + 1);
+                                break;
+                            }
+                        }
+
+                        BuddyAddResult result = this.BuddyRequest(addBuddyID, addBuddyChannel);
+
+                        if (result == BuddyAddResult.BuddyListFull)
+                        {
+                            this.BuddyList.SendMessage(12);
+                        }
+                        else if (result == BuddyAddResult.AlreadyOnList)
+                        {
+                            name = Database.Fetch("characters", "Name", "ID = '{0}'", addBuddyID);
+                            Buddy newBuddy = new Buddy(name, group, addBuddyID, addBuddyChannel, false);
+                            this.BuddyList.Add(newBuddy);
+                            this.BuddyList.Update(10);
+
+                            if (addBuddyChannel != 0)
+                            {
+                                ChannelServer.LoginServerConnection.UpdateBuddies(this, true, addBuddyID);
                             }
                         }
                         else
                         {
-                            string realName = Database.Fetch("characters", "Name", "ID = '{0}'", addBuddyID);
-                            Buddy newBuddy = new Buddy(realName, group, addBuddyID, 0, false);
-                            buddyList.Add(newBuddy.CharacterID, newBuddy);
-                            buddyList.Update();
+                            name = Database.Fetch("characters", "Name", "ID = '{0}'", addBuddyID);
+                            Buddy newBuddy = new Buddy(name, group, addBuddyID, 0, false);
+                            this.BuddyList.Add(newBuddy);
+                            this.BuddyList.Update(10);
 
-                            if (newBuddyCharacter == null)
+                            if (addBuddyChannel == 0)
                             {
                                 dynamic datum = new Datum("buddies");
 
@@ -3278,42 +3279,56 @@ namespace Loki.Maple.Characters
 
                                 datum.Insert();
                             }
+                            else
+                            {
+                                ChannelServer.LoginServerConnection.SendBuddyRequest(this, addBuddyChannel, addBuddyID);
+                            }
                         }
                     }
                     break;
                 case 2: //Accept
-                    int addCharacterID = inPacket.ReadInt();
-                    Character addCharacter = ChannelData.Characters[Database.Fetch("characters", "Name", "ID = '{0}'", addCharacterID)];
-
-                    if (addCharacter != null)
+                    addBuddyID = inPacket.ReadInt();
+                    name = Database.Fetch("characters", "Name", "ID = '{0}'", addBuddyID);
+                    addBuddyChannel = 0;
+                    OnlineCharacters = ChannelData.GetCharacterStorage(this.ID);
+                    foreach (byte loopChannel in OnlineCharacters.Keys)
                     {
-                        buddyList.Add(addCharacterID, new Buddy(addCharacter.Name, "Default Group", addCharacterID, addCharacter.Channel, false));
-                        addCharacter.BuddyList[this.ID].Channel = this.Channel;
-                        addCharacter.BuddyList.UpdateBuddyChannel(addCharacter.BuddyList[this.ID]);
+                        if (OnlineCharacters[loopChannel].Contains(addBuddyID))
+                        {
+                            addBuddyChannel = (byte)(loopChannel + 1);
+                            break;
+                        }
+                    }
+
+                    if (addBuddyChannel != 0)
+                    {
+                        this.BuddyList.Add(new Buddy(name, "Default Group", addBuddyID, addBuddyChannel, false));
+                        ChannelServer.LoginServerConnection.UpdateBuddies(this, true, addBuddyID);
                     }
                     else
                     {
-                        buddyList.Add(addCharacterID, new Buddy(Database.Fetch("characters", "Name", "ID = '{0}'", addCharacterID), "Default Group", addCharacterID, 0, false));
+                        this.BuddyList.Add(new Buddy(name, "Default Group", addBuddyID, 0, false));
                     }
-                    
-                    buddyList.Update();
+
+                    this.BuddyList.Update(10);
                     break;
                 case 3: //Delete
                     int deleteID = inPacket.ReadInt();
-                    if (this.BuddyList.ContainsKey(deleteID))
+
+                    if (this.BuddyList.Contains(deleteID))
                     {
                         if (this.BuddyList[deleteID].IsOnline)
                         {
-                            Character deleteCharacter = ChannelData.Characters[this.BuddyList[deleteID].Name];
-                            deleteCharacter.BuddyList[this.ID].Channel = 0;
-                            deleteCharacter.BuddyList.UpdateBuddyChannel(deleteCharacter.BuddyList[this.ID]);
+                            ChannelServer.LoginServerConnection.UpdateBuddies(this, false, deleteID);
                         }
+
                         if (this.BuddyList[deleteID].Assigned)
                             this.BuddyList.DeleteBuddy(deleteID);
+
                         this.BuddyList.Remove(deleteID);
                     }
 
-                    this.BuddyList.Update();
+                    this.BuddyList.Update(18);
                     break;
             }
         }

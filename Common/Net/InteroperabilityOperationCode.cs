@@ -21,7 +21,10 @@
         GetCashRequest,
         GetCashResponse,
         SetCashRequest,
-        UpdateBuddiesRequest,
-        UpdateBuddiesResponse
+        CharacterStorageRequest,
+        CharacterStorageResponse,
+        CharacterWorldInteraction,
+        BuddyAddResultRequest,
+        BuddyAddResultResponse
     }
 }

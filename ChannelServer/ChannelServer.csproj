@@ -172,7 +172,7 @@
     <Compile Include="Maple\Point.cs" />
     <Compile Include="Maple\Skill.cs" />
     <Compile Include="Maple\Characters\CharacterSkills.cs" />
-    <Compile Include="Maple\Data\Channel.cs" />
+    <Compile Include="Maple\Data\ChannelData.cs" />
     <Compile Include="Net\ChannelClientHandler.cs" />
     <Compile Include="Net\ChannelServer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

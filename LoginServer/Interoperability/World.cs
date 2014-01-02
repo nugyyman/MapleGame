@@ -167,5 +167,56 @@ namespace Loki.Interoperability
 
             return this.CreatedCharacterPool.Dequeue(accountID);
         }
+
+        public void CharacterWorldInteraction(Packet inPacket)
+        {
+            string characterName;
+            byte channel;
+
+            switch ((CharacterWorldInteractionAction)inPacket.ReadByte())
+            {
+                case CharacterWorldInteractionAction.UpdateBuddies:
+                    characterName = inPacket.ReadString();
+                    channel = inPacket.ReadByte();
+                    int buddyID;
+
+                    while (inPacket.Remaining > 0)
+                    {
+                        buddyID = inPacket.ReadInt();
+
+                        foreach (byte loopChannel in this.CharacterStorage.Keys)
+                        {
+                            if (this.CharacterStorage[loopChannel].Contains(buddyID))
+                            {
+                                this[loopChannel].UpdateBuddy(buddyID, characterName, channel);
+                            }
+                        }
+                    }
+
+                    break;
+
+                case CharacterWorldInteractionAction.SendBuddyRequest:
+                    this[inPacket.ReadByte()].SendBuddyRequest(inPacket);
+                    break;
+            }
+        }
+
+        public void GetBuddyAddResult(Packet inPacket)
+        {
+            byte addBuddyChannel = inPacket.ReadByte();
+            int addBuddyID = inPacket.ReadInt();
+            int characterID = inPacket.ReadInt();
+            byte characterChannel = inPacket.ReadByte();
+
+            BuddyAddResult result = this[addBuddyChannel].RequestBuddyAddResult(addBuddyID, characterID);
+
+            using (Packet outPacket = new Packet(InteroperabilityOperationCode.BuddyAddResultResponse))
+            {
+                outPacket.WriteInt(characterID);
+                outPacket.WriteByte((byte)result);
+
+                this[characterChannel].Send(outPacket);
+            }
+        }
     }
 }
