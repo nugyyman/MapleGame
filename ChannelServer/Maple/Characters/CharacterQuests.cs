@@ -100,7 +100,7 @@ namespace Loki.Maple.Characters
                         outPacket.WriteByte(1);
                         outPacket.WriteUShort(quest.ID);
                         outPacket.WriteByte(2);
-                        outPacket.WriteDateTime(DateTime.UtcNow);
+                        outPacket.WriteLongDateTime(DateTime.UtcNow);
 
                         this.Parent.Client.Send(outPacket);
                     }
@@ -279,7 +279,7 @@ namespace Loki.Maple.Characters
                 foreach (KeyValuePair<ushort, DateTime> questStatus in this.Completed)
                 {
                     buffer.WriteUShort(questStatus.Key);
-                    buffer.WriteDateTime(questStatus.Value);
+                    buffer.WriteLongDateTime(questStatus.Value);
                 }
 
                 buffer.Flip();

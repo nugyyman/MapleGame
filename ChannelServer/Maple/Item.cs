@@ -1243,7 +1243,7 @@ namespace Loki.Maple
                     buffer.WriteString(this.Creator);
                     buffer.WriteShort(this.Flags);
                     buffer.WriteByte();
-                    buffer.WriteByte(); // TODO: Item level. Timeless has it.
+                    buffer.WriteByte(1); // TODO: Item level. Timeless has it.
                     buffer.WriteInt(); // TODO: Item EXP. Timeless has it.
                     buffer.WriteInt(-1);
                     buffer.WriteInt(this.ViciousHammerApplied);
@@ -1256,9 +1256,9 @@ namespace Loki.Maple
                     buffer.WriteShort(); // potential stat 4 ?
                     buffer.WriteShort(); // potential stat 5 ?
                     buffer.WriteShort();
-                    buffer.WriteShort();
-                    buffer.WriteShort();
-                    buffer.WriteShort();
+                    buffer.WriteShort(-1);
+                    buffer.WriteShort(-1);
+                    buffer.WriteShort(-1);
 
                     if (!this.IsEquippedCash && !this.IsCash)
                     {

@@ -156,7 +156,7 @@ namespace Loki.Net
                     break;
 
                 case MapleClientOperationCode.QuestAction:
-                    //this.Character.Quests.Handle(inPacket);
+                    this.Character.Quests.Handle(inPacket);
                     break;
 
                 case MapleClientOperationCode.PlayerInteraction:

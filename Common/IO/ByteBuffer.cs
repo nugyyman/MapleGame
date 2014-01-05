@@ -223,9 +223,19 @@ namespace Loki.IO
             this.Position += length;
         }
 
-        public void WriteDateTime(DateTime item)
+        public void WriteIntDateTime(DateTime item)
         {
-            this.Writer.Write((long)(item.ToUniversalTime() - new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).TotalMilliseconds);
+            string time = item.Year.ToString();
+            time += item.Month < 10 ? ("0" + item.Month.ToString()) : item.Month.ToString();
+            time += item.Day < 10 ? ("0" + item.Day.ToString()) : item.Day.ToString();
+            time += item.Hour < 10 ? ("0" + item.Hour.ToString()) : item.Hour.ToString();
+            this.Writer.Write(int.Parse(time));
+            this.Position += sizeof(int);
+        }
+
+        public void WriteLongDateTime(DateTime item)
+        {
+            this.Writer.Write((long)((item.Millisecond  * 10000) + 116444592000000000L));
             this.Position += sizeof(long);
         }
 

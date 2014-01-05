@@ -546,7 +546,6 @@ namespace Loki.Maple.Characters
                 {
                     buffer.WriteBytes(item.ToByteArray());
                 }
-
                 buffer.WriteShort();
 
                 foreach (Item item in this.GetEquipped(EquippedQueryMode.Cash))

@@ -9,6 +9,7 @@ using Loki.Maple.Life;
 using Loki.Maple.Maps;
 using Loki.Net;
 using Loki.Maple.CashShop;
+using Loki.Maple.Commands.Implementation;
 
 namespace Loki.Maple.Characters
 {
@@ -1160,7 +1161,7 @@ namespace Loki.Maple.Characters
                 }
 
                 buffer.WriteByte();
-                buffer.WriteInt();
+                buffer.WriteIntDateTime(DateTime.UtcNow);
 
                 // trait stuff
                 for (int i = 0; i < 6; i++)
@@ -1173,12 +1174,12 @@ namespace Loki.Maple.Characters
                 }
 
                 buffer.WriteInt(); // PVP exp
-                buffer.WriteByte(); // PVP rank
+                buffer.WriteByte(10); // PVP rank
                 buffer.WriteInt(); // PVP points
                 buffer.WriteByte(5);
                 buffer.WriteInt();
-                buffer.WriteInt();
-                buffer.WriteInt();
+                buffer.WriteUInt(2516280533);
+                buffer.WriteInt(0x137);
 
                 buffer.Flip();
                 return buffer.GetContent();
@@ -1321,14 +1322,14 @@ namespace Loki.Maple.Characters
                 // TODO: Teleport rocks.
                 for (int i = 0; i < 41; i++)
                 {
-                    buffer.WriteInt();
+                    buffer.WriteInt(999999999);
                 }
 
                 // TODO: Monster book.
                 buffer.WriteInt(0);
                 buffer.WriteByte(0);
                 buffer.WriteShort(0);
-                buffer.WriteInt(0);
+                buffer.WriteInt(-1);
                 buffer.WriteShort(0);
 
                 buffer.WriteShort(); // New year gift card
@@ -1375,11 +1376,11 @@ namespace Loki.Maple.Characters
                 outPacket.WriteBytes(new CharacterRandom().ToByteArray());
 
                 outPacket.WriteBytes(this.DataToByteArray());
-                outPacket.WriteInt(0); // Lucky reward after long unactivity; Received/do not show = 1; not received/show = 0
+                outPacket.WriteInt(0); // Lucky reward after long unactivity; Received/do not show = 0; not received/show = 1
                 outPacket.WriteInt(30100003); // SN of cash item #1
                 outPacket.WriteInt(30100003); // SN #2
                 outPacket.WriteInt(30100003); // SN #3
-                outPacket.WriteDateTime(DateTime.UtcNow);
+                outPacket.WriteLongDateTime(DateTime.UtcNow);
                 outPacket.WriteInt(100);
                 outPacket.WriteByte(0);
                 outPacket.WriteByte(1);
@@ -1650,7 +1651,7 @@ namespace Loki.Maple.Characters
                 outPacket.WriteByte(portalId);
                 outPacket.WriteInt(this.CurrentHP);
                 outPacket.WriteByte();
-                outPacket.WriteDateTime(DateTime.UtcNow);
+                outPacket.WriteLongDateTime(DateTime.UtcNow);
                 outPacket.WriteInt(100);
                 outPacket.WriteByte();
                 outPacket.WriteBool(!this.IsResistance);

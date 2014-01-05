@@ -187,7 +187,7 @@ namespace Loki.Net
                     outPacket.WriteBool(false); // OBSOLETE: Quiet ban.
                     outPacket.WriteLong();
                     outPacket.WriteByte(1);
-                    outPacket.WriteDateTime(this.Account.Creation);
+                    outPacket.WriteLongDateTime(this.Account.Creation);
                     outPacket.WriteInt();
                     outPacket.WriteByte(0); // pin 0 = Enable, 1 = Disable
                     outPacket.WriteByte((byte)(LoginServer.RequestPic ? (this.Account.Pic == null || this.Account.Pic.Length == 0 ? 0 : 1) : 2)); // pic 0 = Register, 1 = Request, 2 = Disable
@@ -477,10 +477,10 @@ namespace Loki.Net
                 outPacket.WriteByte(3);
                 outPacket.WriteBool(false); // OBSOLETE: Quiet ban.
                 outPacket.WriteLong();
-                outPacket.WriteDateTime(this.Account.Creation);
+                outPacket.WriteLongDateTime(this.Account.Creation);
                 outPacket.WriteInt(10);
                 outPacket.WriteByte();
-                outPacket.WriteDateTime(DateTime.UtcNow);
+                outPacket.WriteLongDateTime(DateTime.UtcNow);
 
                 this.Send(outPacket);
             }
@@ -721,7 +721,7 @@ namespace Loki.Net
                 outPacket.WriteBool(false); // OBSOLETE: Quiet ban.
                 outPacket.WriteLong();
                 outPacket.WriteByte(1);
-                outPacket.WriteDateTime(this.Account.Creation);
+                outPacket.WriteLongDateTime(this.Account.Creation);
                 outPacket.WriteInt();
                 outPacket.WriteByte(0); // pin 0 = Enable, 1 = Disable
                 outPacket.WriteByte((byte)(LoginServer.RequestPic ? (this.Account.Pic == null || this.Account.Pic.Length == 0 ? 0 : 1) : 2)); // pic 0 = Register, 1 = Request, 2 = Disable
