@@ -119,7 +119,7 @@
         INTRO_LOCK = 0x153,
         INTRO_ENABLE_UI = 0x154,
         INTRO_DISABLE_UI = 0x155,
-        UpdateQuestInfo = 0x174,
+        UpdateQuestInfo = 0x147,
         AranComboCounter = 0x158,
         ArabComboRecharge = 0x159,
         UltimateMessage = 0x173,

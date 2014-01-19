@@ -9,7 +9,6 @@ namespace Loki.Maple.Life
         public int MaximumQuantity { get; private set; }
         public int QuestID { get; private set; }
         public int Chance { get; private set; }
-        public bool IsMeso { get; private set; }
 
         public Loot(dynamic datum)
         {
@@ -18,7 +17,6 @@ namespace Loki.Maple.Life
             this.MaximumQuantity = datum.maximum_quantity;
             this.QuestID = datum.questid;
             this.Chance = datum.chance;
-            this.IsMeso = datum.flags.Contains("is_mesos");
         }
     }
 }

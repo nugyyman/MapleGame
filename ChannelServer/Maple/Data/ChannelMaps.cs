@@ -25,7 +25,16 @@ namespace Loki.Maple.Data
             {
                 foreach (dynamic portalDatum in new Datums("map_portals").Populate())
                 {
-                    this[portalDatum.mapid].Portals.Add(new Portal(portalDatum));
+                    Type implementedType = Assembly.GetExecutingAssembly().GetType("Loki.Maple.Maps.Portals." + portalDatum.script.ToString());
+
+                    if (implementedType != null)
+                    {
+                        this[portalDatum.mapid].Portals.Add((Portal)Activator.CreateInstance(implementedType, portalDatum));
+                    }
+                    else
+                    {
+                        this[portalDatum.mapid].Portals.Add(new Portal(portalDatum));
+                    }
                 }
             }
 

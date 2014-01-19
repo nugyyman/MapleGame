@@ -31,8 +31,16 @@ namespace Loki.Maple.Characters
             this.Items = new List<Item>();
         }
 
-        public void Add(Item item, bool fromDrop = false, bool autoMerge = true)
+        public void Add(Item item, bool fromDrop = false, bool autoMerge = true, bool inChat = false)
         {
+            if (inChat && this.Parent.IsInitialized)
+            {
+                using (Packet showGain = item.GetShowGainPacket())
+                {
+                    this.Parent.Client.Send(showGain);
+                }
+            }
+
             if (this.Available(item.MapleID) % item.MaxPerStack != 0 && autoMerge)
             {
                 foreach (Item loopItem in this)
@@ -370,9 +378,13 @@ namespace Loki.Maple.Characters
 
                     this.Parent.Map.Drops.Remove(drop);
 
-                    using (Packet showGain = drop.GetShowGainPacket())
+                    using (Packet outPacket = new Packet(MapleServerOperationCode.ShowLog))
                     {
-                        drop.Picker.Client.Send(showGain);
+                        outPacket.WriteShort();
+                        outPacket.WriteInt(((Item)drop).MapleID);
+                        outPacket.WriteInt(((Item)drop).Quantity);
+
+                        drop.Picker.Client.Send(outPacket);
                     }
                 }
                 catch (InventoryFullException)

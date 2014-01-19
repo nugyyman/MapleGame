@@ -107,7 +107,9 @@
     <Compile Include="Maple\Data\CachedCashItems.cs" />
     <Compile Include="Maple\Data\CharacterCreationData.cs" />
     <Compile Include="Maple\Data\ForbiddenNames.cs" />
+    <Compile Include="Maple\Life\Implementation\Npc2000.cs" />
     <Compile Include="Maple\Life\Implementation\Npc9030100.cs" />
+    <Compile Include="Maple\Maps\Portals\entertraining.cs" />
     <Compile Include="Maple\Shortcut.cs" />
     <Compile Include="Maple\Interaction\Fredrick.cs" />
     <Compile Include="Maple\Interaction\HiredMerchant.cs" />
@@ -192,4 +194,5 @@
       <Name>Common</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
 </Project>

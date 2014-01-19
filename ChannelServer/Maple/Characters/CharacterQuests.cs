@@ -4,6 +4,7 @@ using Loki.Data;
 using Loki.IO;
 using Loki.Maple.Data;
 using Loki.Net;
+using System.Reflection;
 
 namespace Loki.Maple.Characters
 {
@@ -40,74 +41,21 @@ namespace Loki.Maple.Characters
 
                 case QuestAction.Start:
                     npcId = inPacket.ReadInt();
-                    this.Started.Add(quest.ID, new Dictionary<int, short>());
-
-                    foreach (KeyValuePair<int, short> requiredKills in ChannelData.Quests[quest.ID].PostRequiredKills)
-                    {
-                        this.Started[quest.ID].Add(requiredKills.Key, 0);
-                    }
-
-                    using (Packet outPacket = new Packet(MapleServerOperationCode.ShowLog))
-                    {
-                        outPacket.WriteByte(1);
-                        outPacket.WriteUShort(quest.ID);
-                        outPacket.WriteByte(1);
-                        outPacket.WriteString("");
-
-                        this.Parent.Client.Send(outPacket);
-                    }
-
-                    this.Update(quest.ID, npcId, 8);
+                    this.Start(quest, npcId);
 
                     break;
 
                 case QuestAction.Complete:
                     npcId = inPacket.ReadInt();
                     inPacket.ReadInt();
-
-                    foreach (KeyValuePair<int, short> item in quest.PostRequiredItems)
-                    {
-                        this.Parent.Items.Remove(item.Key, item.Value);
-                    }
-
-                    this.Parent.Experience += quest.ExperienceReward * ChannelServer.QuestExperienceRate;
-                    this.Parent.Fame += (short)quest.FameReward;
-                    this.Parent.Meso += quest.MesoReward * ChannelServer.MesoRate;
-
-                    // TODO: Skill rewards
-
-                    foreach (KeyValuePair<int, short> item in quest.ItemRewards)
-                    {
-                        if (item.Value > 0)
-                        {
-                            this.Parent.Items.Add(new Item(item.Key, item.Value));
-                        }
-                        else if (item.Value < 0)
-                        {
-                            this.Parent.Items.Remove(item.Key, Math.Abs(item.Value));
-                        }
-                    }
+                    int itemChoiceId = 0;
 
                     if (inPacket.Remaining >= 4)
                     {
-                        int itemChoiceId = inPacket.ReadInt();
-
-                        //this.Parent.Items.Add(new Item(itemChoiceId, quest.SelectibleItemRewards[itemChoiceId]));
+                        itemChoiceId = inPacket.ReadInt();
                     }
 
-                    using (Packet outPacket = new Packet(MapleServerOperationCode.ShowLog))
-                    {
-                        outPacket.WriteByte(1);
-                        outPacket.WriteUShort(quest.ID);
-                        outPacket.WriteByte(2);
-                        outPacket.WriteLongDateTime(DateTime.UtcNow);
-
-                        this.Parent.Client.Send(outPacket);
-                    }
-
-                    this.Delete(quest.ID);
-
-                    this.Completed.Add(quest.ID, DateTime.UtcNow);
+                    this.Finish(quest, itemChoiceId);
 
                     break;
 
@@ -127,17 +75,103 @@ namespace Loki.Maple.Characters
                     break;
 
                 case QuestAction.ScriptStart:
-                    npcId = inPacket.ReadInt();
-
-                    //throw new NotImplementedException("Scripted quests not implemented.");
-                    break;
-
                 case QuestAction.ScriptEnd:
                     npcId = inPacket.ReadInt();
 
-                    //throw new NotImplementedException("Scripted quests not implemented.");
+                    Type implementedType = Assembly.GetExecutingAssembly().GetType("Loki.Maple.Life.Implementation.Npc" + npcId);
+
+                    if(implementedType != null)
+                        this.Parent.Converse(npcId, quest);
                     break;
             }
+        }
+
+        public void Start(Quest quest, int npcId)
+        {
+            this.Started.Add(quest.ID, new Dictionary<int, short>());
+
+            foreach (KeyValuePair<int, short> requiredKills in ChannelData.Quests[quest.ID].PostRequiredKills)
+            {
+                this.Started[quest.ID].Add(requiredKills.Key, 0);
+            }
+
+            //TODO: Add checks for this rewards?
+            this.Parent.GainExperience(quest.ExperienceReward[0], true);
+            this.Parent.Fame += (short)quest.FameReward[0];
+            this.Parent.Meso += quest.MesoReward[0] * ChannelServer.MesoRate;
+
+            // TODO: Skill rewards and pet related rewards
+
+            foreach (KeyValuePair<int, short> item in quest.PreItemRewards)
+            {
+                if (item.Value > 0)
+                {
+                    this.Parent.Items.Add(new Item(item.Key, item.Value), inChat: true);
+                }
+                else if (item.Value < 0)
+                {
+                    this.Parent.Items.Remove(item.Key, Math.Abs(item.Value));
+                }
+            }
+
+            using (Packet outPacket = new Packet(MapleServerOperationCode.ShowLog))
+            {
+                outPacket.WriteByte(1);
+                outPacket.WriteUShort(quest.ID);
+                outPacket.WriteByte(1);
+                outPacket.WriteString("");
+
+                this.Parent.Client.Send(outPacket);
+            }
+
+            this.Update(quest.ID, npcId, 10);
+        }
+
+        public void Finish(Quest quest, int itemChoiseId)
+        {
+
+            foreach (KeyValuePair<int, short> item in quest.PostRequiredItems)
+            {
+                this.Parent.Items.Remove(item.Key, item.Value);
+            }
+
+            //TODO: Add checks for this rewards?
+            this.Parent.GainExperience(quest.ExperienceReward[1], true);
+            this.Parent.Fame += (short)quest.FameReward[1];
+            this.Parent.Meso += quest.MesoReward[1] * ChannelServer.MesoRate;
+
+            // TODO: Skill rewards and pet related rewards
+
+            foreach (KeyValuePair<int, short> item in quest.PostItemRewards)
+            {
+                if (item.Value > 0)
+                {
+                    this.Parent.Items.Add(new Item(item.Key, item.Value), inChat: true);
+                }
+                else if (item.Value < 0)
+                {
+                    this.Parent.Items.Remove(item.Key, Math.Abs(item.Value));
+                }
+            }
+
+            if (itemChoiseId != 0)
+            {
+                //this.Parent.Items.Add(new Item(itemChoiceId, quest.SelectibleItemRewards[itemChoiceId]));
+            }
+
+            using (Packet outPacket = new Packet(MapleServerOperationCode.ShowLog))
+            {
+                outPacket.WriteByte(1);
+                outPacket.WriteUShort(quest.ID);
+                outPacket.WriteByte(2);
+                outPacket.WriteLongDateTime(DateTime.UtcNow);
+
+                this.Parent.Client.Send(outPacket);
+            }
+
+            this.Delete(quest.ID);
+
+            this.Completed.Add(quest.ID, DateTime.UtcNow);
         }
 
         public void Update(ushort questId, int npcId, byte progress)

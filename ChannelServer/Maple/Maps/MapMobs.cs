@@ -48,7 +48,7 @@ namespace Loki.Maple.Maps
                             owner = attacker.Key;
                         }
 
-                        attacker.Key.Experience += (int)Math.Min(item.Experience, (attacker.Value * item.Experience) / item.MaxHP) * ChannelServer.ExperienceRate;
+                        attacker.Key.GainExperience((int)Math.Min(item.Experience, (attacker.Value * item.Experience) / item.MaxHP));
                     }
                 }
 
@@ -62,22 +62,11 @@ namespace Loki.Maple.Maps
                     {
                         if ((Application.Random.Next(1000000) / ChannelServer.DropRate) <= loopLoot.Chance)
                         {
-                            if (loopLoot.IsMeso)
+                            drops.Add(new Item(loopLoot.MapleID, (short)Application.Random.Next(loopLoot.MinimumQuantity, loopLoot.MaximumQuantity))
                             {
-                                drops.Add(new Meso((short)(Application.Random.Next(loopLoot.MinimumQuantity, loopLoot.MaximumQuantity) * ChannelServer.MesoRate))
-                                {
-                                    Dropper = item,
-                                    Owner = owner
-                                });
-                            }
-                            else
-                            {
-                                drops.Add(new Item(loopLoot.MapleID, (short)Application.Random.Next(loopLoot.MinimumQuantity, loopLoot.MaximumQuantity))
-                                {
-                                    Dropper = item,
-                                    Owner = owner
-                                });
-                            }
+                                Dropper = item,
+                                Owner = owner
+                            });
                         }
                     }
 
@@ -100,31 +89,34 @@ namespace Loki.Maple.Maps
                     {
                         if (loopStartedQuest.Value.ContainsKey(item.MapleID))
                         {
-                            loopStartedQuest.Value[item.MapleID]++;
-
-                            using (Packet outPacket = new Packet(MapleServerOperationCode.ShowLog))
+                            if (loopStartedQuest.Value[item.MapleID] < ChannelData.Quests[loopStartedQuest.Key].PostRequiredKills[item.MapleID])
                             {
-                                outPacket.WriteByte(1);
-                                outPacket.WriteUShort(loopStartedQuest.Key);
-                                outPacket.WriteByte(1);
+                                loopStartedQuest.Value[item.MapleID]++;
 
-                                string kills = string.Empty;
-
-                                foreach (int kill in loopStartedQuest.Value.Values)
+                                using (Packet outPacket = new Packet(MapleServerOperationCode.ShowLog))
                                 {
-                                    kills += kill.ToString().PadLeft(3, '0');
+                                    outPacket.WriteByte(1);
+                                    outPacket.WriteUShort(loopStartedQuest.Key);
+                                    outPacket.WriteByte(1);
+
+                                    string kills = string.Empty;
+
+                                    foreach (int kill in loopStartedQuest.Value.Values)
+                                    {
+                                        kills += kill.ToString().PadLeft(3, '0');
+                                    }
+
+                                    outPacket.WriteString(kills);
+                                    outPacket.WriteInt();
+                                    outPacket.WriteInt();
+
+                                    owner.Client.Send(outPacket);
                                 }
 
-                                outPacket.WriteString(kills);
-                                outPacket.WriteInt();
-                                outPacket.WriteInt();
-
-                                owner.Client.Send(outPacket);
-                            }
-
-                            if (owner.Quests.CanComplete(loopStartedQuest.Key, true))
-                            {
-                                owner.Quests.NotifyComplete(loopStartedQuest.Key);
+                                if (owner.Quests.CanComplete(loopStartedQuest.Key, true))
+                                {
+                                    owner.Quests.NotifyComplete(loopStartedQuest.Key);
+                                }
                             }
                         }
                     }

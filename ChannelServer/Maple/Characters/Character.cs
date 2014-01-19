@@ -70,6 +70,7 @@ namespace Loki.Maple.Characters
         private short fame;
         private int meso;
         private Npc lastNpc;
+        private Quest lastQuest;
 
         private int aranCombo;
         private DateTime lastAranCombo;
@@ -494,44 +495,54 @@ namespace Loki.Maple.Characters
                     return;
                 }
 
-                int delta = value - experience;
-
                 experience = value;
 
                 if (ChannelServer.AllowMultiLeveling)
                 {
-                    while (experience >= ExperienceTables.CharacterLevel[this.Level - 1])
+                    while (experience >= ExperienceTables.CharacterLevel[this.Level])
                     {
-                        experience -= ExperienceTables.CharacterLevel[this.Level - 1];
+                        experience -= ExperienceTables.CharacterLevel[this.Level];
 
                         this.Level++;
                     }
                 }
                 else
                 {
-                    if (experience >= ExperienceTables.CharacterLevel[this.Level - 1])
+                    if (experience >= ExperienceTables.CharacterLevel[this.Level])
                     {
-                        experience -= ExperienceTables.CharacterLevel[this.Level - 1];
+                        experience -= ExperienceTables.CharacterLevel[this.Level];
 
                         this.Level++;
                     }
 
-                    if (experience >= ExperienceTables.CharacterLevel[this.Level - 1])
+                    if (experience >= ExperienceTables.CharacterLevel[this.Level])
                     {
-                        experience = ExperienceTables.CharacterLevel[this.Level - 1] - 1;
+                        experience = ExperienceTables.CharacterLevel[this.Level] - 1;
                     }
                 }
+            }
+        }
 
-                if (this.IsInitialized && delta != 0)
+        public void GainExperience(int exp, bool fromQuest = false)
+        {
+            this.Experience += fromQuest ? exp * ChannelServer.QuestExperienceRate : exp * ChannelServer.ExperienceRate;
+
+            if (this.IsInitialized && exp != 0)
+            {
+                this.UpdateStatistics(StatisticType.Experience);
+
+                using (Packet outPacket = new Packet(MapleServerOperationCode.ShowLog))
                 {
-                    this.UpdateStatistics(StatisticType.Experience);
-
-                    using (Packet outPacket = new Packet(MapleServerOperationCode.ShowLog))
+                    outPacket.WriteByte(3); // 3 = exp, 4 = fame, 5 = mesos, 6 = guildpoints
+                    outPacket.WriteBool(true); // White?
+                    outPacket.WriteInt(exp);
+                    outPacket.WriteBool(fromQuest); // in chat
+                    if (fromQuest)
                     {
-                        outPacket.WriteByte(3); // 3 = exp, 4 = fame, 5 = mesos, 6 = guildpoints
-                        outPacket.WriteBool(true); // White?
-                        outPacket.WriteInt(delta);
-                        outPacket.WriteByte();
+                        outPacket.Skip(65);
+                    }
+                    else
+                    {
                         outPacket.WriteInt(); // monster book bonus (Bonus Event Exp)
                         outPacket.WriteShort(); //Weird stuff
                         outPacket.WriteInt(); //wedding bonus
@@ -550,9 +561,9 @@ namespace Loki.Maple.Characters
                         outPacket.WriteInt(0); // Item Bonus EXP (+%d)
                         outPacket.WriteInt(); // Party Ring Bonus EXP(+%d)
                         outPacket.WriteInt(0); // Cake vs Pie Bonus EXP(+%d)
-
-                        this.Client.Send(outPacket);
                     }
+
+                    this.Client.Send(outPacket);
                 }
             }
         }
@@ -790,6 +801,20 @@ namespace Loki.Maple.Characters
                 }
 
                 lastNpc = value;
+            }
+        }
+
+        public Quest LastQuest
+        {
+            get
+            {
+                return this.lastQuest;
+            }
+            set
+            {
+                //TODO: Add checks
+
+                this.lastQuest = value;
             }
         }
 
@@ -1716,11 +1741,10 @@ namespace Loki.Maple.Characters
         public void ChangeMapSpecial(Packet inPacket)
         {
             inPacket.ReadByte();
-            String portalLabel = inPacket.ReadString();
+            string portalLabel = inPacket.ReadString();
 
             Portal portal = this.Map.Portals[portalLabel];
-
-            this.Release();
+            portal.Enter(this);
         }
 
         public void Release()
@@ -1896,6 +1920,12 @@ namespace Loki.Maple.Characters
         public void Converse(Packet inPacket)
         {
             this.Converse(this.Map.Npcs[inPacket.ReadInt()]);
+        }
+
+        public void Converse(int npcMapleId, Quest quest)
+        {
+            this.LastQuest = quest;
+            this.Converse(npcMapleId);
         }
 
         public void DistributeAP(Packet inPacket)

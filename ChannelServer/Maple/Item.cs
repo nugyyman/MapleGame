@@ -40,6 +40,7 @@ namespace Loki.Maple
         public bool PreventsColdness { get; set; }
         public bool IsTradeBlocked { get; private set; }
         public bool IsScisored { get; private set; }
+        public bool IsQuestItem { get; private set; }
         public int SalePrice { get; private set; }
 
         public byte UpgradesAvailable { get; set; }
@@ -697,6 +698,7 @@ namespace Loki.Maple
                 this.IsCash = itemDatum.flags.Contains("cash_item");
                 this.OnlyOne = itemDatum.max_possession_count > 0;
                 this.IsTradeBlocked = itemDatum.flags.Contains("no_trade");
+                this.IsQuestItem = itemDatum.flags.Contains("quest");
                 this.IsScisored = false;
                 this.SalePrice = itemDatum.price;
                 this.RequiredLevel = itemDatum.min_level;
@@ -1357,7 +1359,7 @@ namespace Loki.Maple
 
         public override Packet GetShowGainPacket()
         {
-            Packet showGain = new Packet(MapleServerOperationCode.ShowLog);
+            Packet showGain = new Packet(MapleServerOperationCode.ShowItemGainInChat);
 
             showGain.WriteBytes(5, 1);
             showGain.WriteInt(((Item)this).MapleID);

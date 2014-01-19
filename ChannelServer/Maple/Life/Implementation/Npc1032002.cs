@@ -43,7 +43,7 @@ namespace Loki.Maple.Life.Implementation
         {
             talker.Items.Add(new Item(2000000, (short)args.Selection));
 
-            talker.Experience += 200 * ChannelServer.ExperienceRate;
+            talker.GainExperience(200 * ChannelServer.ExperienceRate, true);
         }
 
         void ClickNo(Character talker, NpcEventArgs args)

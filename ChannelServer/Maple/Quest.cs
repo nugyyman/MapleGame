@@ -32,16 +32,19 @@ namespace Loki.Maple
         public Dictionary<int, short> PostRequiredKills { get; private set; }
         public List<Job> ValidJobs { get; private set; }
 
-        // TODO: Rewards are fucked in general.
-        public int ExperienceReward { get; set; }
-        public int MesoReward { get; set; }
-        public int PetClosenessReward { get; set; }
-        public bool PetSpeedReward { get; set; }
-        public int FameReward { get; set; }
-        public int PetSkillReward { get; set; }
-        public Dictionary<int, short> ItemRewards { get; private set; } // TODO: Reward probability.
-        public Dictionary<int, short> ItemTakes { get; private set; }
-        public Dictionary<Skill, Job> SkillRewards { get; set; }
+        // Rewards (Start, End)
+        public int[] ExperienceReward { get; set; }
+        public int[] MesoReward { get; set; }
+        public int[] PetClosenessReward { get; set; }
+        public bool[] PetSpeedReward { get; set; }
+        public int[] FameReward { get; set; }
+        public int[] PetSkillReward { get; set; }
+        public Dictionary<int, short> PreItemRewards { get; private set; }
+        public Dictionary<int, short> PostItemRewards { get; private set; }
+        public Dictionary<Skill, Job> PreSkillRewards { get; set; }
+        public Dictionary<Skill, Job> PostSkillRewards { get; set; }
+
+
 
         public Quest(dynamic questDatum)
         {
@@ -63,9 +66,17 @@ namespace Loki.Maple
             this.PostRequiredItems = new Dictionary<int, short>();
             this.PostRequiredKills = new Dictionary<int, short>();
 
-            this.ItemRewards = new Dictionary<int, short>();
-            this.ItemTakes = new Dictionary<int, short>();
-            this.SkillRewards = new Dictionary<Skill, Job>();
+            this.ExperienceReward = new int[2];
+            this.MesoReward = new int[2];
+            this.PetClosenessReward = new int[2];
+            this.PetSpeedReward = new bool[2];
+            this.FameReward = new int[2];
+            this.PetSkillReward = new int[2];
+
+            this.PreItemRewards = new Dictionary<int, short>();
+            this.PostItemRewards = new Dictionary<int, short>();
+            this.PreSkillRewards = new Dictionary<Skill, Job>();
+            this.PostSkillRewards = new Dictionary<Skill, Job>();
 
             this.ValidJobs = new List<Job>();
         }
