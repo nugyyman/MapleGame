@@ -449,7 +449,8 @@ namespace Loki.Maple
     public enum ForeignEffect : byte
     {
         LevelUp,
-        JobAdvance = 8
+        JobAdvance = 11,
+        QuestCompletion
     }
 
     public enum ShopAction : byte

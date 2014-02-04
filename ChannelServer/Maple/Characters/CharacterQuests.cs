@@ -172,6 +172,15 @@ namespace Loki.Maple.Characters
             this.Delete(quest.ID);
 
             this.Completed.Add(quest.ID, DateTime.UtcNow);
+
+            using (Packet outPacket = new Packet(MapleServerOperationCode.ShowItemGainInChat))
+            {
+                outPacket.WriteByte(12);
+
+                this.Parent.Client.Send(outPacket);
+            }
+
+            this.Parent.ShowEffect(ForeignEffect.QuestCompletion, true);
         }
 
         public void Update(ushort questId, int npcId, byte progress)

@@ -1890,14 +1890,17 @@ namespace Loki.Maple.Characters
             }
         }
 
-        public void ShowEffect(ForeignEffect effect)
+        public void ShowEffect(ForeignEffect effect, bool ignore = false)
         {
             using (Packet outPacket = new Packet(MapleServerOperationCode.ShowForeignEffect))
             {
                 outPacket.WriteInt(this.ID);
                 outPacket.WriteByte((byte)effect);
 
-                this.Map.Broadcast(outPacket);
+                if (ignore)
+                    this.Map.Broadcast(this, outPacket);
+                else
+                    this.Map.Broadcast(outPacket);
             }
         }
 
