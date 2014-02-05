@@ -32,6 +32,7 @@ namespace Loki.Maple.Maps.Portals
             else
             {
                 character.Notify("Only the adventurers that have been trained by Mai may enter.");
+                character.Release();
             }
         }
     }

@@ -7,9 +7,10 @@ namespace Loki.Maple.Maps
     {
         public SpawnPoint(dynamic datum) : base((DynamicObject)datum) { }
 
-        public void Spawn()
+        public void Spawn(Map map)
         {
-            this.Map.Mobs.Add(new Mob(this));
+            //this.Map.Mobs.Add(new Mob(this));
+            map.Mobs.Add(new Mob(this));
         }
     }
 }

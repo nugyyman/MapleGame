@@ -114,22 +114,23 @@ namespace Loki.Maple.Data
                 Strings.Load();
                 CommandFactory.Initialize();
 
-                List<SpawnPoint> toSpawn = new List<SpawnPoint>();
+                //List<SpawnPoint> toSpawn = new List<SpawnPoint>();
 
                 foreach (Map loopMap in ChannelData.Maps)
                 {
                     foreach (SpawnPoint loopSpawnPoint in loopMap.SpawnPoints)
                     {
-                        toSpawn.Add(loopSpawnPoint);
+                        //toSpawn.Add(loopSpawnPoint);
+                        loopSpawnPoint.Spawn(loopMap);
                     }
                 }
 
-                foreach (SpawnPoint loopSpawnPoint in toSpawn)
+                /*foreach (SpawnPoint loopSpawnPoint in toSpawn)
                 {
                     loopSpawnPoint.Spawn();
-                }
+                }*/
 
-                toSpawn = null;
+                //toSpawn = null;
 
                 Log.Success("Maple data loaded in {0} seconds.", (DateTime.Now - dti).Seconds);
 

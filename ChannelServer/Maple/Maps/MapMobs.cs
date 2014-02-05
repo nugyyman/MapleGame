@@ -136,7 +136,7 @@ namespace Loki.Maple.Maps
 
                 if (item.SpawnPoint != null && item.CanRespawn)
                 {
-                    Delay.Execute(3 * 1000, () => item.SpawnPoint.Spawn());
+                    Delay.Execute(3 * 1000, () => item.SpawnPoint.Spawn(this.Map));
                 }
 
                 foreach (int summonId in item.DeathSummons)
