@@ -1,9 +1,8 @@
-﻿using Loki.Collections;
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 
 namespace Loki.Maple.Maps
 {
-    public class MapSpawnPoints : NumericalKeyedCollection<SpawnPoint>
+    public class MapSpawnPoints : KeyedCollection<int, SpawnPoint>
     {
         public MapSpawnPoints(Map parent) : base() { }
 

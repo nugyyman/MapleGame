@@ -35,9 +35,13 @@ namespace Loki.Maple.Characters
         {
             if (inChat && this.Parent.IsInitialized)
             {
-                using (Packet showGain = item.GetShowGainPacket())
+                using (Packet outPacket = new Packet(MapleServerOperationCode.ShowItemGainInChat))
                 {
-                    this.Parent.Client.Send(showGain);
+                    outPacket.WriteBytes(5, 1);
+                    outPacket.WriteInt(item.MapleID);
+                    outPacket.WriteInt(item.Quantity);
+
+                    this.Parent.Client.Send(outPacket);
                 }
             }
 
@@ -378,13 +382,9 @@ namespace Loki.Maple.Characters
 
                     this.Parent.Map.Drops.Remove(drop);
 
-                    using (Packet outPacket = new Packet(MapleServerOperationCode.ShowLog))
+                    using (Packet showGain = drop.GetShowGainPacket())
                     {
-                        outPacket.WriteShort();
-                        outPacket.WriteInt(((Item)drop).MapleID);
-                        outPacket.WriteInt(((Item)drop).Quantity);
-
-                        drop.Picker.Client.Send(outPacket);
+                        this.Parent.Client.Send(showGain);
                     }
                 }
                 catch (InventoryFullException)

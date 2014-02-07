@@ -32,6 +32,7 @@ namespace Loki.Maple.Maps
         public MapDrops Drops { get; private set; }
         public MapMobs Mobs { get; private set; }
         public MapNpcs Npcs { get; private set; }
+        public MapReactors Reactors { get; private set; }
         public MapPortals Portals { get; private set; }
         public MapSpawnPoints SpawnPoints { get; private set; }
         public MapPlayerShops PlayerShops { get; private set; }
@@ -68,12 +69,12 @@ namespace Loki.Maple.Maps
                 return true;
             }
 
-            if (this.Portals.Contains(objectId))
+            if (this.Reactors.Contains(objectId))
             {
                 return true;
             }
 
-            if (this.SpawnPoints.Contains(objectId))
+            if (this.Portals.Contains(objectId))
             {
                 return true;
             }
@@ -147,6 +148,7 @@ namespace Loki.Maple.Maps
             this.Drops = new MapDrops(this);
             this.Mobs = new MapMobs(this);
             this.Npcs = new MapNpcs(this);
+            this.Reactors = new MapReactors(this);
             this.Portals = new MapPortals(this);
             this.SpawnPoints = new MapSpawnPoints(this);
             this.PlayerShops = new MapPlayerShops(this);

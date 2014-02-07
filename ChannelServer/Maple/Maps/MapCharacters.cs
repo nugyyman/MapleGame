@@ -93,6 +93,17 @@ namespace Loki.Maple.Maps
                 }
             }
 
+            lock (this.Map.Reactors)
+            {
+                foreach (Reactor loopReactor in this.Map.Reactors)
+                {
+                    using (Packet spawn = loopReactor.GetSpawnPacket())
+                    {
+                        item.Client.Send(spawn);
+                    }
+                }
+            }
+
             lock (this.Map.Npcs)
             {
                 foreach (Npc loopNpc in this.Map.Npcs)

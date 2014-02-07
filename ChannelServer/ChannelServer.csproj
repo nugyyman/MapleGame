@@ -105,10 +105,14 @@
     <Compile Include="Maple\Commands\Implementation\MesoCommand.cs" />
     <Compile Include="Maple\Commands\Implementation\SearchCommand.cs" />
     <Compile Include="Maple\Data\CachedCashItems.cs" />
+    <Compile Include="Maple\Data\CachedReactors.cs" />
     <Compile Include="Maple\Data\CharacterCreationData.cs" />
     <Compile Include="Maple\Data\ForbiddenNames.cs" />
     <Compile Include="Maple\Life\Implementation\Npc2000.cs" />
     <Compile Include="Maple\Life\Implementation\Npc9030100.cs" />
+    <Compile Include="Maple\Life\Implementation\Reactor1002009.cs" />
+    <Compile Include="Maple\Life\Reactor.cs" />
+    <Compile Include="Maple\Maps\MapReactors.cs" />
     <Compile Include="Maple\Maps\Portals\entertraining.cs" />
     <Compile Include="Maple\Shortcut.cs" />
     <Compile Include="Maple\Interaction\Fredrick.cs" />

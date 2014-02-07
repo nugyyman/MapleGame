@@ -242,6 +242,10 @@ namespace Loki.Net
                 case MapleClientOperationCode.AranComboCounter:
                     this.Character.AranCombo++;
                     break;
+
+                case MapleClientOperationCode.DamageReactor:
+                    this.Character.Map.Reactors[inPacket.ReadInt()].Damage(this.Character, inPacket);
+                    break;
             }
         }
 

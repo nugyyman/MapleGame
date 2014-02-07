@@ -10,13 +10,26 @@ namespace Loki.Maple.Life
         public int QuestID { get; private set; }
         public int Chance { get; private set; }
 
-        public Loot(dynamic datum)
+        public Loot(dynamic datum, bool fromMob = true)
         {
             this.MapleID = datum.itemid;
-            this.MinimumQuantity = datum.minimum_quantity;
-            this.MaximumQuantity = datum.maximum_quantity;
+
+            if (fromMob)
+            {
+                this.MinimumQuantity = datum.minimum_quantity;
+                this.MaximumQuantity = datum.maximum_quantity;
+            }
+
             this.QuestID = datum.questid;
             this.Chance = datum.chance;
+        }
+
+        public Loot(int minMeso, int maxMeso, int chance)
+        {
+            this.MapleID = 0;
+            this.MinimumQuantity = minMeso;
+            this.MaximumQuantity = maxMeso;
+            this.Chance = chance;
         }
     }
 }

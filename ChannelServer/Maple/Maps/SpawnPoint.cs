@@ -1,16 +1,39 @@
 ﻿using System.Dynamic;
 using Loki.Maple.Life;
+using System;
+using System.Reflection;
 
 namespace Loki.Maple.Maps
 {
     public class SpawnPoint : LifeObject
     {
-        public SpawnPoint(dynamic datum) : base((DynamicObject)datum) { }
+        private bool IsMob { get; set; }
+
+        public SpawnPoint(dynamic datum)
+            : base((DynamicObject)datum)
+        {
+            this.IsMob = ((string)datum.life_type).Equals("mob");
+        }
 
         public void Spawn(Map map)
         {
-            //this.Map.Mobs.Add(new Mob(this));
-            map.Mobs.Add(new Mob(this));
+            if (this.IsMob)
+            {
+                map.Mobs.Add(new Mob(this));
+            }
+            else
+            {
+                Type implementedType = Assembly.GetExecutingAssembly().GetType("Loki.Maple.Life.Implementation.Reactor" + this.MapleID.ToString());
+
+                if (implementedType != null)
+                {
+                    map.Reactors.Add((Reactor)Activator.CreateInstance(implementedType, this));
+                }
+                else
+                {
+                    map.Reactors.Add(new Reactor(this));
+                }
+            }
         }
     }
 }

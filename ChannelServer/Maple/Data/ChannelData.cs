@@ -17,6 +17,7 @@ namespace Loki.Maple.Data
         public static CachedItems CachedItems { get; private set; }
         public static CachedSkills CachedSkills { get; private set; }
         public static CachedMobs CachedMobs { get; private set; }
+        public static CachedReactors CachedReactors { get; private set; }
         public static CachedCashItems CachedCashItems { get; private set; }
         public static AvailableStyles AvailableStyles { get; private set; }
         public static ChannelCharactersHelper Characters { get; private set; }
@@ -53,6 +54,11 @@ namespace Loki.Maple.Data
                 if (ChannelData.CachedMobs != null)
                 {
                     ChannelData.CachedMobs.Clear();
+                }
+
+                if (ChannelData.CachedReactors != null)
+                {
+                    ChannelData.CachedReactors.Clear();
                 }
 
                 if (ChannelData.CachedCashItems != null)
@@ -103,6 +109,7 @@ namespace Loki.Maple.Data
 
                 ChannelData.AvailableStyles = new AvailableStyles();
                 ChannelData.CachedMobs = new CachedMobs();
+                ChannelData.CachedReactors = new CachedReactors();
                 ChannelData.CachedItems = new CachedItems();
                 ChannelData.CachedSkills = new CachedSkills();
                 ChannelData.CachedCashItems = new CachedCashItems();
@@ -114,23 +121,13 @@ namespace Loki.Maple.Data
                 Strings.Load();
                 CommandFactory.Initialize();
 
-                //List<SpawnPoint> toSpawn = new List<SpawnPoint>();
-
                 foreach (Map loopMap in ChannelData.Maps)
                 {
                     foreach (SpawnPoint loopSpawnPoint in loopMap.SpawnPoints)
                     {
-                        //toSpawn.Add(loopSpawnPoint);
                         loopSpawnPoint.Spawn(loopMap);
                     }
                 }
-
-                /*foreach (SpawnPoint loopSpawnPoint in toSpawn)
-                {
-                    loopSpawnPoint.Spawn();
-                }*/
-
-                //toSpawn = null;
 
                 Log.Success("Maple data loaded in {0} seconds.", (DateTime.Now - dti).Seconds);
 

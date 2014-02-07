@@ -19,7 +19,7 @@ namespace Loki.Maple
             Packet showGain = new Packet(MapleServerOperationCode.ShowLog);
 
             showGain.WriteBytes(0, 1, 0);
-            showGain.WriteInt(((Meso)this).Amount);
+            showGain.WriteInt(this.Amount);
             showGain.WriteShort();
 
             return showGain;

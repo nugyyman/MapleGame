@@ -70,14 +70,13 @@ namespace Loki.Maple.Maps
                         }
                     }
 
-                    double i = drops.Count / 2.0 * -1;
+                    Point dropPosition = new Point(item.Position.X, item.Position.Y);
+                    dropPosition.X -= (short)(12 * drops.Count);
 
                     foreach (Drop loopDrop in drops)
                     {
-                        //Log.Warn((short)(25.0 * i));
-
-                        //loopDrop.Position.X += (short)(25.0 * i);
-                        i++;
+                        loopDrop.Position = new Point(dropPosition.X, dropPosition.Y);
+                        dropPosition.X += 25;
 
                         this.Map.Drops.Add(loopDrop);
                     }

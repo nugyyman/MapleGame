@@ -1359,11 +1359,11 @@ namespace Loki.Maple
 
         public override Packet GetShowGainPacket()
         {
-            Packet showGain = new Packet(MapleServerOperationCode.ShowItemGainInChat);
+            Packet showGain = new Packet(MapleServerOperationCode.ShowLog);
 
-            showGain.WriteBytes(5, 1);
-            showGain.WriteInt(((Item)this).MapleID);
-            showGain.WriteInt(((Item)this).Quantity);
+            showGain.WriteShort();
+            showGain.WriteInt(this.MapleID);
+            showGain.WriteInt(this.Quantity);
 
             return showGain;
         }

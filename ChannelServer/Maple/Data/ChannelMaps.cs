@@ -59,6 +59,7 @@ namespace Loki.Maple.Data
                             break;
 
                         case "mob":
+                        case "reactor":
                             this[lifeDatum.mapid].SpawnPoints.Add(new SpawnPoint(lifeDatum));
                             break;
                     }
