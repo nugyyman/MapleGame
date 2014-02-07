@@ -1474,11 +1474,14 @@ namespace Loki.Maple.Characters
             spawn.WriteInt();
 
             // TODO: Buffs?
-            //long buffMask = 0;
-            //spawn.WriteInt((int)((buffMask >> 32) & 0xffffffffL));
-            //spawn.WriteInt((int)(buffMask & 0xffffffffL));
-
-            spawn.Skip(32); //buff stats?
+            spawn.Skip(3);
+            spawn.WriteByte(0xFE);
+            spawn.WriteShort();
+            spawn.WriteByte(0xA0);
+            spawn.WriteByte();
+            spawn.WriteLong();
+            spawn.WriteLong();
+            spawn.WriteLong();
             spawn.WriteInt(-1);
 
             int characterSpawn = Application.Random.Next(5000000);
@@ -1560,7 +1563,6 @@ namespace Loki.Maple.Characters
             spawn.WriteInt();
             spawn.WriteByte();
             spawn.WriteInt();
-            spawn.Skip(100);
 
             return spawn;
         }
