@@ -66,18 +66,25 @@ namespace Loki.Maple.Shops
         {
             using (Packet outPacket = new Packet(MapleServerOperationCode.OpenNpcShop))
             {
+                outPacket.WriteInt();
                 outPacket.WriteInt(this.ID);
+
+                outPacket.WriteByte(); //TODO: shop ranks
+
                 outPacket.WriteShort((short)this.Items.Count);
 
                 foreach (ShopItem loopShopItem in this.Items)
                 {
                     outPacket.WriteInt(loopShopItem.MapleID);
                     outPacket.WriteInt(loopShopItem.PurchasePrice);
-                    outPacket.WriteInt(); // Discount
-                    outPacket.WriteInt();
-                    outPacket.WriteInt();
-                    outPacket.WriteInt();
                     outPacket.WriteByte();
+                    outPacket.WriteInt();
+                    outPacket.WriteInt();
+                    outPacket.WriteInt();
+                    outPacket.WriteInt();
+                    outPacket.WriteInt(); // 1 = equip, 2 = use, 3 = setup, 4 = etc, 5 = recipe, 6 = scroll, 7 = special, 8 = 7th anniversary, 9 = button, 10 = invitation ticket, 11 = materials, 12 = korean word, 0 = no tab
+                    outPacket.WriteBool(false);
+                    outPacket.WriteInt();
 
                     if (loopShopItem.IsRechargeable)
                     {
@@ -91,7 +98,11 @@ namespace Loki.Maple.Shops
                         outPacket.WriteShort(loopShopItem.Quantity);
                         outPacket.WriteShort(loopShopItem.MaxPerStack);
                     }
+
+                    //TODO: shop ranks
                 }
+
+                //TODO: items rebuy
 
                 customer.Client.Send(outPacket);
             }

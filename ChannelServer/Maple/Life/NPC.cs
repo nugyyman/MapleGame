@@ -43,6 +43,7 @@ namespace Loki.Maple.Life
         public Dictionary<Character, int[]> StyleSelectionHelpers = new Dictionary<Character, int[]>();
 
         public Shop Shop { get; set; }
+        public int StorageCost { get; set; }
 
         public Npc(dynamic lifeDatum) : base((Datum)lifeDatum) { }
 
@@ -105,6 +106,10 @@ namespace Loki.Maple.Life
             if (Shop != null)
             {
                 Shop.Show(talker);
+            }
+            else if (this.StorageCost > 0)
+            {
+                talker.Storage.Open(this);
             }
             else
             {

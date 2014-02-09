@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using Loki.Data;
 using Loki.Net;
+using Loki.Maple.Life;
 
 namespace Loki.Maple.Characters
 {
@@ -13,6 +14,7 @@ namespace Loki.Maple.Characters
         public byte Slots { get; set; }
         public int Meso { get; set; }
         public  StorageItem[] Items { get; set; }
+        private Npc Npc { get; set; }
 
         public CharacterStorage(Character parent)
         {
@@ -80,14 +82,15 @@ namespace Loki.Maple.Characters
             }
         }
 
-        public void Open(int npcId)
+        public void Open(Npc npc)
         {
             this.Load();
+            this.Npc = npc;
 
             using (Packet outPacket = new Packet(MapleServerOperationCode.Storage))
             {
                 outPacket.WriteByte(0x16);
-                outPacket.WriteInt(npcId);
+                outPacket.WriteInt(this.Npc.MapleID);
                 outPacket.WriteByte(this.Slots);
                 outPacket.WriteShort(0x7E);
                 outPacket.WriteShort(0);
@@ -252,20 +255,23 @@ namespace Loki.Maple.Characters
                     item = this.Parent.Items[itemid, slot];
                     if (!this.IsFull())
                     {
-                        if (quantity > 0 && item.Quantity >= quantity)
+                        if(this.Parent.Meso >= this.Npc.StorageCost)
                         {
-                            if (item.Quantity != quantity)
+                            if (quantity > 0 && item.Quantity >= quantity)
                             {
-                                this.Parent.Items.Remove(item.MapleID, quantity);
-                                this.StoreItem(new StorageItem(new Item(item.MapleID, quantity), false));
-                            }
-                            else
-                            {
-                                this.Parent.Items.Remove(item, true);
-                                this.StoreItem(new StorageItem(item, false));
-                            }
+                                if (item.Quantity != quantity)
+                                {
+                                    this.Parent.Items.Remove(item.MapleID, quantity);
+                                    this.StoreItem(new StorageItem(new Item(item.MapleID, quantity), false));
+                                }
+                                else
+                                {
+                                    this.Parent.Items.Remove(item, true);
+                                    this.StoreItem(new StorageItem(item, false));
+                                }
 
-                            this.Parent.Meso -= this.Parent.Map.MapleID == 910000000 ? 500 : 100;
+                                this.Parent.Meso -= this.Npc.StorageCost;
+                            }
                         }
                     }
                     break;
@@ -305,6 +311,7 @@ namespace Loki.Maple.Characters
 
                 case 8: // Close
                     this.Save();
+                    this.Npc = null;
                     break;
             }
         }

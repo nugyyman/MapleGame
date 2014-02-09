@@ -109,7 +109,6 @@
     <Compile Include="Maple\Data\CharacterCreationData.cs" />
     <Compile Include="Maple\Data\ForbiddenNames.cs" />
     <Compile Include="Maple\Life\Implementation\Npc2000.cs" />
-    <Compile Include="Maple\Life\Implementation\Npc9030100.cs" />
     <Compile Include="Maple\Life\Implementation\Reactor1002009.cs" />
     <Compile Include="Maple\Life\Reactor.cs" />
     <Compile Include="Maple\Maps\MapReactors.cs" />

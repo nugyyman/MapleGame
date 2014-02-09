@@ -64,6 +64,23 @@ namespace Loki.Maple.Data
                             break;
                     }
                 }
+
+                foreach (dynamic npcDatum in new Datums("npc_data").Populate())
+                {
+                    if (npcDatum.storage_cost > 0)
+                    {
+                        foreach (Map loopMap in this)
+                        {
+                            foreach (Npc loopNpc in loopMap.Npcs)
+                            {
+                                if (loopNpc.MapleID == npcDatum.npcid)
+                                {
+                                    loopNpc.StorageCost = npcDatum.storage_cost;
+                                }
+                            }
+                        }
+                    }
+                }
             }
 
             using (Log.Load("Shops"))
