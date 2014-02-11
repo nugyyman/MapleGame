@@ -8,7 +8,7 @@ using Loki.Maple.Data;
 
 namespace Loki.Maple.CashShop
 {
-    class UseCashItem
+    public class UseCashItem
     {
         public static void Handle(Character player, Packet inPacket)
         {

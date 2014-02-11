@@ -407,7 +407,7 @@ namespace Loki
 				StackTrace=False
 				LoadTime=False
 				JumpLists=3
-				PacketRecord=[recive/send, ExactPacketName]
+				PacketRecord=[receive/send, ExactPacketName]
 				
 				[Server]
 				World={1}

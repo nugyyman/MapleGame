@@ -69,7 +69,7 @@ namespace Loki.Maple.Shops
                 outPacket.WriteInt();
                 outPacket.WriteInt(this.ID);
 
-                outPacket.WriteByte(); //TODO: shop ranks
+                outPacket.WriteBool(false); //TODO: shop ranks
 
                 outPacket.WriteShort((short)this.Items.Count);
 
@@ -98,6 +98,8 @@ namespace Loki.Maple.Shops
                         outPacket.WriteShort(loopShopItem.Quantity);
                         outPacket.WriteShort(loopShopItem.MaxPerStack);
                     }
+
+                    outPacket.WriteBool(false); //rebuy item is true
 
                     //TODO: shop ranks
                 }

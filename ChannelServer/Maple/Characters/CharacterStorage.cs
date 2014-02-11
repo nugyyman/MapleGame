@@ -1,33 +1,22 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using Loki.Data;
 using Loki.Net;
 using Loki.Maple.Life;
 
 namespace Loki.Maple.Characters
 {
-    public class CharacterStorage
+    public class CharacterStorage : List<Item>
     {
         public Character Parent { get; private set; }
         public byte Slots { get; set; }
         public int Meso { get; set; }
-        public  StorageItem[] Items { get; set; }
         private Npc Npc { get; set; }
 
         public CharacterStorage(Character parent)
+            : base()
         {
             this.Parent = parent;
-            this.Items = new StorageItem[0];
-        }
-
-        public void ClearItems()
-        {
-            for (int i = 0; i < this.Items.Length; i++)
-            {
-                this.Items[i] = null;
-            }
         }
 
         public void Load()
@@ -44,13 +33,12 @@ namespace Loki.Maple.Characters
             {
                 this.Slots = datum.Slots;
                 this.Meso = datum.Meso;
-                this.Items = new StorageItem[this.Slots];
             }
 
-            this.ClearItems();
+            this.Clear();
             foreach (dynamic datum in new Datums("storage_items").Populate("AccountID = '{0}'", this.Parent.AccountID))
             {
-                this.Items[this.GetNextFreeSlot()] = new StorageItem(new Item(datum), true);
+                this.Add(new Item(datum));
             }
         }
 
@@ -69,15 +57,12 @@ namespace Loki.Maple.Characters
             datum.Meso = this.Meso;
             datum.Update("AccountID = '{0}'", this.Parent.AccountID);
 
-            foreach(StorageItem sItem in this.Items)
+            foreach (Item loopItem in this)
             {
-                if (sItem != null)
+                if (!loopItem.Assigned)
                 {
-                    if (!sItem.Assigned)
-                    {
-                        sItem.Assigned = true;
-                        sItem.Item.SaveToStorage(this.Parent);
-                    }
+                    loopItem.Assigned = true;
+                    loopItem.SaveToStorage(this.Parent);
                 }
             }
         }
@@ -97,11 +82,11 @@ namespace Loki.Maple.Characters
                 outPacket.WriteInt(0);
                 outPacket.WriteInt(this.Meso);
                 outPacket.WriteShort(0);
-                outPacket.WriteByte((byte)this.CountItems());
+                outPacket.WriteByte((byte)this.Count);
 
-                for (int i = 0; i < this.CountItems(); i++)
+                foreach (Item loopItem in this)
                 {
-                    outPacket.WriteBytes(this.Items[i].Item.ToByteArray(true));
+                    outPacket.WriteBytes(loopItem.ToByteArray(true));
                 }
 
                 outPacket.WriteShort(0);
@@ -111,27 +96,24 @@ namespace Loki.Maple.Characters
             }
         }
 
-        public void StoreItem(StorageItem sItem)
+        public void StoreItem(Item item)
         {
-            this.Items[this.GetNextFreeSlot()] = sItem;
+            this.Add(item);
 
             using (Packet outPacket = new Packet(MapleServerOperationCode.Storage))
             {
                 outPacket.WriteByte(0xD);
                 outPacket.WriteByte(this.Slots);
-                outPacket.WriteShort((short)(2 << (byte)sItem.Item.Type));
+                outPacket.WriteShort((short)(2 << (byte)item.Type));
                 outPacket.WriteShort(0);
                 outPacket.WriteInt(0);
-                outPacket.WriteByte((byte)this.CountTypeItems(sItem.Item.Type));
+                outPacket.WriteByte((byte)this.CountTypeItems(item.Type));
 
-                for (int i = 0; i < Items.Length; i++)
+                foreach (Item loopItem in this)
                 {
-                    if (this.Items[i] != null)
+                    if (loopItem.Type == item.Type)
                     {
-                        if (this.Items[i].Item.Type == sItem.Item.Type)
-                        {
-                            outPacket.WriteBytes(this.Items[i].Item.ToByteArray(true));
-                        }
+                        outPacket.WriteBytes(loopItem.ToByteArray(true));
                     }
                 }
 
@@ -141,25 +123,11 @@ namespace Loki.Maple.Characters
 
         public void TakeItem(ItemType type, sbyte slot)
         {
-            if (this.Items[slot].Assigned)
+            if (this[slot].Assigned)
             {
-                this.Items[slot].Item.DeleteFromStorage();
+                this[slot].DeleteFromStorage();
             }
-
-            while(this.Items[slot] != null)
-            {
-                if (slot == (sbyte)(this.Items.Length - 1))
-                {
-                    this.Items[slot] = null;
-                    break;
-                }
-                else
-                {
-                    this.Items[slot] = this.Items[slot + 1];
-                }
-
-                slot++;
-            }
+            this.RemoveAt(slot);
 
             using (Packet outPacket = new Packet(MapleServerOperationCode.Storage))
             {
@@ -170,14 +138,11 @@ namespace Loki.Maple.Characters
                 outPacket.WriteInt(0);
                 outPacket.WriteByte((byte)this.CountTypeItems(type));
 
-                for (int i = 0; i < this.Items.Length; i++)
+                foreach (Item loopItem in this)
                 {
-                    if (this.Items[i] != null)
+                    if (loopItem.Type == type)
                     {
-                        if (this.Items[i].Item.Type == type)
-                        {
-                            outPacket.WriteBytes(this.Items[i].Item.ToByteArray(true));
-                        }
+                        outPacket.WriteBytes(loopItem.ToByteArray(true));
                     }
                 }
 
@@ -204,12 +169,9 @@ namespace Loki.Maple.Characters
 
         public bool IsFull()
         {
-            foreach (StorageItem sItem in this.Items)
+            if (this.Count < this.Slots)
             {
-                if (sItem == null)
-                {
-                    return false;
-                }
+                return false;
             }
 
             using (Packet outPacket = new Packet(MapleServerOperationCode.Storage))
@@ -218,6 +180,7 @@ namespace Loki.Maple.Characters
 
                 this.Parent.Client.Send(outPacket);
             }
+
             return true;
         }
 
@@ -232,18 +195,25 @@ namespace Loki.Maple.Characters
                 case 4: // Take item
                     byte type = inPacket.ReadByte();
                     slot = (sbyte)inPacket.ReadByte();
-                    StorageItem sItem = this.Items[slot];
-                    if (sItem != null)
+                    item = this[slot];
+                    if (item != null)
                     {
-                        if (!this.Parent.Items.IsFull((ItemType)type))
+                        if (this.Parent.Map.MapleID == 910000000 || this.Parent.Map.MapleID == 910001000)
                         {
-                            sItem.Item.Slot = 0;
-                            this.Parent.Items.Add(sItem.Item);
-                            this.TakeItem((ItemType)type, slot);
+                            if (!this.Parent.Items.IsFull((ItemType)type))
+                            {
+                                item.Slot = 0;
+                                this.Parent.Items.Add(item);
+                                this.TakeItem((ItemType)type, slot);
+                            }
+                            else
+                            {
+                                this.Parent.Items.NotifyFull();
+                            }
                         }
                         else
                         {
-                            this.Parent.Items.NotifyFull();
+                            this.Parent.Notify("You don't have enough mesos to take the item");
                         }
                     }
                     break;
@@ -255,23 +225,28 @@ namespace Loki.Maple.Characters
                     item = this.Parent.Items[itemid, slot];
                     if (!this.IsFull())
                     {
-                        if(this.Parent.Meso >= this.Npc.StorageCost)
+                        if (this.Parent.Meso >= this.Npc.StorageCost)
                         {
                             if (quantity > 0 && item.Quantity >= quantity)
                             {
                                 if (item.Quantity != quantity)
                                 {
                                     this.Parent.Items.Remove(item.MapleID, quantity);
-                                    this.StoreItem(new StorageItem(new Item(item.MapleID, quantity), false));
+                                    this.StoreItem(new Item(item.MapleID, quantity));
                                 }
                                 else
                                 {
                                     this.Parent.Items.Remove(item, true);
-                                    this.StoreItem(new StorageItem(item, false));
+                                    item.Assigned = false;
+                                    this.StoreItem(item);
                                 }
 
                                 this.Parent.Meso -= this.Npc.StorageCost;
                             }
+                        }
+                        else
+                        {
+                            this.Parent.Notify("You don't have enough mesos to store the item");
                         }
                     }
                     break;
@@ -295,9 +270,7 @@ namespace Loki.Maple.Characters
                     {
                         if (this.Meso - meso < 0)
                         {
-                            Log.Inform(meso);
                             meso = -int.MaxValue + this.Meso;
-                            Log.Inform(meso);
                             if (-meso > this.Parent.Meso) return;
                         }
                     }
@@ -316,59 +289,19 @@ namespace Loki.Maple.Characters
             }
         }
 
-        public int CountItems()
-        {
-            int count = 0;
-
-            for (int i = 0; i < this.Items.Length; i++)
-            {
-                if (this.Items[i] != null)
-                {
-                    count++;
-                }
-            }
-            return count;
-        }
-
-        public sbyte GetNextFreeSlot()
-        {
-            for (sbyte i = 0; i < this.Items.Length; i++)
-            {
-                if (this.Items[i] == null)
-                {
-                    return i;
-                }
-            }
-            throw new InventoryFullException(); // Cant really happen..
-        }
-
         public int CountTypeItems(ItemType type)
         {
             int count = 0;
 
-            for (int i = 0; i < this.Items.Length; i++)
+            foreach (Item loopItem in this)
             {
-                if (this.Items[i] != null)
+                if (loopItem.Type == type)
                 {
-                    if (this.Items[i].Item.Type == type)
-                    {
-                        count++;
-                    }
+                    count++;
                 }
+                
             }
             return count;
-        }
-    }
-
-    public class StorageItem
-    {
-        public Item Item { get; private set; }
-        public bool Assigned { get; set; }
-
-        public StorageItem(Item item, bool assigned)
-        {
-            this.Item = item;
-            this.Assigned = assigned;
         }
     }
 }

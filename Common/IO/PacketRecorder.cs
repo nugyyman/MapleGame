@@ -18,26 +18,26 @@ namespace Loki.IO
             packets = Settings.GetString("Log/PacketRecord");
         }
 
-        public void Record(Packet packet, string from, bool recived)
+        public void Record(Packet packet, string from, bool received)
         {
             string operationCode = "NaP";
 
-            if (recived && !from.Equals("Channel"))
+            if (received && !from.Equals("Channel"))
             {
                 operationCode = ((MapleClientOperationCode)packet.OperationCode).ToString();
             }
-            else if (!recived && !from.Equals("Channel"))
+            else if (!received && !from.Equals("Channel"))
             {
                 operationCode = ((MapleServerOperationCode)packet.OperationCode).ToString();
             }
 
-            if (this.packets.Contains("[" + (recived ? "recive" : "send") + ", " + operationCode + "]"))
+            if (this.packets.Contains("[" + (received ? "receive" : "send") + ", " + operationCode + "]"))
             {
                 using (TextWriter fileWriter = new StreamWriter(Application.ExecutablePath + "PacketRecords.log", true))
                 {
                     StringBuilder sb = new StringBuilder();
 
-                    sb.Append(string.Format("[{0}] {1} packet {2} :\r\n", DateTime.Now.ToString(), (recived ? "Recived " : "Sent ") + operationCode, (recived ? "from " : "to ") + from));
+                    sb.Append(string.Format("[{0}] {1} packet {2} :\r\n", DateTime.Now.ToString(), (received ? "Received " : "Sent ") + operationCode, (received ? "from " : "to ") + from));
                     sb.Append('\n');
 
                     if (packet == null || packet.GetContent().Length == 0)
@@ -46,7 +46,7 @@ namespace Loki.IO
                     }
                     else
                     {
-                        if (recived)
+                        if (received)
                         {
                             sb.AppendFormat("{0:X2} ", packet.OperationCode);
                             sb.AppendFormat("{0:X2} ", "00");
