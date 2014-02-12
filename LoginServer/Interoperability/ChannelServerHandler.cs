@@ -355,23 +355,26 @@ namespace Loki.Interoperability
 
         public void SetCash(Packet inPacket)
         {
-            int accountID = inPacket.ReadInt();
+            int accountID = inPacket.ReadInt(), cash;
 
             dynamic datum = new Datum("accounts");
 
-            switch (inPacket.ReadByte())
+            cash = inPacket.ReadInt();
+            if (cash != 0)
             {
-                case 1:
-                    datum.CardNX = inPacket.ReadInt();
-                    break;
+                datum.CardNX = cash;
+            }
 
-                case 2:
-                    datum.MaplePoints = inPacket.ReadInt();
-                    break;
+            cash = inPacket.ReadInt();
+            if (cash != 0)
+            {
+                datum.MaplePoints = cash;
+            }
 
-                case 3:
-                    datum.PaypalNX = inPacket.ReadInt();
-                    break;
+            cash = inPacket.ReadInt();
+            if (cash != 0)
+            {
+                datum.PaypalNX = cash;
             }
 
             datum.Update("ID = '{0}'", accountID);

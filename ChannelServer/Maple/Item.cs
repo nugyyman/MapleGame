@@ -1253,20 +1253,20 @@ namespace Loki.Maple
                     buffer.WriteByte((byte)this.Potential); // 0/4 = No potential, 1/2/3 = Hidden potential, 5 = Rare, 6 = Epic, 7 = Unique
                     buffer.WriteByte(this.Stars); // stars
                     buffer.WriteShort(this.Potential1); // potential stat 1
-                    buffer.WriteShort(this.Potential2); // potential stat 2
-                    buffer.WriteShort(this.Potential3); // potential stat 3
-                    buffer.WriteShort(); // potential stat 4 ?
-                    buffer.WriteShort(); // potential stat 5 ?
+
+                    if (this.UniqueID == 0)
+                    {
+                        buffer.WriteShort(this.Potential2); // potential stat 2
+                        buffer.WriteShort(this.Potential3); // potential stat 3
+                        buffer.WriteShort(); // potential stat 4 ?
+                        buffer.WriteShort(); // potential stat 5 ?
+                    }
+
                     buffer.WriteShort();
                     buffer.WriteShort(-1);
                     buffer.WriteShort(-1);
                     buffer.WriteShort(-1);
-
-                    if (!this.IsEquippedCash && !this.IsCash)
-                    {
-                        buffer.WriteLong(-1);
-                    }
-
+                    buffer.WriteLong(-1);
                     buffer.WriteBytes(0x00, 0x40, 0xE0, 0xFD, 0x3B, 0x37, 0x4F, 0x01);
                     buffer.WriteInt(-1);
                 }

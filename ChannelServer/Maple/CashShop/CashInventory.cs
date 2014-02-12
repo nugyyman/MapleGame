@@ -32,9 +32,10 @@ namespace Loki.Maple.CashShop
 
             using (Packet outPacket = new Packet(MapleServerOperationCode.CashShopOperation))
             {
-                outPacket.WriteByte(0x77);
+                outPacket.WriteByte((byte)(CashShopOperation.Operation + 36));
                 outPacket.WriteShort((short)cash.Slot);
                 outPacket.WriteBytes(cash.ToByteArray(true));
+                outPacket.WriteInt();
 
                 this.Parent.Client.Send(outPacket);
             }
@@ -84,18 +85,33 @@ namespace Loki.Maple.CashShop
         {
             using (Packet outPacket = new Packet(MapleServerOperationCode.CashShopOperation))
             {
-                outPacket.WriteByte(0x58);
+                outPacket.WriteByte((byte)(CashShopOperation.Operation + 4));
                 outPacket.WriteShort((short)this.Count);
 
+                int equips = 0;
                 foreach(CashItem cashItem in this)
                 {
                     outPacket.WriteBytes(cashItem.ToByteArray(this.Parent.AccountID));
+
+                    if (cashItem.ToItem().Type == ItemType.Equipment)
+                    {
+                        //equips++; I have no idea what this is in lithium
+                    }
+                }
+
+                outPacket.WriteInt(equips);
+                foreach(CashItem  cashItem in this)
+                {
+                    if (cashItem.ToItem().Type == ItemType.Equipment)
+                    {
+                        outPacket.WriteBytes(cashItem.ToItem().ToByteArray());
+                    }
                 }
 
                 outPacket.WriteShort(); // Storage slots
                 outPacket.WriteShort(); // Character slots
                 outPacket.WriteShort();
-                outPacket.WriteShort();
+                outPacket.WriteShort(4);
 
                 this.Parent.Client.Send(outPacket);
             }

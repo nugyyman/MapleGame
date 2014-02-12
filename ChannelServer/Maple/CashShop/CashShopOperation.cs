@@ -10,14 +10,16 @@ namespace Loki.Maple.CashShop
 {
     public class CashShopOperation
     {
-        public static void Handle(Character player, Packet inPacket)
+        public static byte Operation = 94;
+
+        public static void Handle(Character costumer, Packet inPacket)
         {
-            if (!player.CashShop.Open)
+            if (!costumer.CashShop.Open)
             {
                 return;
             }
 
-            CharacterCashShop cs = player.CashShop;
+            CharacterCashShop cs = costumer.CashShop;
             byte action = inPacket.ReadByte();
             CashItem cashItem = null;
             Item item = null;
@@ -26,7 +28,7 @@ namespace Loki.Maple.CashShop
             switch (action)
             {
                 case 0x03: // Buy item
-                case 0x20: // Buy packege
+                case 0x22: // Buy packege
                     inPacket.Skip(1);
                     cash = inPacket.ReadInt();
                     try
@@ -38,19 +40,19 @@ namespace Loki.Maple.CashShop
                         cashItem = null;
                     }
 
-                    if (!CanBuy(cashItem, player, cash)) return;
+                    if (!CanBuy(cashItem, costumer, cash)) return;
 
                     if (action == 0x03) // Item
                     {
                         cashItem.UniqueID = cs.CashInventory.GenerateUniqueID();
-                        player.CashShop.CashInventory.Add(cashItem);
+                        costumer.CashShop.CashInventory.Add(cashItem);
 
                         using (Packet outPacket = new Packet(MapleServerOperationCode.CashShopOperation))
                         {
-                            outPacket.WriteByte(0x64);
-                            outPacket.WriteBytes(cashItem.ToByteArray(player.AccountID));
+                            outPacket.WriteByte((byte)(Operation + 17));
+                            outPacket.WriteBytes(cashItem.ToByteArray(costumer.AccountID));
 
-                            player.Client.Send(outPacket);
+                            costumer.Client.Send(outPacket);
                         }
                     }
                     else // Package
@@ -69,27 +71,27 @@ namespace Loki.Maple.CashShop
                         foreach (CashItem cItem in package)
                         {
                             cItem.UniqueID = cs.CashInventory.GenerateUniqueID();
-                            player.CashShop.CashInventory.Add(cItem);
+                            costumer.CashShop.CashInventory.Add(cItem);
                         }
 
                         using (Packet outPacket = new Packet(MapleServerOperationCode.CashShopOperation))
                         {
-                            outPacket.WriteByte(0x9A);
+                            outPacket.WriteByte((byte)(Operation + 71));
                             outPacket.WriteByte((byte)package.Count);
 
                             foreach (CashItem cItem in package)
                             {
-                                outPacket.WriteBytes(cItem.ToByteArray(player.AccountID));
+                                outPacket.WriteBytes(cItem.ToByteArray(costumer.AccountID));
                             }
 
                             outPacket.WriteShort();
 
-                            player.Client.Send(outPacket);
+                            costumer.Client.Send(outPacket);
                         }  
                     }
 
-                    player.GainCash((byte)cash, -cashItem.Price);
-                    player.CashShop.ShowCash();
+                    costumer.GainCash((byte)cash, -cashItem.Price);
+                    costumer.CashShop.ShowCash();
                     break;
 
                 case 0x04: // Gift
@@ -118,26 +120,26 @@ namespace Loki.Maple.CashShop
 
                     if (inPacket.ReadByte() == 0)
                     {
-                        if (player.GetCash((byte)cash) < 4000)
+                        if (costumer.GetCash((byte)cash) < 4000)
                         {
                             return;
                         }
 
                         byte type = inPacket.ReadByte();
 
-                        if (player.GainInventorySlots((ItemType)type, 4, false))
+                        if (costumer.GainInventorySlots((ItemType)type, 4, false))
                         {
                             using (Packet outPacket = new Packet(MapleServerOperationCode.CashShopOperation))
                             {
-                                outPacket.WriteByte(0x6D);
+                                outPacket.WriteByte((byte)(Operation + 26));
                                 outPacket.WriteByte(type);
-                                outPacket.WriteShort(player.Items.MaxSlots[(ItemType)type]);
+                                outPacket.WriteShort(costumer.Items.MaxSlots[(ItemType)type]);
 
-                                player.Client.Send(outPacket);
+                                costumer.Client.Send(outPacket);
                             }
 
-                            player.GainCash((byte)cash, -4000);
-                            player.CashShop.ShowCash();
+                            costumer.GainCash((byte)cash, -4000);
+                            costumer.CashShop.ShowCash();
                         }
                     }
                     break;
@@ -164,35 +166,48 @@ namespace Loki.Maple.CashShop
                 case 0x0F: // Put into cash inventory
                     uniqueID = inPacket.ReadInt();
                     inPacket.Skip(4);
-                    item = player.Items[uniqueID, (ItemType)inPacket.ReadByte()];
+                    item = costumer.Items[uniqueID, (ItemType)inPacket.ReadByte()];
 
                     if (item != null)
                     {
-                        player.Items.Remove(item, false);
+                        costumer.Items.Remove(item, false);
                         cashItem = new CashItem(item.SerialNumber);
                         cashItem.UniqueID = item.UniqueID;
                         cs.CashInventory.Add(cashItem);
 
                         using (Packet outPacket = new Packet(MapleServerOperationCode.CashShopOperation))
                         {
-                            outPacket.WriteByte(0x79);
-                            outPacket.WriteBytes(cashItem.ToByteArray(player.AccountID));
+                            outPacket.WriteByte((byte)(Operation + 38));
+                            outPacket.WriteBytes(cashItem.ToByteArray(costumer.AccountID));
 
-                            player.Client.Send(outPacket);
+                            costumer.Client.Send(outPacket);
                         }
                     }
                     break;
 
-                case 0x1F: // Buy crush ring
+                case 0x20: // Buy crush ring
                     break;
 
-                case 0x22: // Buy 1 meso item
+                case 0x23: // Buy 1 meso item
                     break;
 
-                case 0x25: // Buy friendship ring
+                case 0x26: // Buy friendship ring
+                    break;
+
+                case 0x2F: // I have no idea what this is
+                    using (Packet outPacket = new Packet(MapleServerOperationCode.CashShopOperation))
+                    {
+                        outPacket.WriteInt();
+                        outPacket.WriteBool(true);
+
+                        costumer.Client.Send(outPacket);
+                    }
                     break;
 
                 case 0x2C: // New tab
+                    break;
+
+                case 0x61: // Open random box
                     break;
 
                 default:

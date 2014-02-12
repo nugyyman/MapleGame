@@ -37,11 +37,11 @@ namespace Loki.Maple.Commands.Implementation
             }
         }
 
-        static byte[] StringToByteArray(string[] args)
+        public static byte[] StringToByteArray(string[] args, int start = 1)
         {
             using (ByteBuffer buffer = new ByteBuffer())
             {
-                for (int i = 1; i < args.Length; i++)
+                for (int i = start; i < args.Length; i++)
                 {
                     buffer.WriteByte(byte.Parse(args[i], System.Globalization.NumberStyles.HexNumber));
                 }

@@ -86,15 +86,7 @@ namespace Loki.Maple.CashShop
         {
             using (Packet outPacket = new Packet(MapleServerOperationCode.CashShopOperation))
             {
-                if (update)
-                {
-                    outPacket.WriteByte(0x62);
-                }
-                else
-                {
-                    outPacket.WriteByte(0x5C);
-                }
-
+                outPacket.WriteByte((byte)(CashShopOperation.Operation + (update ? 15 : 8)));
                 outPacket.WriteBytes(this.ToByteArray(true));
 
                 this.Parent.Client.Send(outPacket);

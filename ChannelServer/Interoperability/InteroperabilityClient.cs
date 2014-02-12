@@ -459,13 +459,14 @@ namespace Loki.Interoperability
             return this.CashPool.Dequeue(accountID);
         }
 
-        public void SetCash(int accountID, byte type, int cash)
+        public void SetCash(int accountID, int nx, int maplepoints, int paypal)
         {
             using (Packet outPacket = new Packet(InteroperabilityOperationCode.SetCashRequest))
             {
                 outPacket.WriteInt(accountID);
-                outPacket.WriteByte(type);
-                outPacket.WriteInt(cash);
+                outPacket.WriteInt(nx);
+                outPacket.WriteInt(maplepoints);
+                outPacket.WriteInt(paypal);
 
                 this.Send(outPacket);
             }

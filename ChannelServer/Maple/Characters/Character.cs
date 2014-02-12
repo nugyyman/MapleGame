@@ -838,41 +838,11 @@ namespace Loki.Maple.Characters
             }
         }
 
-        public int CardNX
-        {
-            get
-            {
-                return ChannelServer.LoginServerConnection.GetCash(this.AccountID, 1);
-            }
-            set
-            {
-                ChannelServer.LoginServerConnection.SetCash(this.AccountID, 1, value);
-            }
-        }
+        public int CardNX { get; set; }
 
-        public int MaplePoints
-        {
-            get
-            {
-                return ChannelServer.LoginServerConnection.GetCash(this.AccountID, 2);
-            }
-            set
-            {
-                ChannelServer.LoginServerConnection.SetCash(this.AccountID, 2, value);
-            }
-        }
+        public int MaplePoints { get; set; }
 
-        public int PaypalNX
-        {
-            get
-            {
-                return ChannelServer.LoginServerConnection.GetCash(this.AccountID, 3);
-            }
-            set
-            {
-                ChannelServer.LoginServerConnection.SetCash(this.AccountID, 3, value);
-            }
-        }
+        public int PaypalNX { get; set; }
 
         public int GetCash(byte cash)
         {
@@ -1031,6 +1001,10 @@ namespace Loki.Maple.Characters
 
             if (initialize)
             {
+                this.CardNX = ChannelServer.LoginServerConnection.GetCash(this.AccountID, 1);
+                this.MaplePoints = ChannelServer.LoginServerConnection.GetCash(this.AccountID, 2);
+                this.PaypalNX = ChannelServer.LoginServerConnection.GetCash(this.AccountID, 3);
+
                 this.Skills.Load();
                 this.Buffs.Load();
                 this.Quests.Load();
@@ -1095,6 +1069,8 @@ namespace Loki.Maple.Characters
 
                 this.Assigned = true;
             }
+
+            ChannelServer.LoginServerConnection.SetCash(this.AccountID, this.CardNX, this.MaplePoints, this.PaypalNX);
 
             this.Items.Save();
             this.Skills.Save();

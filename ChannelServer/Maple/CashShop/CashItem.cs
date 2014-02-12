@@ -108,6 +108,7 @@ namespace Loki.Maple.CashShop
 
                 buffer.WriteLong((long)ExpirationTime.DefaultTime);
                 buffer.WriteLong();
+                buffer.Skip(10);
 
                 buffer.Flip();
                 return buffer.GetContent();

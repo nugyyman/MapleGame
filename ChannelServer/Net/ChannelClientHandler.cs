@@ -276,6 +276,7 @@ namespace Loki.Net
                 outPacket.WriteBool(true); // UNK: What does false do?
                 outPacket.WriteBytes(ChannelServer.RemoteEndPoint.Address.GetAddressBytes());
                 outPacket.WriteShort(ChannelServer.LoginServerConnection.GetChannelPort((byte)(channelID - 1)));
+                outPacket.WriteByte();
 
                 this.Send(outPacket);
             }
