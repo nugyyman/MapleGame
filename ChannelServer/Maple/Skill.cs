@@ -385,8 +385,29 @@ namespace Loki.Maple
             {
                 outPacket.WriteByte(effect);
                 outPacket.WriteInt(this.MapleID);
-                outPacket.WriteByte(0xA9);
-                outPacket.WriteByte(1);
+                outPacket.WriteByte((byte)(character.Level - 1));
+
+                if (effect == 2 && this.MapleID == 31111003)
+                {
+                    outPacket.WriteInt(0); // idk
+                }
+
+                outPacket.WriteByte(this.CurrentLevel);
+
+                if (direction != (byte)3 || this.MapleID == 1320006 || this.MapleID == 30001062 || this.MapleID == 30001061)
+                {
+                    outPacket.WriteByte(direction);
+                    // 0: Monster successfully captured.
+                    // 1: Capture failed. Monster HP too high.
+                    // 2: Monster cannot be captured.
+                }
+
+                if (this.MapleID == 30001062)
+                { // Call Of hunter
+                    outPacket.WriteInt(0); // position of monster spawned
+                }
+
+                outPacket.Skip(10);
 
                 character.Client.Send(outPacket);
             }
@@ -395,23 +416,31 @@ namespace Loki.Maple
             {
                 outPacket.WriteInt(character.ObjectID);
 
-                if (this.MapleID == (int)SkillNames.Buccaneer.SuperTransformation || this.MapleID == (int)SkillNames.Marauder.Transformation || this.MapleID == (int)SkillNames.WindArcher3.EagleEye || this.MapleID == (int)SkillNames.ThunderBreaker3.Transformation)
-                {
-                    outPacket.WriteByte(1);
-                    outPacket.WriteInt(this.MapleID);
-                    outPacket.WriteByte(direction);
-                }
-                else
-                {
-                    outPacket.WriteByte(effect); //buff level
-                    outPacket.WriteInt(this.MapleID);
-                    outPacket.WriteByte(1);
+                outPacket.WriteByte(effect);
+                outPacket.WriteInt(this.MapleID);
+                outPacket.WriteByte((byte)(character.Level - 1));
 
-                    if (direction != (byte)3)
-                    {
-                        outPacket.WriteByte(direction);
-                    }
+                if (effect == 2 && this.MapleID == 31111003)
+                {
+                    outPacket.WriteInt(0); // idk
                 }
+
+                outPacket.WriteByte(this.CurrentLevel);
+
+                if (direction != (byte)3 || this.MapleID == 1320006 || this.MapleID == 30001062 || this.MapleID == 30001061)
+                {
+                    outPacket.WriteByte(direction);
+                    // 0: Monster successfully captured.
+                    // 1: Capture failed. Monster HP too high.
+                    // 2: Monster cannot be captured.
+                }
+
+                if (this.MapleID == 30001062)
+                { // Call Of hunter
+                    outPacket.WriteInt(0); // position of monster spawned
+                }
+
+                outPacket.Skip(10);
 
                 character.Map.Broadcast(character, outPacket);
             }
