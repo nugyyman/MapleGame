@@ -32,3 +32,8 @@ OdinMS developers that I learned a lot from their code, mostly about how stuff w
 Hendi48 helped me a LOT, really everytime I needed  
 Diamondo25 also helped me with a lot of things  
 Some source that I took packets from (moople, xeonms, lithium)  
+
+Tools for MCDB:   
+Hendi's WZ explorer - http://subversion.assembla.com/svn/WZExplorer/  
+My MCDBTool - https://hostr.co/Exs7vZohFnpQ   
+Note: use both for all the tables MapleGame uses.
